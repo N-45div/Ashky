@@ -14,8 +14,9 @@ def test_gemini_agentic_inspection_direct():
     assert res.status_code == 200
     data = res.json()
     assert data["campaign_id"] == "test_camp_direct_001"
-    assert "gemini-2.0-flash" in data["gemini_model"]
+    assert "gemini-3.5-flash" in data["gemini_model"]
     assert data["token_reduction_pct"] >= 80.0
+
     assert data["cost_savings_pct"] >= 60.0
     assert len(data["active_inspections"]) >= 3
     assert data["active_inspections"][0]["inspection_type"] == "hook_interrupt"

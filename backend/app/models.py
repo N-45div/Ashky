@@ -128,8 +128,9 @@ class GeminiKeyframeInspection(BaseModel):
 
 class GeminiAgenticVideoAnalysis(BaseModel):
     campaign_id: str
-    gemini_model: str = "gemini-2.0-flash (Agentic Multimodal)"
+    gemini_model: str = "gemini-3.5-flash (Agentic Multimodal)"
     token_reduction_pct: float = 88.0
+
     cost_savings_pct: float = 66.0
     tokens_consumed: int = 2450
     static_ingestion_baseline_tokens: int = 20400

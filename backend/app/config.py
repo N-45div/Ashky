@@ -1,10 +1,14 @@
 import os
 from typing import Optional
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 from pydantic import ConfigDict
 
+load_dotenv()
+
 class Settings(BaseSettings):
     model_config = ConfigDict(env_file=".env", extra="allow")
+
 
     APP_NAME: str = "Ashky"
     APP_VERSION: str = "1.0.0"
@@ -12,10 +16,11 @@ class Settings(BaseSettings):
     PORT: int = 8000
     HOST: str = "0.0.0.0"
 
-    # Google Gemini API
+    # Google Gemini API (Agentic Video Understanding)
     GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY", "")
-    GEMINI_MODEL: str = "gemini-2.0-flash"
-    GEMINI_VISION_MODEL: str = "gemini-2.0-flash"
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
+    GEMINI_VISION_MODEL: str = os.getenv("GEMINI_VISION_MODEL", "gemini-3.5-flash")
+
 
     # Grafana Cloud Settings
     GRAFANA_CLOUD_URL: Optional[str] = os.getenv("GRAFANA_CLOUD_URL", "")

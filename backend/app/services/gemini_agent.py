@@ -139,9 +139,10 @@ class GeminiAgenticVideoEngine:
                 prompt = (
                     f"Perform an agentic video understanding audit on the following video campaign blueprint:\n"
                     f"Product: {blueprint.product_name}\n"
-                    f"Scenes: {json.dumps([s.dict() for s in blueprint.scenes])}\n"
+                    f"Scenes: {json.dumps([s.model_dump() for s in blueprint.scenes])}\n"
                     f"Evaluate: 3-second hook drop-off %, brand clarity, and token efficiency."
                 )
+
                 response = self.model.generate_content(prompt)
                 if response and response.text:
                     log_collector.record_log("INFO", "gemini_agent", "Live Gemini Agentic audit completed successfully")
