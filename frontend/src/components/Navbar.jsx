@@ -3,6 +3,7 @@ import { Film, Search, BarChart3, Bot, Sparkles, Activity, ShieldCheck } from 'l
 
 export default function Navbar({ activeTab, setActiveTab, sidecarOpen, setSidecarOpen, systemHealthy = true }) {
   const navItems = [
+    { id: 'landing', label: 'Overview', icon: Sparkles, badge: 'Home' },
     { id: 'video_studio', label: 'Progressive Video Studio', icon: Film, badge: 'FirstFrame UX' },
     { id: 'geo_optimizer', label: 'AI Search Optimizer (GEO)', icon: Search, badge: 'ChatGPT • Gemini' },
     { id: 'observability', label: 'Grafana Telemetry & SRE', icon: BarChart3, badge: 'Prometheus • MCP' }
@@ -13,7 +14,7 @@ export default function Navbar({ activeTab, setActiveTab, sidecarOpen, setSideca
       position: 'sticky',
       top: 0,
       zIndex: 50,
-      background: 'rgba(6, 7, 10, 0.82)',
+      background: 'rgba(6, 7, 10, 0.88)',
       backdropFilter: 'blur(16px)',
       WebkitBackdropFilter: 'blur(16px)',
       borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
@@ -29,7 +30,10 @@ export default function Navbar({ activeTab, setActiveTab, sidecarOpen, setSideca
         gap: '20px'
       }}>
         {/* Brand Logo & Tagline */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div 
+          onClick={() => setActiveTab('landing')}
+          style={{ display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer' }}
+        >
           <div style={{
             width: '42px',
             height: '42px',
@@ -74,6 +78,7 @@ export default function Navbar({ activeTab, setActiveTab, sidecarOpen, setSideca
             </p>
           </div>
         </div>
+
 
         {/* Engine Navigation Tabs */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(14, 16, 23, 0.7)', padding: '4px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>

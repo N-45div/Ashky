@@ -5,13 +5,24 @@ import {
   CheckCircle2, Clock, Eye, AlertTriangle, ChevronRight, Layers, ArrowUpRight, Film
 } from 'lucide-react';
 
-export default function VideoStudio() {
+export default function VideoStudio({ initialPreset }) {
   const [presets, setPresets] = useState([]);
-  const [productName, setProductName] = useState('LaunchFlow');
-  const [productPitch, setProductPitch] = useState('Autonomous customer onboarding & interactive walkthrough agent that triples free-to-paid conversion for SaaS founders.');
-  const [category, setCategory] = useState('B2B SaaS');
-  const [aspectRatio, setAspectRatio] = useState('9:16');
-  const [style, setStyle] = useState('Kinetic High-Tech Dark');
+  const [productName, setProductName] = useState(initialPreset?.product_name || 'LaunchFlow');
+  const [productPitch, setProductPitch] = useState(initialPreset?.product_pitch || 'Autonomous customer onboarding & interactive walkthrough agent that triples free-to-paid conversion for SaaS founders.');
+  const [category, setCategory] = useState(initialPreset?.category || 'B2B SaaS');
+  const [aspectRatio, setAspectRatio] = useState(initialPreset?.aspect_ratio || '9:16');
+  const [style, setStyle] = useState(initialPreset?.style || 'Kinetic High-Tech Dark');
+
+  useEffect(() => {
+    if (initialPreset) {
+      if (initialPreset.product_name) setProductName(initialPreset.product_name);
+      if (initialPreset.product_pitch) setProductPitch(initialPreset.product_pitch);
+      if (initialPreset.category) setCategory(initialPreset.category);
+      if (initialPreset.aspect_ratio) setAspectRatio(initialPreset.aspect_ratio);
+      if (initialPreset.style) setStyle(initialPreset.style);
+    }
+  }, [initialPreset]);
+
 
   const [generating, setGenerating] = useState(false);
   const [pipelineProgress, setPipelineProgress] = useState(0);
