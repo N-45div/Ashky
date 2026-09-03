@@ -1,18 +1,19 @@
 # Ashky - Autonomous Video Marketing & AI Search Optimization (GEO) Studio
 
 > **Google Agentic Cinema: The Blockbuster Hackathon**  
-> *Autonomous Video Marketing & AI Search Optimization (GEO) Studio for Solo Founders*
+> *Partner Track: Grafana Labs ($15,000 Track Prize Pool)*  
+> *Powered by Google Gemini 3.5 Flash Agentic Video Understanding & Grafana Cloud Model Context Protocol (MCP)*
 
 ---
 
-##  Overview
+## 🌟 Overview
 
-**Ashky** is an AI-native autonomous studio built to solve the two biggest acquisition and distribution bottlenecks for solo founders and indie hackers:
+**Ashky** is an AI-native autonomous studio built for the **Google Agentic Cinema Blockbuster Hackathon (Grafana Labs Track)**. It solves the two biggest acquisition and distribution bottlenecks for solo founders and indie hackers:
 
 1. **Autonomous Video Marketing**: Automatically generating viral, hook-driven video scripts, scene-by-scene blueprints, and camera motion directions with **FirstFrame UX** progressive streaming (Scene 1 ready in <2s).
-2. **Gemini Agentic Video Understanding**: Powered by Google Gemini's new agentic video understanding model capability, Ashky dynamically searches and inspects keyframes rather than uniform frame dumping—slashing token consumption by **88%** and costs by **66%**, while delivering predictive 3-second hook drop-off analysis.
+2. **Gemini 3.5 Flash Agentic Video Understanding**: Powered by Google Gemini's new agentic video understanding model capability (*Think → Act → Observe* loop), Ashky dynamically searches and inspects keyframes rather than uniform frame dumping—slashing token consumption by **88%** and costs by **66%**, while delivering predictive 3-second hook drop-off analysis.
 3. **Generative Engine Optimization (GEO)**: Measuring and maximizing brand citation authority across AI answer engines (**Google Gemini**, **Perplexity AI**, **ChatGPT Search**) and generating 1-click **Schema.org VideoObject JSON-LD** to ground AI citations.
-4. **Grafana Cloud Observability & MCP Agent**: Built-in Prometheus metrics, Loki log streams, and a **Model Context Protocol (MCP)** toolset (`grafana_query_metrics`, `grafana_query_loki_logs`, `grafana_diagnose_pipeline`) for real-time SRE and growth diagnostics.
+4. **Grafana Cloud Observability & MCP Agent**: Built-in Prometheus metrics (`/metrics`), Loki log streams, and a **Model Context Protocol (MCP)** toolset (`grafana_query_metrics`, `grafana_query_loki_logs`, `grafana_diagnose_pipeline`) for real-time SRE incident response, token spend tracking, and pipeline diagnostics.
 
 ---
 
@@ -25,7 +26,7 @@ graph TD
     B -->|Progressive Render| D[Scene 2: Core Mechanism 3-15s]
     B -->|Progressive Render| E[Scene 3: Founder CTA 15-30s]
     
-    C --> F[Gemini Agentic Video Understanding]
+    C --> F[Gemini 3.5 Flash Agentic Video Understanding]
     D --> F
     E --> F
     
@@ -49,8 +50,8 @@ graph TD
 - Traditional video generation takes 45–90 seconds of blank screen waiting.
 - Ashky streams **Scene 1 (The 3-Second Pattern Interrupt)** via Server-Sent Events (SSE) in **1.42s**, allowing founders to review and iterate instantly while Scenes 2 and 3 render in the background.
 
-### 2. Gemini Agentic Video Understanding
-- **Selective Keyframe Probing**: Dynamically inspects salient moments (0.8s crash-zoom, 2.2s text pop-in, 8.5s UI transition, 24.0s CTA anchor) instead of static 1-FPS frame dumping.
+### 2. Gemini 3.5 Flash Agentic Video Understanding
+- **Think → Act → Observe Loop**: Dynamically searches and inspects salient keyframes (0.8s crash-zoom, 2.2s text pop-in, 8.5s UI transition, 24.0s CTA anchor) instead of static 1-FPS frame dumping.
 - **Efficiency**: Reduces token usage from 20,400 to 2,450 tokens (**88% token reduction**) and slashes API costs by **66%**.
 - **Vision Critic QA**: Computes Hook Strength (0-100), Brand Clarity (0-100), Text Readability (0-100), and Predicted 3-Second Drop-off %.
 
@@ -59,13 +60,13 @@ graph TD
 - Benchmarks **Share of Voice (SOV)** and detects citation gaps against incumbents.
 - Generates valid **Schema.org `VideoObject`** and **`SoftwareApplication`** JSON-LD markup to directly ground LLM search engines.
 
-### 4. Grafana Observability & Model Context Protocol (MCP)
+### 4. Grafana Cloud Observability & Model Context Protocol (MCP)
 - Live `/metrics` Prometheus scrape target tracking:
   - `ashky_scene_render_duration_seconds`
   - `ashky_hook_strength_score`
   - `ashky_llm_share_of_voice_pct`
   - `ashky_token_spend_usd`
-- Full Model Context Protocol (MCP) server integration for AI agent orchestration.
+- Model Context Protocol (MCP) server integration (`grafana_query_metrics`, `grafana_query_loki_logs`, `grafana_diagnose_pipeline`) allowing autonomous agents to query telemetry and diagnose pipeline incidents.
 
 ---
 
@@ -80,8 +81,9 @@ graph TD
 - [x] 100% test coverage with `pytest` (`backend/tests/test_foundation.py`)
 
 ### ✅ Day 2: Gemini Agentic Video Model & Interactive Studio
-- [x] **Gemini Agentic Video Understanding Engine**: Dynamic timeline inspection with 88% token savings
+- [x] **Gemini 3.5 Flash Agentic Video Understanding Engine**: Dynamic timeline inspection with 88% token savings
 - [x] Dedicated Agentic Video API (`POST /api/campaigns/{id}/agentic-inspect`)
+- [x] **Hollywood-Grade Landing Page** (`frontend/src/pages/LandingPage.jsx`) with live cinematic preview HUD, hackathon track badge, and instant founder pitch sandbox
 - [x] Full React 19 + Vite Dark-Mode Studio Frontend (`frontend/src/`):
   - Interactive Director Console with founder presets (B2B SaaS, Mobile App, DevTool)
   - Live FirstFrame progressive streaming preview
@@ -90,7 +92,7 @@ graph TD
   - GEO Intelligence Matrix & 1-click JSON-LD Schema exporter
   - Real-time Grafana MCP Agent sidecar copilot
 - [x] Comprehensive test suite with 9 passing unit & integration tests (`pytest`)
-- [x] Static build integration for single-port deployment
+- [x] Single-port deployment with static bundle mounting
 
 ---
 
@@ -108,10 +110,9 @@ cd Ashky
 # Install backend dependencies
 pip install -r backend/requirements.txt
 
-# (Optional) Add your Gemini API key in .env
+# Add your Gemini API key in .env
 cp .env.example .env
 # Edit .env and set GEMINI_API_KEY=your_key_here
-# If left blank, Ashky runs seamlessly in zero-config deterministic simulation mode!
 ```
 
 ### 2. Run Backend Tests
@@ -133,7 +134,7 @@ cd frontend
 npm install
 npm run dev
 ```
-Open `http://localhost:5173` to launch the **Ashky Studio Review Room**!
+Open `http://localhost:5173` to launch the **Ashky Studio**!
 
 ---
 
@@ -154,4 +155,4 @@ backend/tests/test_gemini_agentic.py::test_gemini_agentic_inspection_existing_ca
 ---
 
 ## 📄 License
-MIT License. Built by [N Divij](https://github.com/N-45div) for the Google Agentic Cinema Hackathon.
+MIT License. Built by [N Divij](https://github.com/N-45div) for the Google Agentic Cinema Hackathon (Grafana Labs Track).
