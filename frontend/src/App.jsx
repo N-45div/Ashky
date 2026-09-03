@@ -21,11 +21,7 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', background: '#06070a' }}>
-      {/* Cinematic Ambient Glows */}
-      <div className="ambient-glow-top" />
-      <div className="ambient-glow-bottom" />
-
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', background: 'var(--bg-canvas)' }}>
       {/* Top Glass Navigation */}
       <Navbar
         activeTab={activeTab}
@@ -59,21 +55,21 @@ export default function App() {
 
       {/* Footer */}
       <footer style={{
-        padding: '28px 24px',
-        borderTop: '1px solid rgba(255, 255, 255, 0.07)',
+        padding: '24px 28px',
+        borderTop: '1px solid var(--border-subtle)',
         textAlign: 'center',
-        fontSize: '0.82rem',
+        fontSize: '0.8rem',
         color: 'var(--text-muted)',
         position: 'relative',
         zIndex: 10,
-        background: 'rgba(6, 7, 10, 0.95)'
+        background: 'var(--bg-surface-1)'
       }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <p style={{ margin: 0, color: '#f8fafc', fontWeight: 600 }}>
-            🎬 <strong>Ashky Studio</strong> — Built for the <em>Google Agentic Cinema Blockbuster Hackathon</em> (Grafana Labs Track)
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <p style={{ margin: 0, color: '#e2e8f0', fontWeight: 600 }}>
+            Ashky Studio — Google Agentic Cinema Blockbuster Hackathon (Grafana Labs Track)
           </p>
-          <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            Powered by Google Gemini 3.5 Flash Agentic Video Understanding & Grafana Cloud Model Context Protocol (MCP)
+          <p style={{ margin: 0, fontSize: '0.74rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+            Google Gemini 3.5 Flash Agentic Video Engine • Grafana Cloud Model Context Protocol (MCP)
           </p>
         </div>
       </footer>

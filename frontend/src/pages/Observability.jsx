@@ -27,67 +27,68 @@ export default function Observability({ onOpenSidecar }) {
   }, []);
 
   return (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px 28px', display: 'flex', flexDirection: 'column', gap: '28px' }}>
+      
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-            <span className="badge-mcp">
-              <Activity size={12} /> GRAFANA LABS PARTNER TRACK HOOK
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <span className="tag-minimal tag-amber">
+              <Activity size={12} /> GRAFANA LABS PARTNER TRACK
             </span>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
               Model Context Protocol (MCP) • Prometheus Metrics • Loki Log Stream
             </span>
           </div>
-          <h1 style={{ fontSize: '2.4rem', fontWeight: 800 }}>
-            Grafana Cloud <span className="gradient-text-amber">Observability & SRE</span>
+          <h1 style={{ fontSize: '2.1rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+            Grafana Observability & SRE
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginTop: '6px', maxWidth: '720px' }}>
-            Full pipeline observability tracking real-time LLM Share of Voice, sub-2s FirstFrame rendering latency, token consumption, and autonomous SRE agent diagnosis.
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.94rem', marginTop: '4px', maxWidth: '680px' }}>
+            Telemetry tracking real-time LLM Share of Voice, FirstFrame render latency, token consumption, and autonomous SRE agent diagnosis.
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={fetchTelemetry} className="btn-cinema-secondary">
-            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+          <button onClick={fetchTelemetry} className="btn-matte-dark">
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             <span>Refresh Metrics</span>
           </button>
-          <button onClick={onOpenSidecar} className="btn-cinema-primary" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', color: '#000' }}>
-            <Wrench size={15} />
+          <button onClick={onOpenSidecar} className="btn-solid-white">
+            <Terminal size={14} />
             <span>Launch SRE Copilot</span>
           </button>
         </div>
       </div>
 
       {/* Primary KPI Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '18px' }}>
-        <div className="glass-panel" style={{ padding: '20px', borderLeft: '4px solid #8b5cf6' }}>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>SCENE 1 RENDER LATENCY</span>
-          <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#c084fc', marginTop: '4px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+        <div className="matte-panel" style={{ padding: '16px', background: '#0d0f14', borderLeft: '3px solid #34d399' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>SCENE 1 RENDER LATENCY</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#34d399', marginTop: '4px' }}>
             {snapshot?.avg_scene1_render_latency_ms || 1420} ms
           </div>
-          <span style={{ fontSize: '0.72rem', color: '#34d399' }}>✓ Meets FirstFrame sub-2s SLA</span>
+          <span style={{ fontSize: '0.72rem', color: '#34d399' }}>Meets sub-2s FirstFrame SLA</span>
         </div>
 
-        <div className="glass-panel" style={{ padding: '20px', borderLeft: '4px solid #10b981' }}>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>AVG HOOK RETENTION</span>
-          <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#34d399', marginTop: '4px' }}>
+        <div className="matte-panel" style={{ padding: '16px', background: '#0d0f14', borderLeft: '3px solid #60a5fa' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>AVG HOOK RETENTION</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#60a5fa', marginTop: '4px' }}>
             {snapshot?.avg_hook_strength_score || 88.5} / 100
           </div>
-          <span style={{ fontSize: '0.72rem', color: '#34d399' }}>Vision Critic: 82% 3s retention</span>
+          <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Vision Critic: 82% 3s retention</span>
         </div>
 
-        <div className="glass-panel" style={{ padding: '20px', borderLeft: '4px solid #3b82f6' }}>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>LLM SHARE OF VOICE</span>
-          <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#60a5fa', marginTop: '4px' }}>
+        <div className="matte-panel" style={{ padding: '16px', background: '#0d0f14', borderLeft: '3px solid #cbd5e1' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>LLM SHARE OF VOICE</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f0f3f6', marginTop: '4px' }}>
             {snapshot?.current_llm_share_of_voice_pct || 42.8}%
           </div>
-          <span style={{ fontSize: '0.72rem', color: '#60a5fa' }}>Gemini 47% • Perplexity 48%</span>
+          <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Gemini 47% • Perplexity 48%</span>
         </div>
 
-        <div className="glass-panel" style={{ padding: '20px', borderLeft: '4px solid #f59e0b' }}>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>TOTAL CAMPAIGN COST</span>
-          <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#fbbf24', marginTop: '4px' }}>
+        <div className="matte-panel" style={{ padding: '16px', background: '#0d0f14', borderLeft: '3px solid #fbbf24' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>TOTAL CAMPAIGN COST</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fbbf24', marginTop: '4px' }}>
             ${snapshot?.total_token_spend_usd || 0.038}
           </div>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{snapshot?.total_gemini_tokens_consumed || 8420} Gemini tokens</span>
@@ -95,22 +96,23 @@ export default function Observability({ onOpenSidecar }) {
       </div>
 
       {/* Middle Section: MCP Tools & Live Loki Log Terminal */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '20px' }}>
+        
         {/* Active MCP Tools */}
-        <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Wrench size={20} color="#fbbf24" />
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Grafana MCP Server Tools</h3>
+        <div className="matte-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', background: '#0d0f14' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Terminal size={18} color="#fbbf24" />
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>Grafana MCP Server Tools</h3>
           </div>
-          <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)' }}>
-            These Model Context Protocol tools allow any AI assistant or the embedded SRE sidecar to query telemetry metrics and structured logs dynamically.
+          <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', margin: 0 }}>
+            Model Context Protocol tools allow AI assistants and SRE sidecars to query Prometheus telemetry and structured logs.
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {[
               {
                 name: 'grafana_query_metrics',
-                desc: 'Runs PromQL queries on ashky_scene_render_duration_seconds, ashky_llm_share_of_voice_pct, and token costs.'
+                desc: 'Runs PromQL queries on ashky_scene_render_duration_seconds and ashky_llm_share_of_voice_pct.'
               },
               {
                 name: 'grafana_query_loki_logs',
@@ -121,62 +123,62 @@ export default function Observability({ onOpenSidecar }) {
                 desc: 'Autonomous SRE audit diagnosing 3-second hook drop-off anomalies and latency spikes.'
               }
             ].map((tool) => (
-              <div key={tool.name} style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '12px 14px' }}>
-                <span className="badge-mcp" style={{ fontSize: '0.74rem' }}>{tool.name}</span>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '6px' }}>{tool.desc}</p>
+              <div key={tool.name} style={{ background: '#07080b', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '10px 12px' }}>
+                <span className="tag-minimal tag-amber" style={{ fontSize: '0.72rem' }}>{tool.name}</span>
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '4px', margin: '4px 0 0' }}>{tool.desc}</p>
               </div>
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-            <a href="/metrics" target="_blank" rel="noreferrer" className="btn-cinema-secondary" style={{ fontSize: '0.8rem', textDecoration: 'none' }}>
-              <ExternalLink size={13} />
+          <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
+            <a href="/metrics" target="_blank" rel="noreferrer" className="btn-matte-dark" style={{ fontSize: '0.78rem', textDecoration: 'none', padding: '6px 12px' }}>
+              <ExternalLink size={12} />
               <span>Prometheus /metrics</span>
             </a>
-            <a href="/docs" target="_blank" rel="noreferrer" className="btn-cinema-secondary" style={{ fontSize: '0.8rem', textDecoration: 'none' }}>
-              <ExternalLink size={13} />
+            <a href="/docs" target="_blank" rel="noreferrer" className="btn-matte-dark" style={{ fontSize: '0.78rem', textDecoration: 'none', padding: '6px 12px' }}>
+              <ExternalLink size={12} />
               <span>FastAPI /docs</span>
             </a>
           </div>
         </div>
 
         {/* Live Loki Log Stream Terminal */}
-        <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div className="matte-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', background: '#0d0f14' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Terminal size={20} color="#34d399" />
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Loki Structured Log Stream</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Terminal size={18} color="#34d399" />
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>Loki Structured Log Stream</h3>
             </div>
-            <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: '#34d399' }}>
+            <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: '#34d399' }}>
               app="ashky", env="prod"
             </span>
           </div>
 
           <div style={{
-            background: 'rgba(0, 0, 0, 0.7)',
-            borderRadius: '10px',
-            padding: '16px',
+            background: '#07080b',
+            borderRadius: '8px',
+            padding: '14px',
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.78rem',
+            fontSize: '0.76rem',
             lineHeight: 1.6,
-            height: '340px',
+            height: '320px',
             overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
-            gap: '8px',
-            border: '1px solid rgba(255, 255, 255, 0.08)'
+            gap: '6px',
+            border: '1px solid var(--border-subtle)'
           }}>
             {snapshot?.recent_loki_logs?.map((log, i) => (
-              <div key={i} style={{ display: 'flex', gap: '10px', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '4px' }}>
+              <div key={i} style={{ display: 'flex', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '3px' }}>
                 <span style={{ color: 'var(--text-muted)' }}>{log.timestamp?.slice(11, 19)}</span>
                 <span style={{
                   color: log.level === 'INFO' ? '#60a5fa' : log.level === 'WARN' ? '#fbbf24' : '#f87171',
-                  fontWeight: 700
+                  fontWeight: 600
                 }}>
                   [{log.level}]
                 </span>
-                <span style={{ color: '#c084fc' }}>[{log.component}]</span>
-                <span style={{ color: '#e2e8f0' }}>{log.message}</span>
+                <span style={{ color: '#cbd5e1' }}>[{log.component}]</span>
+                <span style={{ color: '#f0f3f6' }}>{log.message}</span>
               </div>
             ))}
           </div>

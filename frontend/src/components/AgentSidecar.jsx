@@ -6,11 +6,11 @@ export default function AgentSidecar({ isOpen, onClose }) {
     {
       id: 1,
       sender: 'agent',
-      text: "👋 Hi Founder! I am your autonomous **Growth & SRE Agent**, powered by the Grafana Model Context Protocol (MCP). I monitor your progressive render latencies, 3-second hook retention scores, and multi-LLM citation ranks in real time. How can I optimize your distribution today?",
+      text: "👋 I am your autonomous **Growth & SRE Copilot**, connected to Grafana Cloud via Model Context Protocol (MCP). I monitor progressive render latencies, 3-second hook retention scores, and multi-LLM citation ranks in real-time. What would you like to inspect?",
       tools: ['grafana_diagnose_pipeline'],
       actions: [
         'Why did our Gemini ranking drop?',
-        'Analyze our hook retention vs token cost',
+        'Analyze hook retention vs token cost',
         'Run full SRE pipeline audit'
       ]
     }
@@ -69,7 +69,7 @@ export default function AgentSidecar({ isOpen, onClose }) {
         {
           id: Date.now() + 1,
           sender: 'agent',
-          text: "I was able to query the Grafana MCP telemetry cache: Your current pipeline is healthy with 1.42s Scene 1 render latency and 88.5 hook strength. Let's run another campaign to test prompt tuning.",
+          text: "Queried Grafana MCP telemetry cache: Pipeline is healthy with 1.42s Scene 1 render latency and 88.5 hook strength.",
           tools: ['grafana_query_metrics'],
           actions: ['Generate new 3-scene blueprint', 'Run GEO Citation benchmark']
         }
@@ -84,45 +84,45 @@ export default function AgentSidecar({ isOpen, onClose }) {
   return (
     <aside style={{
       position: 'fixed',
-      top: '72px',
+      top: '64px',
       right: 0,
       bottom: 0,
-      width: '440px',
+      width: '420px',
       maxWidth: '100vw',
-      background: 'rgba(10, 12, 18, 0.95)',
-      backdropFilter: 'blur(24px)',
-      WebkitBackdropFilter: 'blur(24px)',
-      borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
+      background: '#0d0f14',
+      borderLeft: '1px solid var(--border-default)',
       zIndex: 100,
       display: 'flex',
       flexDirection: 'column',
-      boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.6)'
+      boxShadow: '-8px 0 30px rgba(0, 0, 0, 0.65)'
     }}>
       {/* Header */}
       <div style={{
-        padding: '16px 20px',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        padding: '14px 18px',
+        borderBottom: '1px solid var(--border-subtle)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        background: 'rgba(18, 22, 34, 0.5)'
+        background: '#08090c'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '8px',
-            background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+            width: '28px',
+            height: '28px',
+            borderRadius: '6px',
+            background: '#1a1f28',
+            border: '1px solid rgba(245, 158, 11, 0.3)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            color: '#fbbf24'
           }}>
-            <Bot size={18} color="#000" />
+            <Terminal size={14} />
           </div>
           <div>
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>Growth & SRE Agent</h3>
-            <span style={{ fontSize: '0.7rem', color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>
-              Connected via Grafana MCP Tools
+            <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0, color: '#f0f3f6' }}>Grafana MCP SRE Copilot</h3>
+            <span style={{ fontSize: '0.68rem', color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>
+              Connected to Prometheus & Loki
             </span>
           </div>
         </div>
@@ -133,10 +133,10 @@ export default function AgentSidecar({ isOpen, onClose }) {
             border: 'none',
             color: 'var(--text-muted)',
             cursor: 'pointer',
-            padding: '6px'
+            padding: '4px'
           }}
         >
-          <X size={20} />
+          <X size={18} />
         </button>
       </div>
 
@@ -144,10 +144,10 @@ export default function AgentSidecar({ isOpen, onClose }) {
       <div style={{
         flex: 1,
         overflowY: 'auto',
-        padding: '18px',
+        padding: '16px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px'
+        gap: '14px'
       }}>
         {messages.map((msg) => (
           <div
@@ -156,21 +156,17 @@ export default function AgentSidecar({ isOpen, onClose }) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-              gap: '6px'
+              gap: '4px'
             }}
           >
             <div style={{
-              maxWidth: '90%',
-              padding: '12px 16px',
-              borderRadius: msg.sender === 'user' ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
-              background: msg.sender === 'user'
-                ? 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)'
-                : 'rgba(25, 30, 46, 0.85)',
-              border: msg.sender === 'user'
-                ? '1px solid rgba(255, 255, 255, 0.2)'
-                : '1px solid rgba(255, 255, 255, 0.08)',
-              color: '#ffffff',
-              fontSize: '0.88rem',
+              maxWidth: '92%',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              background: msg.sender === 'user' ? '#ffffff' : '#14171e',
+              border: msg.sender === 'user' ? '1px solid #ffffff' : '1px solid var(--border-default)',
+              color: msg.sender === 'user' ? '#090a0c' : '#f0f3f6',
+              fontSize: '0.84rem',
               lineHeight: 1.5,
               whiteSpace: 'pre-wrap'
             }}>
@@ -178,10 +174,10 @@ export default function AgentSidecar({ isOpen, onClose }) {
 
               {/* MCP Tool Badges */}
               {msg.tools && msg.tools.length > 0 && (
-                <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: msg.sender === 'user' ? '1px solid #cbd5e1' : '1px solid var(--border-subtle)', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                   {msg.tools.map((tool) => (
-                    <span key={tool} className="badge-mcp" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
-                      <Wrench size={10} />
+                    <span key={tool} className="tag-minimal tag-amber" style={{ fontSize: '0.65rem' }}>
+                      <Terminal size={9} />
                       {tool}
                     </span>
                   ))}
@@ -189,20 +185,20 @@ export default function AgentSidecar({ isOpen, onClose }) {
               )}
             </div>
 
-            {/* Suggested Actions Pill Buttons */}
+            {/* Suggested Actions */}
             {msg.actions && msg.actions.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px', maxWidth: '90%' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '3px', maxWidth: '92%' }}>
                 {msg.actions.map((act, i) => (
                   <button
                     key={i}
                     onClick={() => handleSend(act)}
                     style={{
-                      background: 'rgba(245, 158, 11, 0.1)',
-                      border: '1px solid rgba(245, 158, 11, 0.3)',
-                      color: '#fef08a',
-                      fontSize: '0.74rem',
-                      padding: '4px 10px',
-                      borderRadius: '16px',
+                      background: '#161a22',
+                      border: '1px solid var(--border-subtle)',
+                      color: '#cbd5e1',
+                      fontSize: '0.72rem',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -211,7 +207,7 @@ export default function AgentSidecar({ isOpen, onClose }) {
                     }}
                   >
                     <span>{act}</span>
-                    <ArrowRight size={10} />
+                    <ArrowRight size={10} color="#94a3b8" />
                   </button>
                 ))}
               </div>
@@ -219,8 +215,8 @@ export default function AgentSidecar({ isOpen, onClose }) {
           </div>
         ))}
         {loading && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fbbf24', fontSize: '0.82rem', padding: '8px 12px' }}>
-            <Activity size={16} className="animate-spin" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fbbf24', fontSize: '0.78rem', padding: '6px 10px', fontFamily: 'var(--font-mono)' }}>
+            <Activity size={14} className="animate-spin" />
             <span>Consulting Grafana Cloud Prometheus & Loki MCP...</span>
           </div>
         )}
@@ -234,45 +230,28 @@ export default function AgentSidecar({ isOpen, onClose }) {
           handleSend();
         }}
         style={{
-          padding: '14px 18px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'rgba(14, 16, 23, 0.8)',
+          padding: '12px 16px',
+          borderTop: '1px solid var(--border-subtle)',
           display: 'flex',
-          gap: '8px'
+          gap: '8px',
+          background: '#08090c'
         }}
       >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask Grafana SRE agent..."
-          style={{
-            flex: 1,
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '8px',
-            padding: '10px 14px',
-            color: '#ffffff',
-            fontSize: '0.85rem',
-            outline: 'none'
-          }}
+          placeholder="Ask SRE copilot (e.g. 'Query Scene 1 latency')..."
+          className="matte-input"
+          style={{ flex: 1, padding: '9px 12px', fontSize: '0.84rem' }}
         />
         <button
           type="submit"
           disabled={!input.trim() || loading}
-          style={{
-            background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '0 14px',
-            color: '#000000',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
+          className="btn-solid-white"
+          style={{ padding: '0 14px', height: '38px' }}
         >
-          <Send size={16} />
+          <Send size={14} />
         </button>
       </form>
     </aside>
