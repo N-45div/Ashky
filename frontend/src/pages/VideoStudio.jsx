@@ -234,14 +234,14 @@ export default function VideoStudio({ initialPreset }) {
               <Zap size={12} /> FIRSTFRAME PROGRESSIVE ENGINE
             </span>
             <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-              Scene 1 Stream (&lt;2s) • Gemini 3.5 Flash QA • Grafana Telemetry
+              Scene 1 Stream (&lt;2s) • Gemini 3.7 Flash QA • Google Veo 2 VideoFX • Grafana Telemetry
             </span>
           </div>
           <h1 style={{ fontSize: '2.1rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
             Director Studio
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.94rem', marginTop: '4px', maxWidth: '640px' }}>
-            Generate 3-scene vertical video ads with progressive streaming and Gemini 3.5 Flash keyframe drop-off analysis.
+            Generate 3-scene vertical video ads with progressive streaming, Google Veo 2 cinematic video synthesis, and Gemini 3.7 Flash keyframe drop-off analysis.
           </p>
         </div>
 
@@ -963,14 +963,14 @@ export default function VideoStudio({ initialPreset }) {
             </>
           )}
 
-          {/* Gemini 3.5 Flash Agentic Video Timeline Inspector */}
+          {/* Gemini 3.7 Flash Agentic Video Timeline Inspector */}
           {agenticAnalysis && (
             <div className="matte-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', background: '#0d0f14' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Cpu size={18} color="#cbd5e1" />
                   <div>
-                    <h3 style={{ fontSize: '0.98rem', fontWeight: 700, margin: 0 }}>Gemini 3.5 Flash Agentic Video Timeline</h3>
+                    <h3 style={{ fontSize: '0.98rem', fontWeight: 700, margin: 0 }}>Gemini 3.7 Flash & Veo 2 Video Timeline</h3>
                     <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>Dynamic Keyframe Probing Loop</span>
                   </div>
                 </div>

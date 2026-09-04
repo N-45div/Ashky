@@ -128,33 +128,9 @@ export default function LandingPage({ onNavigate, onSelectPreset }) {
       <div style={{ maxWidth: '1360px', margin: '0 auto', padding: '36px 28px 0', position: 'relative', zIndex: 1 }}>
         
         {/* ============================================================ */}
-        {/* 1. HACKATHON STATUS BAR */}
+        {/* HERO HEADLINE & VALUE PROPOSITION */}
         {/* ============================================================ */}
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '6px 14px',
-            borderRadius: '6px',
-            background: '#0e1117',
-            border: '1px solid var(--border-default)',
-            fontSize: '0.78rem',
-            fontFamily: 'var(--font-mono)'
-          }}>
-            <span className="status-dot status-dot-amber" />
-            <span style={{ color: '#e2e8f0', fontWeight: 600 }}>GOOGLE AGENTIC CINEMA HACKATHON</span>
-            <span style={{ color: '#4b5563' }}>/</span>
-            <span style={{ color: '#94a3b8' }}>GRAFANA LABS TRACK</span>
-            <span style={{ color: '#4b5563' }}>/</span>
-            <span style={{ color: '#38bdf8' }}>GEMINI 3.5 FLASH</span>
-          </div>
-        </div>
-
-        {/* ============================================================ */}
-        {/* 2. HERO HEADLINE & VALUE PROPOSITION */}
-        {/* ============================================================ */}
-        <div style={{ textAlign: 'center', maxWidth: '960px', margin: '0 auto 56px' }}>
+        <div style={{ textAlign: 'center', maxWidth: '960px', margin: '20px auto 56px' }}>
           <h1 style={{
             fontSize: 'clamp(2.4rem, 5vw, 4.2rem)',
             fontWeight: 800,
@@ -171,13 +147,13 @@ export default function LandingPage({ onNavigate, onSelectPreset }) {
             fontSize: '1.12rem',
             lineHeight: 1.6,
             color: 'var(--text-secondary)',
-            maxWidth: '780px',
+            maxWidth: '820px',
             margin: '0 auto 36px',
             fontWeight: 400
           }}>
-            Turn raw product pitches into high-retention 3-scene video campaigns in <strong style={{ color: '#ffffff' }}>under 2 seconds</strong>. 
-            Powered by <strong style={{ color: '#ffffff' }}>Gemini 3.5 Flash Agentic Video Understanding</strong> (-88% token spend) 
-            and real-time <strong style={{ color: '#fbbf24' }}>Grafana Cloud MCP Observability</strong>.
+            Turn raw product pitches into high-retention 3-scene vertical video campaigns in <strong style={{ color: '#ffffff' }}>under 2 seconds</strong>. 
+            Directed autonomously by <strong style={{ color: '#ffffff' }}>Gemini 3.7 Flash</strong> and generated with <strong style={{ color: '#38bdf8' }}>Google Veo 2 Cinematic Video Models</strong>, 
+            monitored end-to-end via <strong style={{ color: '#fbbf24' }}>Grafana Cloud MCP Observability</strong>.
           </p>
 
           {/* Action Button Row */}
@@ -328,7 +304,7 @@ export default function LandingPage({ onNavigate, onSelectPreset }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div>
                 <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#8b949e', letterSpacing: '0.04em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
-                  GEMINI 3.5 FLASH AGENTIC ENGINE
+                  GEMINI 3.7 FLASH & GOOGLE VEO 2 AGENTIC DIRECTOR
                 </span>
                 <h3 style={{ fontSize: '1.45rem', fontWeight: 700, margin: '4px 0 8px' }}>
                   Targeted Keyframe Inspection vs 1-FPS Dumping
@@ -436,7 +412,7 @@ export default function LandingPage({ onNavigate, onSelectPreset }) {
               </div>
             </div>
 
-            {/* Bento Card 2: Gemini 3.5 Flash Agentic Video (Col 5) */}
+            {/* Bento Card 2: Gemini 3.7 Flash & Google Veo 2 Video (Col 5) */}
             <div className="matte-panel" style={{
               gridColumn: 'span 5',
               padding: '28px',
@@ -451,12 +427,12 @@ export default function LandingPage({ onNavigate, onSelectPreset }) {
                 </div>
                 <span className="tag-minimal tag-slate">-88% TOKEN SPEND</span>
               </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>Gemini 3.5 Flash Agentic Video</h3>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>Gemini 3.7 Flash & Google Veo 2</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5, margin: 0 }}>
-                Implements Google Gemini's <em>Think → Act → Observe</em> loop. Targeted keyframe probing evaluates hook retention (94/100) and predicts 3-second viewer drop-off.
+                Combines Gemini 3.7 Flash autonomous director loop with Google Veo 2 generative video models. Targeted keyframe probing evaluates hook retention (94/100) and predicts 3-second viewer drop-off before synthesis.
               </p>
               <div style={{ marginTop: 'auto', paddingTop: '14px', borderTop: '1px solid var(--border-subtle)' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#cbd5e1', fontFamily: 'var(--font-mono)' }}>MODEL: gemini-3.5-flash</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#cbd5e1', fontFamily: 'var(--font-mono)' }}>MODELS: gemini-3.7-flash • google-veo-2</span>
               </div>
             </div>
 
