@@ -56,3 +56,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+.pytest_cache/
+
+# Generated Media (audio, video, images)
+backend/media/*
+!backend/media/.gitkeep
+

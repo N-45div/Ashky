@@ -13,7 +13,7 @@ import logging
 import shutil
 import subprocess
 import json
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -159,10 +159,12 @@ class VideoCompositor:
         output_path: str,
         width: int = 1080,
         height: int = 1920,
+        image_path: Optional[str] = None,
     ) -> str:
         """
         Generate a single scene video clip with:
-        - Solid color background
+        - Image background (AI-generated or procedural gradient) with solid fallback
+        - Smooth crossfade transitions (fade in/out)
         - Title text overlay (top area)
         - Subtitle text overlay (bottom area, simulating kinetic captions)
         - Voiceover audio track
@@ -181,14 +183,12 @@ class VideoCompositor:
         output_path = output_path.replace("\\", "/")
 
         # Escape special characters for ffmpeg drawtext filter
-        # In ffmpeg drawtext, colons and single quotes must be escaped
         safe_title = title.replace("\\", "/").replace("'", "\\'").replace(":", "\\:")
         safe_subtitle = voiceover_text.replace("\\", "/").replace("'", "\\'").replace(":", "\\:")
 
         # Truncate subtitle for display (max ~60 chars per line)
         if len(safe_subtitle) > 120:
             mid = len(safe_subtitle) // 2
-            # Find nearest space to split
             split_pos = safe_subtitle.rfind(" ", 0, mid + 10)
             if split_pos == -1:
                 split_pos = mid
@@ -221,24 +221,42 @@ class VideoCompositor:
             f"enable='gte(t,0.3)'"
         )
 
-        args = [
-            # Generate solid color background video
-            "-f", "lavfi",
-            "-i", f"color=c={bg_color}:s={width}x{height}:d={duration}:r=30",
-            # Audio input
-            "-i", audio_path,
-            # Apply text overlays
-            "-vf", drawtext_filters,
-            # Encoding settings
-            "-c:v", "libx264",
-            "-preset", "fast",
-            "-crf", "23",
-            "-c:a", "aac",
-            "-b:a", "128k",
-            "-shortest",
-            "-pix_fmt", "yuv420p",
-            output_path,
-        ]
+        fade_filter = f"fade=t=in:st=0:d=0.3,fade=t=out:st={max(0.1, duration - 0.3)}:d=0.3"
+
+        if image_path and os.path.exists(image_path):
+            safe_img = image_path.replace("\\", "/")
+            video_inputs = [
+                "-loop", "1",
+                "-t", str(duration),
+                "-i", safe_img,
+            ]
+            video_filters = (
+                f"scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},setsar=1,"
+                f"{fade_filter},"
+                f"{drawtext_filters}"
+            )
+        else:
+            video_inputs = [
+                "-f", "lavfi",
+                "-i", f"color=c={bg_color}:s={width}x{height}:d={duration}:r=30",
+            ]
+            video_filters = f"{fade_filter},{drawtext_filters}"
+
+        args = (
+            video_inputs
+            + ["-i", audio_path]
+            + ["-vf", video_filters]
+            + [
+                "-c:v", "libx264",
+                "-preset", "fast",
+                "-crf", "23",
+                "-c:a", "aac",
+                "-b:a", "128k",
+                "-shortest",
+                "-pix_fmt", "yuv420p",
+                output_path,
+            ]
+        )
 
         _run_ffmpeg(args, f"scene {scene_number} clip generation")
         logger.info(f"Scene {scene_number} clip: {output_path} ({duration}s)")
@@ -253,11 +271,9 @@ class VideoCompositor:
         Concatenate multiple scene clips into one final video using
         ffmpeg's concat demuxer (lossless concatenation).
         """
-        # Write concat list file
         concat_list_path = str(Path(output_path).parent / "concat_list.txt")
         with open(concat_list_path, "w") as f:
             for clip in clip_paths:
-                # Use forward slashes and escape for ffmpeg
                 safe_path = clip.replace("\\", "/")
                 f.write(f"file '{safe_path}'\n")
 
@@ -271,7 +287,6 @@ class VideoCompositor:
 
         _run_ffmpeg(args, "final video concatenation")
 
-        # Clean up concat list
         try:
             os.remove(concat_list_path)
         except OSError:
@@ -286,6 +301,7 @@ class VideoCompositor:
         scenes: list,
         audio_paths: List[str],
         aspect_ratio: str = "9:16",
+        image_paths: Optional[Dict[int, str]] = None,
     ) -> str:
         """
         Full render pipeline: combine per-scene audio with visuals and
@@ -296,6 +312,7 @@ class VideoCompositor:
             scenes: List of SceneBlueprint objects
             audio_paths: List of audio file paths (one per scene)
             aspect_ratio: "9:16" or "16:9"
+            image_paths: Optional mapping of scene_number -> local image file path
 
         Returns:
             Path to the final rendered MP4 file
@@ -309,8 +326,8 @@ class VideoCompositor:
         clip_paths = []
         for i, (scene, audio_path) in enumerate(zip(scenes, audio_paths)):
             clip_output = str(campaign_video_dir / f"scene_{scene.scene_number}.mp4")
+            img_path = image_paths.get(scene.scene_number) if image_paths else None
 
-            # Run in executor to avoid blocking the event loop
             clip_path = await asyncio.get_event_loop().run_in_executor(
                 None,
                 self._generate_scene_clip,
@@ -322,6 +339,7 @@ class VideoCompositor:
                 clip_output,
                 width,
                 height,
+                img_path,
             )
             clip_paths.append(clip_path)
 

@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.services.tts_engine import tts_engine, AUDIO_DIR, ensure_media_dirs
 from app.services.video_compositor import video_compositor, VIDEO_DIR, get_audio_duration
+from app.services.image_generator import image_generator, IMAGE_DIR
 from app.models import SceneBlueprint
 
 client = TestClient(app)
@@ -21,6 +22,7 @@ def setup_and_teardown():
     # Clean up test artifacts
     shutil.rmtree(str(AUDIO_DIR / TEMP_TEST_CAMPAIGN), ignore_errors=True)
     shutil.rmtree(str(VIDEO_DIR / TEMP_TEST_CAMPAIGN), ignore_errors=True)
+    shutil.rmtree(str(IMAGE_DIR / TEMP_TEST_CAMPAIGN), ignore_errors=True)
     test_mp4 = VIDEO_DIR / f"{TEMP_TEST_CAMPAIGN}.mp4"
     if test_mp4.exists():
         try:
@@ -86,6 +88,57 @@ async def test_video_compositor_scene_and_campaign_assembly():
     assert os.path.exists(output_video)
     file_size = os.path.getsize(output_video)
     assert file_size > 10000, f"Rendered MP4 too small ({file_size} bytes)"
+    assert output_video.endswith(".mp4")
+
+
+@pytest.mark.asyncio
+async def test_image_generator_and_compositing_with_visuals():
+    """Verify image generator generates backgrounds and video compositor renders with visual backgrounds."""
+    # 1. Generate image background
+    img_path = await image_generator.generate_scene_image(
+        campaign_id=TEMP_TEST_CAMPAIGN,
+        scene_number=1,
+        visual_prompt="Futuristic dark UI SaaS dashboard with glowing neon accents",
+        aspect_ratio="9:16",
+    )
+    assert os.path.exists(img_path)
+    assert os.path.getsize(img_path) > 1000
+
+    # 2. Generate voiceover audio
+    audio_path = str(AUDIO_DIR / TEMP_TEST_CAMPAIGN / "scene_1.mp3")
+    os.makedirs(os.path.dirname(audio_path), exist_ok=True)
+    await tts_engine.generate_voiceover(
+        text="Experience autonomous AI marketing with Ashky Studio.",
+        voice="en-US-GuyNeural",
+        output_path=audio_path,
+    )
+
+    # 3. Assemble video with image background
+    fake_scenes = [
+        SceneBlueprint(
+            scene_number=1,
+            title="Visual Background Scene",
+            duration_seconds=3.0,
+            timeframe="0-3s",
+            camera_cues="Smooth pan",
+            kinetic_motion="Captions float",
+            text_overlay="Ashky Visual Studio",
+            voiceover_script="Experience autonomous AI marketing with Ashky Studio.",
+            visual_prompt="Futuristic dark UI SaaS dashboard with glowing neon accents",
+            status="ready",
+        )
+    ]
+
+    output_video = await video_compositor.render_campaign(
+        campaign_id=TEMP_TEST_CAMPAIGN,
+        scenes=fake_scenes,
+        audio_paths=[audio_path],
+        aspect_ratio="9:16",
+        image_paths={1: img_path},
+    )
+
+    assert os.path.exists(output_video)
+    assert os.path.getsize(output_video) > 10000
     assert output_video.endswith(".mp4")
 
 
