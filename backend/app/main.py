@@ -62,6 +62,15 @@ async def prometheus_metrics():
     content = get_prometheus_metrics_text()
     return Response(content=content, media_type="text/plain; version=0.0.4")
 
+from fastapi import Request
+from app.services.grafana_mcp import handle_mcp_jsonrpc
+
+@app.post("/mcp")
+async def root_mcp_endpoint(request: Request):
+    """Root JSON-RPC 2.0 endpoint for external Model Context Protocol clients."""
+    body = await request.json()
+    return await handle_mcp_jsonrpc(body)
+
 # Optional Frontend Mounting if built
 import os
 from fastapi.staticfiles import StaticFiles

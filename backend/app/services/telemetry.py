@@ -64,10 +64,49 @@ CURRENT_HOOK_SCORE = Gauge(
 # Loki In-Memory / Cloud Log Buffer
 # ==========================================
 
+import asyncio
+import httpx
+from app.config import settings
+
 class LokiLogCollector:
     def __init__(self, max_entries: int = 150):
         self.max_entries = max_entries
         self.logs: List[Dict[str, Any]] = []
+        self._loki_url = settings.GRAFANA_LOKI_URL
+        self._loki_user = settings.GRAFANA_CLOUD_USER
+        self._loki_key = settings.GRAFANA_API_KEY
+
+    async def _push_to_grafana_loki(self, level: str, component: str, message: str):
+        """Asynchronously push log streams to Grafana Cloud Loki if credentials are configured."""
+        if not self._loki_url or not self._loki_key:
+            return
+
+        push_url = f"{self._loki_url.rstrip('/')}/loki/api/v1/push"
+        time_ns = str(int(time.time() * 1e9))
+
+        payload = {
+            "streams": [
+                {
+                    "stream": {
+                        "app": "ashky",
+                        "component": component,
+                        "level": level.lower(),
+                        "env": "production"
+                    },
+                    "values": [
+                        [time_ns, f"[{component}] {message}"]
+                    ]
+                }
+            ]
+        }
+
+        try:
+            auth = (self._loki_user, self._loki_key) if self._loki_user else None
+            headers = {"Content-Type": "application/json"}
+            async with httpx.AsyncClient(timeout=4.0) as client:
+                await client.post(push_url, json=payload, auth=auth, headers=headers)
+        except Exception:
+            pass  # Non-blocking telemetry
 
     def record_log(self, level: str, component: str, message: str, metadata: Dict[str, Any] = None):
         entry = {
@@ -87,6 +126,13 @@ class LokiLogCollector:
         if len(self.logs) > self.max_entries:
             self.logs.pop(0)
 
+        # Trigger non-blocking remote push if event loop is running
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(self._push_to_grafana_loki(level, component, message))
+        except RuntimeError:
+            pass
+
     def get_recent_logs(self, limit: int = 50) -> List[Dict[str, Any]]:
         return self.logs[-limit:]
 
@@ -94,7 +140,7 @@ log_collector = LokiLogCollector()
 
 # Initialize with realistic telemetry logs
 log_collector.record_log("INFO", "telemetry", "Ashky Prometheus & Loki telemetry engine initialized")
-log_collector.record_log("INFO", "director_agent", "Gemini 2.0 Director agent registered with cinema prompt bank")
+log_collector.record_log("INFO", "director_agent", "Gemini 3.7 Flash Director agent registered with cinema prompt bank")
 log_collector.record_log("INFO", "vision_critic", "Gemini Vision 3-second hook QA critic standing by")
 log_collector.record_log("INFO", "geo_arm", "Multi-LLM Citation prober ready for ChatGPT, Gemini, Perplexity")
 log_collector.record_log("INFO", "grafana_mcp", "Grafana Model Context Protocol provider active")
@@ -110,7 +156,7 @@ def record_campaign_metrics(category: str, aspect_ratio: str, tokens: int, cost:
     _metrics_state["total_spend_usd"] = round(_metrics_state["total_spend_usd"] + cost, 4)
 
     CAMPAIGNS_TOTAL.labels(category=category, aspect_ratio=aspect_ratio).inc()
-    GEMINI_TOKENS_TOTAL.labels(agent_name="director_agent", model="gemini-2.0-flash").inc(tokens)
+    GEMINI_TOKENS_TOTAL.labels(agent_name="director_agent", model="gemini-3.7-flash").inc(tokens)
     TOKEN_COST_USD_TOTAL.labels(agent_name="director_agent").inc(cost)
 
 def record_scene_render_time(scene_number: int, duration_sec: float):
