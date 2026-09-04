@@ -74,3 +74,19 @@ def test_grafana_snapshot_and_mcp():
     chat_data = chat_res.json()
     assert "answer" in chat_data
     assert len(chat_data["mcp_tools_called"]) > 0
+    assert "structured_diagnostic" in chat_data
+    assert chat_data["structured_diagnostic"] is not None
+    assert "finding" in chat_data["structured_diagnostic"]
+    assert "evidence" in chat_data["structured_diagnostic"]
+
+
+def test_neon_circuit_seeded_campaign():
+    """Verify default demo campaign is pre-seeded in memory so instant rendering succeeds."""
+    from app.api.campaigns import CAMPAIGN_STORE
+    assert "camp_neon_circuit_01" in CAMPAIGN_STORE
+    neon = CAMPAIGN_STORE["camp_neon_circuit_01"]
+    assert neon.product_name == "Neon Circuit"
+    assert len(neon.scenes) == 3
+    assert neon.scenes[0].text_overlay == "Every Crash Rewrites The City: Neon Circuit"
+    assert neon.vision_qa[0].hook_strength >= 90
+

@@ -99,9 +99,10 @@ if os.path.exists(FRONTEND_DIST):
     @app.get("/", response_class=FileResponse)
     @app.get("/studio", response_class=FileResponse)
     @app.get("/app", response_class=FileResponse)
+    @app.get("/app/{catchall:path}", response_class=FileResponse)
     @app.get("/observability", response_class=FileResponse)
     @app.get("/geo", response_class=FileResponse)
-    async def serve_spa():
+    async def serve_spa(catchall: str = None):
         return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
 else:
     @app.get("/")
