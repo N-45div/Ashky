@@ -275,6 +275,7 @@ export default function AppWorkspace({ initialPreset = null }) {
           {activeTab === 'observability' && (
             <Observability 
               onOpenSidecar={() => setSidecarOpen(true)} 
+              onNavigateToStudio={() => handleSelectTab('studio')}
               campaign={selectedPreset}
             />
           )}
