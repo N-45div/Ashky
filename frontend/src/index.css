@@ -282,3 +282,52 @@ h1, h2, h3, h4, h5, h6 {
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
+/* ==========================================================================
+   Responsive Display Utility Classes (Vanilla CSS)
+   ========================================================================== */
+.hidden {
+  display: none !important;
+}
+
+@media (min-width: 640px) {
+  .sm\:inline { display: inline !important; }
+  .sm\:flex { display: flex !important; }
+  .sm\:block { display: block !important; }
+  .sm\:hidden { display: none !important; }
+}
+
+@media (min-width: 768px) {
+  .md\:inline { display: inline !important; }
+  .md\:flex { display: flex !important; }
+  .md\:block { display: block !important; }
+  .md\:hidden { display: none !important; }
+}
+
+@media (min-width: 1024px) {
+  .lg\:inline { display: inline !important; }
+  .lg\:flex { display: flex !important; }
+  .lg\:block { display: block !important; }
+  .lg\:hidden { display: none !important; }
+}
+
+/* Studio 3-Column Responsive Grid */
+.studio-layout-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 320px) minmax(320px, 1fr) minmax(280px, 330px);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1180px) {
+  .studio-layout-grid {
+    grid-template-columns: minmax(280px, 320px) 1fr;
+  }
+}
+
+@media (max-width: 820px) {
+  .studio-layout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

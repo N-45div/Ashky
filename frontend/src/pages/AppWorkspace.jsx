@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import AppSidebar from '../components/AppSidebar';
-import CampaignContextBar from '../components/CampaignContextBar';
 import AgentSidecar from '../components/AgentSidecar';
 import VideoStudio from './VideoStudio';
 import GeoOptimizer from './GeoOptimizer';
@@ -92,6 +91,24 @@ export default function AppWorkspace({ initialPreset = null }) {
     return 'Video Studio';
   };
 
+  const getLifecycleStage = () => {
+    if (activeTab === 'studio') {
+      if (campaignStatus === 'Draft' || campaignStatus === 'Generating' || campaignStatus === 'Planning') {
+        return { label: 'Create · 1 of 4', color: '#60a5fa' };
+      }
+      return { label: 'Review · 2 of 4', color: '#fbbf24' };
+    }
+    if (activeTab === 'geo') {
+      return { label: 'Discover · 3 of 4', color: '#38bdf8' };
+    }
+    if (activeTab === 'observability') {
+      return { label: 'Operate · 4 of 4', color: '#34d399' };
+    }
+    return { label: 'Review · 2 of 4', color: '#fbbf24' };
+  };
+
+  const currentLifecycle = getLifecycleStage();
+
   return (
     <div style={{
       display: 'flex',
@@ -122,20 +139,22 @@ export default function AppWorkspace({ initialPreset = null }) {
         minWidth: 0,
         position: 'relative'
       }}>
-        {/* Minimal Dark Top Bar */}
+        {/* Single Unified 62px Header */}
         <header style={{
-          height: '56px',
-          padding: '0 24px',
+          height: '62px',
+          padding: '0 22px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'rgba(10, 12, 16, 0.85)',
-          backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.07)',
+          background: 'rgba(10, 12, 16, 0.94)',
+          backdropFilter: 'blur(16px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           position: 'sticky',
           top: 0,
-          zIndex: 30
+          zIndex: 30,
+          userSelect: 'none'
         }}>
+          {/* Left: Campaign Name / Current View */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {isCollapsed && (
               <button
@@ -156,15 +175,39 @@ export default function AppWorkspace({ initialPreset = null }) {
               </button>
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '0.85rem', color: '#64748b' }}>ashky</span>
+              <span style={{ fontSize: '0.94rem', fontWeight: 700, color: '#ffffff' }}>
+                {selectedPreset?.product_name || 'Neon Circuit'}
+              </span>
               <span style={{ fontSize: '0.8rem', color: '#475569' }}>/</span>
-              <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#f8fafc' }}>
+              <span style={{ fontSize: '0.88rem', fontWeight: 500, color: '#cbd5e1' }}>
                 {getTabTitle()}
               </span>
             </div>
           </div>
 
-          {/* Right Header Status & Drawer Opener */}
+          {/* Center: Exactly One Active Lifecycle Step */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: '#07080a',
+            padding: '5px 14px',
+            borderRadius: '20px',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            fontSize: '0.78rem'
+          }}>
+            <span style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: currentLifecycle.color
+            }} />
+            <span style={{ fontWeight: 600, color: '#f0f3f6' }}>
+              {currentLifecycle.label}
+            </span>
+          </div>
+
+          {/* Right: Single Health Badge + Single Global Agent Trigger */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
               display: 'flex',
@@ -172,19 +215,26 @@ export default function AppWorkspace({ initialPreset = null }) {
               gap: '6px',
               fontSize: '0.74rem',
               color: '#34d399',
-              background: 'rgba(16, 185, 129, 0.06)',
+              background: 'rgba(16, 185, 129, 0.08)',
               padding: '4px 10px',
               borderRadius: '6px',
-              border: '1px solid rgba(16, 185, 129, 0.2)',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
               fontFamily: 'var(--font-mono)'
             }}>
-              <span className="status-dot status-dot-emerald" />
-              <span>PIPELINE HEALTHY</span>
+              <span style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: '#10b981',
+                boxShadow: '0 0 6px #10b981'
+              }} />
+              <span>Healthy</span>
             </div>
 
             <button
               type="button"
               onClick={() => setSidecarOpen(!sidecarOpen)}
+              title="Open Ashky Pipeline Agent with Grafana evidence"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -192,30 +242,19 @@ export default function AppWorkspace({ initialPreset = null }) {
                 background: sidecarOpen ? '#272012' : 'rgba(245, 158, 11, 0.08)',
                 color: '#fbbf24',
                 border: sidecarOpen ? '1px solid #f59e0b' : '1px solid rgba(245, 158, 11, 0.3)',
-                padding: '6px 12px',
+                padding: '6px 14px',
                 borderRadius: '6px',
                 fontWeight: 600,
-                fontSize: '0.8rem',
+                fontSize: '0.82rem',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease'
               }}
             >
               <Terminal size={14} />
-              <span className="hidden sm:inline">Ashky Pipeline Agent</span>
+              <span>Ask Ashky</span>
             </button>
           </div>
         </header>
-
-        {/* Persistent Campaign Context Bar */}
-        <CampaignContextBar
-          campaignName={selectedPreset?.product_name || 'Neon Circuit'}
-          category={selectedPreset?.category || 'Indie Game'}
-          status={campaignStatus}
-          activeTab={activeTab}
-          onSelectTab={handleSelectTab}
-          onOpenSidecar={() => setSidecarOpen(true)}
-          lastUpdated="Just now"
-        />
 
         {/* Tab Content */}
         <main style={{ flex: 1, padding: '0', position: 'relative' }}>

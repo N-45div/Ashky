@@ -631,28 +631,6 @@ export default function AppSidebar({
             </span>
           )}
         </button>
-
-        {/* Pipeline Health indicator */}
-        {!isCollapsed && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '4px 8px',
-            fontSize: '0.7rem',
-            color: '#10b981',
-            fontFamily: 'var(--font-mono)'
-          }}>
-            <span style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              background: '#10b981',
-              boxShadow: '0 0 6px #10b981'
-            }} />
-            <span>PIPELINE HEALTHY</span>
-          </div>
-        )}
       </div>
     </motion.aside>
   );
