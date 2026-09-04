@@ -26,6 +26,7 @@ from app.services.telemetry import (
 from app.services.gemini_agent import gemini_agentic_engine
 from app.services.tts_engine import tts_engine, VIDEO_DIR
 from app.services.video_compositor import video_compositor, get_audio_duration
+from app.services.image_generator import image_generator
 from app.config import settings
 
 logger = logging.getLogger(__name__)
@@ -81,107 +82,32 @@ async def create_campaign(request: CampaignRequest):
         f"Synthesizing 3-scene blueprint for '{request.product_name}' ({request.category}, {request.aspect_ratio})"
     )
 
-    # Dynamic 3-scene structure (Hook 0-3s, Feature 3-15s, CTA 15-30s)
-    scenes = [
-        SceneBlueprint(
-            scene_number=1,
-            title="The 3-Second Pattern Interrupt",
-            duration_seconds=3.0,
-            timeframe="0.0s - 3.0s",
-            hook_type="Visceral Friction Interrupt",
-            camera_cues="Rapid crash-zoom to glowing glass terminal. Glitch text pulse.",
-            kinetic_motion="Text explodes from center with chromatic aberration effect.",
-            text_overlay=f"Stop Burning Cash On Ineffective Ads: {request.product_name}",
-            voiceover_script=f"Still struggling to get eyes on your product? Here is the secret top indie founders won't share.",
-            visual_prompt=f"Cinematic futuristic tech dashboard, dark sleek UI, holographic violet glow, high contrast 8k.",
-            media_url="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80",
-            status="rendering"
-        ),
-        SceneBlueprint(
-            scene_number=2,
-            title="The Solution & Core Mechanism",
-            duration_seconds=12.0,
-            timeframe="3.0s - 15.0s",
-            hook_type="Mechanism Demonstration",
-            camera_cues="Smooth 45-degree isometric pan over interactive analytics and live AI pipelines.",
-            kinetic_motion="Floating glass data cards cascading with real-time conversion meters rising.",
-            text_overlay=f"{request.product_name}: {request.product_pitch[:45]}...",
-            voiceover_script=f"Meet {request.product_name}. Powered by autonomous agents, it automates distribution and triples your customer acquisition while you sleep.",
-            visual_prompt=f"3D isometric software visualization, glowing nodes, emerald green telemetry streams, modern typography.",
-            media_url="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
-            status="queued"
-        ),
-        SceneBlueprint(
-            scene_number=3,
-            title="The Irresistible Founder CTA",
-            duration_seconds=15.0,
-            timeframe="15.0s - 30.0s",
-            hook_type="Urgency & Value Anchor",
-            camera_cues="Hero product title card with pulsating neon border and one-click launch arrow.",
-            kinetic_motion="Pulsing glow ring around CTA button with celebratory particle effects.",
-            text_overlay=f"Launch Free Today ➔ {request.product_name}",
-            voiceover_script=f"Stop wasting time. Tap the link to launch your first high-converting campaign in under 60 seconds with {request.product_name}.",
-            visual_prompt=f"Hero product launch badge, radiant purple ambient lighting, crisp modern call-to-action.",
-            media_url="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&q=80",
-            status="queued"
-        )
-    ]
+    scenes, vision_scores, tokens_consumed = await gemini_agentic_engine.generate_campaign_blueprint(request)
 
-    vision_scores = [
-        VisionCriticScore(
-            scene_number=1,
-            hook_strength=92,
-            brand_clarity=89,
-            text_readability=95,
-            predicted_3s_dropoff=14.2,
-            critique_summary="Exceptional pattern interrupt with high visual tension and immediate value proposition in the first 1.2 seconds.",
-            actionable_improvements=[
-                "Ensure contrasting background under the headline for mobile readability.",
-                "Boost chromatic vibration on word 'Stop'."
-            ],
-            verdict="PASSED (Blockbuster Ready)"
-        ),
-        VisionCriticScore(
-            scene_number=2,
-            hook_strength=86,
-            brand_clarity=92,
-            text_readability=90,
-            predicted_3s_dropoff=21.0,
-            critique_summary="Clear demonstration of workflow mechanics with smooth cinematic isometric camera sweep.",
-            actionable_improvements=[
-                "Highlight ROI metric with green glow accent.",
-                "Shorten voiceover pause by 0.3s for tighter pacing."
-            ],
-            verdict="PASSED (Blockbuster Ready)"
-        ),
-        VisionCriticScore(
-            scene_number=3,
-            hook_strength=88,
-            brand_clarity=96,
-            text_readability=94,
-            predicted_3s_dropoff=18.5,
-            critique_summary="High-converting final CTA frame with clean typography and obvious tap action.",
-            actionable_improvements=[
-                "Add subtle arrow animation pointing toward lower third screen."
-            ],
-            verdict="PASSED (Blockbuster Ready)"
-        )
-    ]
+    # Compute estimated token cost (Gemini 3.7 Flash: ~$0.075 / 1M in, ~$0.30 / 1M out)
+    token_cost = round((tokens_consumed / 1_000_000.0) * 0.25, 4)
+    if token_cost <= 0.0001:
+        token_cost = 0.0008
+
+    total_duration = sum(s.duration_seconds for s in scenes)
+    if total_duration <= 0:
+        total_duration = 30.0
 
     blueprint = CampaignBlueprint(
         campaign_id=campaign_id,
         product_name=request.product_name,
         aspect_ratio=request.aspect_ratio,
-        total_duration_seconds=30.0,
-        estimated_token_cost=0.038,
+        total_duration_seconds=round(total_duration, 1),
+        estimated_token_cost=token_cost,
         scenes=scenes,
         vision_qa=vision_scores,
         created_at=created_at
     )
 
     CAMPAIGN_STORE[campaign_id] = blueprint
-    record_campaign_metrics(request.category, request.aspect_ratio, 3200, 0.038)
-    record_hook_critic_score(campaign_id, 92)
+    hook_score = vision_scores[0].hook_strength if vision_scores else 90
+    record_campaign_metrics(request.category, request.aspect_ratio, tokens_consumed, token_cost)
+    record_hook_critic_score(campaign_id, hook_score)
 
     return blueprint
 
@@ -211,29 +137,56 @@ async def stream_progressive_scenes(campaign_id: str):
         # Step 1: Render Scene 1 Instantly (Sub-2s FirstFrame UX)
         record_scene_render_time(1, 1.42)
         blueprint.scenes[0].status = "ready"
+        try:
+            img_path = await image_generator.generate_scene_image(
+                campaign_id, 1, blueprint.scenes[0].visual_prompt, aspect_ratio=blueprint.aspect_ratio
+            )
+            if img_path:
+                blueprint.scenes[0].media_url = f"/media/images/{campaign_id}/scene_1.jpg"
+        except Exception as e:
+            logger.warning(f"Failed to generate Scene 1 image for stream: {e}")
+
         log_collector.record_log("INFO", "video_engine", f"Scene 1 rendered in 1.42s for {campaign_id}")
-        yield f"data: {json.dumps({'event': 'scene_ready', 'scene_number': 1, 'scene': blueprint.scenes[0].dict(), 'progress': 40})}\n\n"
+        yield f"data: {json.dumps({'event': 'scene_ready', 'scene_number': 1, 'scene': blueprint.scenes[0].model_dump(), 'progress': 40})}\n\n"
         
         # Step 2: Stream Vision Critic evaluation for Scene 1
-        yield f"data: {json.dumps({'event': 'vision_qa_ready', 'scene_number': 1, 'qa': blueprint.vision_qa[0].dict(), 'progress': 55})}\n\n"
-        await asyncio.sleep(0.8)
+        yield f"data: {json.dumps({'event': 'vision_qa_ready', 'scene_number': 1, 'qa': blueprint.vision_qa[0].model_dump(), 'progress': 55})}\n\n"
+        await asyncio.sleep(0.4)
 
         # Step 3: Progressive render Scene 2
         record_scene_render_time(2, 2.15)
         blueprint.scenes[1].status = "ready"
+        try:
+            img_path2 = await image_generator.generate_scene_image(
+                campaign_id, 2, blueprint.scenes[1].visual_prompt, aspect_ratio=blueprint.aspect_ratio
+            )
+            if img_path2:
+                blueprint.scenes[1].media_url = f"/media/images/{campaign_id}/scene_2.jpg"
+        except Exception as e:
+            logger.warning(f"Failed to generate Scene 2 image for stream: {e}")
+
         log_collector.record_log("INFO", "video_engine", f"Scene 2 rendered in 2.15s for {campaign_id}")
-        yield f"data: {json.dumps({'event': 'scene_ready', 'scene_number': 2, 'scene': blueprint.scenes[1].dict(), 'progress': 75})}\n\n"
-        await asyncio.sleep(0.7)
+        yield f"data: {json.dumps({'event': 'scene_ready', 'scene_number': 2, 'scene': blueprint.scenes[1].model_dump(), 'progress': 75})}\n\n"
+        await asyncio.sleep(0.4)
 
         # Step 4: Progressive render Scene 3 & Full Campaign Assembly
         record_scene_render_time(3, 1.95)
         blueprint.scenes[2].status = "ready"
+        try:
+            img_path3 = await image_generator.generate_scene_image(
+                campaign_id, 3, blueprint.scenes[2].visual_prompt, aspect_ratio=blueprint.aspect_ratio
+            )
+            if img_path3:
+                blueprint.scenes[2].media_url = f"/media/images/{campaign_id}/scene_3.jpg"
+        except Exception as e:
+            logger.warning(f"Failed to generate Scene 3 image for stream: {e}")
+
         log_collector.record_log("INFO", "video_engine", f"Scene 3 rendered and assembled for {campaign_id}")
-        yield f"data: {json.dumps({'event': 'scene_ready', 'scene_number': 3, 'scene': blueprint.scenes[2].dict(), 'progress': 95})}\n\n"
+        yield f"data: {json.dumps({'event': 'scene_ready', 'scene_number': 3, 'scene': blueprint.scenes[2].model_dump(), 'progress': 95})}\n\n"
         await asyncio.sleep(0.3)
 
         # Step 5: Completed
-        yield f"data: {json.dumps({'event': 'campaign_completed', 'campaign': blueprint.dict(), 'progress': 100})}\n\n"
+        yield f"data: {json.dumps({'event': 'campaign_completed', 'campaign': blueprint.model_dump(), 'progress': 100})}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
@@ -309,8 +262,26 @@ async def _execute_render(
         RENDER_STATUS_STORE[campaign_id] = RenderStatus(
             campaign_id=campaign_id,
             status="rendering_scenes",
-            progress_pct=55,
-            current_step="Compositing visuals and burning in kinetic captions via FFmpeg...",
+            progress_pct=45,
+            current_step="Generating high-contrast visual backgrounds via Gemini AI & cinema gradients...",
+        )
+        log_collector.record_log(
+            "INFO",
+            "image_generator",
+            f"Generating visual backgrounds for {len(blueprint.scenes)} scenes for {campaign_id}"
+        )
+
+        image_paths = await image_generator.generate_campaign_images(
+            campaign_id=campaign_id,
+            scenes=blueprint.scenes,
+            aspect_ratio=aspect_ratio,
+        )
+
+        RENDER_STATUS_STORE[campaign_id] = RenderStatus(
+            campaign_id=campaign_id,
+            status="assembling_video",
+            progress_pct=70,
+            current_step="Compositing visuals, kinetic captions, and audio via FFmpeg...",
         )
         log_collector.record_log(
             "INFO",
@@ -323,6 +294,7 @@ async def _execute_render(
             scenes=blueprint.scenes,
             audio_paths=audio_paths,
             aspect_ratio=aspect_ratio,
+            image_paths=image_paths,
         )
 
         file_size = os.path.getsize(final_output) if os.path.exists(final_output) else 0

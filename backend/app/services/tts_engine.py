@@ -98,6 +98,7 @@ class TTSEngine:
         self,
         campaign_id: str,
         scenes: list,
+        voice: Optional[str] = None,
     ) -> List[str]:
         """
         Generate voiceover audio files for all scenes in a campaign.
@@ -105,6 +106,7 @@ class TTSEngine:
         Args:
             campaign_id: Unique campaign identifier
             scenes: List of SceneBlueprint objects with voiceover_script field
+            voice: Optional Edge TTS voice override (e.g., 'en-US-GuyNeural')
 
         Returns:
             List of file paths to generated MP3 audio files
@@ -124,7 +126,7 @@ class TTSEngine:
                 continue
 
             output_path = str(campaign_audio_dir / f"scene_{scene_num}.mp3")
-            await self.generate_voiceover(script, output_path)
+            await self.generate_voiceover(script, output_path, voice=voice)
             audio_paths.append(output_path)
 
         logger.info(
