@@ -372,106 +372,37 @@ export default function VideoStudio({
   const currentScene = campaign?.scenes?.[selectedSceneIndex];
   const currentVisionScore = campaign?.vision_qa?.[selectedSceneIndex];
 
-  // Pipeline strip stages
-  const pipelineStages = [
-    { id: 'brief', label: 'Brief', state: campaign ? 'complete' : 'active' },
-    { id: 'plan', label: 'Plan', state: campaign ? 'complete' : studioState === 'creating' ? 'active' : 'pending' },
-    { id: 'scene1', label: 'Scene 1', state: campaign?.scenes?.[0]?.status === 'ready' ? 'complete' : studioState === 'scene1_ready' ? 'active' : 'pending' },
-    { id: 'scene2', label: 'Scene 2', state: campaign?.scenes?.[1]?.status === 'ready' ? 'complete' : 'pending' },
-    { id: 'scene3', label: 'Scene 3', state: campaign?.scenes?.[2]?.status === 'ready' ? 'complete' : 'pending' },
-    { id: 'review', label: 'Review', state: campaign?.vision_qa ? 'complete' : studioState === 'review_running' ? 'active' : 'pending' },
-    { 
-      id: 'render', 
-      label: 'Render', 
-      state: renderStatus?.status === 'completed' ? 'complete' : renderingVideo ? 'active' : studioState === 'recoverable_failure' ? 'failed' : 'pending' 
-    }
-  ];
-
   return (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
       
-      {/* ============================================================ */}
-      {/* 1. SINGLE PIPELINE STRIP: Brief -> Plan -> Scene 1 -> 2 -> 3 -> Review -> Render */}
-      {/* ============================================================ */}
-      <div style={{
-        background: '#0d0f14',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '10px',
-        padding: '14px 20px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '12px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
-            CAMPAIGN PIPELINE:
-          </span>
-        </div>
-
-        {/* Stepper with clear text labels and states (not color alone) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-          {pipelineStages.map((stage, idx) => {
-            const isComplete = stage.state === 'complete';
-            const isActive = stage.state === 'active';
-            const isFailed = stage.state === 'failed';
-
-            return (
-              <React.Fragment key={stage.id}>
-                {idx > 0 && <span style={{ color: '#334155', fontSize: '0.75rem' }}>→</span>}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '4px 10px',
-                  borderRadius: '6px',
-                  background: isComplete 
-                    ? 'rgba(16, 185, 129, 0.08)' 
-                    : isActive 
-                    ? 'rgba(59, 130, 246, 0.12)' 
-                    : isFailed 
-                    ? 'rgba(239, 68, 68, 0.12)' 
-                    : 'rgba(255, 255, 255, 0.03)',
-                  border: isComplete 
-                    ? '1px solid rgba(16, 185, 129, 0.25)' 
-                    : isActive 
-                    ? '1px solid rgba(59, 130, 246, 0.35)' 
-                    : isFailed 
-                    ? '1px solid rgba(239, 68, 68, 0.35)' 
-                    : '1px solid rgba(255, 255, 255, 0.06)',
-                  fontSize: '0.76rem',
-                  fontWeight: isComplete || isActive ? 600 : 500,
-                  color: isComplete ? '#34d399' : isActive ? '#60a5fa' : isFailed ? '#f87171' : '#64748b',
-                  fontFamily: 'var(--font-mono)'
-                }}>
-                  {isComplete && <CheckCircle2 size={12} color="#34d399" />}
-                  {isActive && <RefreshCw size={12} color="#60a5fa" className="animate-spin" />}
-                  {isFailed && <AlertTriangle size={12} color="#f87171" />}
-                  <span>{stage.label}</span>
-                  <span style={{ fontSize: '0.64rem', opacity: 0.8 }}>
-                    {isComplete ? 'Done' : isActive ? 'Working' : isFailed ? 'Failed' : 'Queued'}
-                  </span>
-                </div>
-              </React.Fragment>
-            );
-          })}
-        </div>
-
-        {/* Recoverable failure action */}
-        {studioState === 'recoverable_failure' && (
+      {/* Recoverable failure action banner (only displayed on error) */}
+      {studioState === 'recoverable_failure' && (
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.08)',
+          border: '1px solid rgba(239, 68, 68, 0.25)',
+          borderRadius: '8px',
+          padding: '12px 18px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', fontSize: '0.84rem' }}>
+            <AlertTriangle size={15} />
+            <span>Scene synthesis encountered a network timeout. Ashky isolated the fault.</span>
+          </div>
           <button
             onClick={handleRetryFailedStage}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '5px 12px',
+              padding: '6px 14px',
               borderRadius: '6px',
               background: '#dc2626',
               color: '#ffffff',
               border: 'none',
-              fontSize: '0.76rem',
+              fontSize: '0.78rem',
               fontWeight: 600,
               cursor: 'pointer'
             }}
@@ -479,18 +410,11 @@ export default function VideoStudio({
             <RotateCcw size={12} />
             <span>Retry Render</span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* ============================================================ */}
-      {/* 2. THREE-COLUMN DESKTOP LAYOUT (Brief -> Preview & Timeline -> Review) */}
-      {/* ============================================================ */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(280px, 320px) 1fr minmax(300px, 340px)',
-        gap: '20px',
-        alignItems: 'start'
-      }}>
+      {/* THREE-COLUMN RESPONSIVE LAYOUT (Brief -> Preview & Timeline -> Review) */}
+      <div className="studio-layout-grid">
         
         {/* ------------------------------------------------------------ */}
         {/* COLUMN 1: CAMPAIGN BRIEF & PRESETS */}
@@ -632,89 +556,117 @@ export default function VideoStudio({
               </div>
             </div>
 
-            {/* Primary Action Button */}
-            <button
-              onClick={handleCreateAndStream}
-              disabled={studioState === 'creating'}
-              className="btn-solid-white"
-              style={{ width: '100%', padding: '12px', fontSize: '0.88rem', fontWeight: 600, marginTop: '4px' }}
-            >
-              {studioState === 'creating' ? (
-                <>
-                  <RefreshCw size={15} className="animate-spin" />
-                  <span>Streaming Scene 1...</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles size={15} />
-                  <span>Generate Campaign</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Voiceover & Render Controls */}
-          {campaign && (
-            <div style={{
-              marginTop: '8px',
-              paddingTop: '12px',
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#f0f3f6', fontFamily: 'var(--font-mono)' }}>
-                  Veo 2 Video Synthesis
-                </span>
-                {renderStatus?.status === 'completed' && (
-                  <span className="tag-minimal tag-emerald" style={{ fontSize: '0.62rem' }}>MP4 READY</span>
-                )}
+            {/* Voiceover Engine (when campaign exists) */}
+            {campaign && (
+              <div style={{
+                marginTop: '4px',
+                paddingTop: '10px',
+                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#f0f3f6', fontFamily: 'var(--font-mono)' }}>
+                    VEO 2 VOICE ENGINE
+                  </span>
+                  {renderStatus?.status === 'completed' && (
+                    <span className="tag-minimal tag-emerald" style={{ fontSize: '0.62rem' }}>MP4 READY</span>
+                  )}
+                </div>
+                <div>
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="matte-input"
+                    disabled={renderingVideo}
+                    style={{ width: '100%', fontSize: '0.78rem' }}
+                  >
+                    <option value="en-US-GuyNeural">Guy (US Male - Founder Crisp)</option>
+                    <option value="en-US-JennyNeural">Jenny (US Female - Engaging)</option>
+                    <option value="en-GB-RyanNeural">Ryan (UK Male - Tech)</option>
+                  </select>
+                </div>
               </div>
+            )}
 
-              <div>
-                <label style={{ fontSize: '0.68rem', color: '#64748b', fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '2px' }}>
-                  FOUNDER VOICE ENGINE
-                </label>
-                <select
-                  value={selectedVoice}
-                  onChange={(e) => setSelectedVoice(e.target.value)}
-                  className="matte-input"
-                  disabled={renderingVideo}
-                  style={{ width: '100%', fontSize: '0.78rem' }}
-                >
-                  <option value="en-US-GuyNeural">Guy (US Male - Founder Crisp)</option>
-                  <option value="en-US-JennyNeural">Jenny (US Female - Engaging)</option>
-                  <option value="en-GB-RyanNeural">Ryan (UK Male - Tech)</option>
-                </select>
-              </div>
-
+            {/* Exactly One Primary Action Based on Lifecycle State: Generate -> Render -> Improve */}
+            {!campaign ? (
               <button
-                type="button"
-                onClick={handleStartRender}
-                disabled={renderingVideo}
+                onClick={handleCreateAndStream}
+                disabled={studioState === 'creating'}
                 className="btn-solid-white"
-                style={{ width: '100%', padding: '10px', fontSize: '0.82rem', fontWeight: 600 }}
+                style={{ width: '100%', padding: '12px', fontSize: '0.88rem', fontWeight: 600, marginTop: '6px' }}
               >
-                {renderingVideo ? (
+                {studioState === 'creating' ? (
                   <>
-                    <RefreshCw size={14} className="animate-spin" />
-                    <span>Rendering 9:16 Video...</span>
-                  </>
-                ) : renderStatus?.status === 'completed' ? (
-                  <>
-                    <RefreshCw size={13} />
-                    <span>Re-Render Video</span>
+                    <RefreshCw size={15} className="animate-spin" />
+                    <span>Generating Campaign...</span>
                   </>
                 ) : (
                   <>
-                    <Film size={14} />
-                    <span>Render 9:16 MP4</span>
+                    <Sparkles size={15} />
+                    <span>Generate Campaign</span>
                   </>
                 )}
               </button>
-            </div>
-          )}
+            ) : renderStatus?.status !== 'completed' ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px' }}>
+                <button
+                  type="button"
+                  onClick={handleStartRender}
+                  disabled={renderingVideo}
+                  className="btn-solid-white"
+                  style={{ width: '100%', padding: '12px', fontSize: '0.88rem', fontWeight: 600 }}
+                >
+                  {renderingVideo ? (
+                    <>
+                      <RefreshCw size={14} className="animate-spin" />
+                      <span>Rendering {aspectRatio} Video...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Film size={14} />
+                      <span>Render {aspectRatio} MP4</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCreateAndStream}
+                  disabled={studioState === 'creating'}
+                  className="btn-matte-dark"
+                  style={{ width: '100%', padding: '7px', fontSize: '0.76rem', color: '#94a3b8' }}
+                >
+                  <span>Update Brief & Regenerate</span>
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStyle('Kinetic High-Tech Dark');
+                    handleCreateAndStream();
+                  }}
+                  className="btn-solid-white"
+                  style={{ width: '100%', padding: '12px', fontSize: '0.88rem', fontWeight: 600 }}
+                >
+                  <Sparkles size={14} />
+                  <span>Improve Campaign</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleStartRender}
+                  disabled={renderingVideo}
+                  className="btn-matte-dark"
+                  style={{ width: '100%', padding: '7px', fontSize: '0.76rem', color: '#94a3b8' }}
+                >
+                  <span>Re-Render MP4</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ------------------------------------------------------------ */}
@@ -909,9 +861,18 @@ export default function VideoStudio({
               {currentScene && (
                 <div style={{
                   position: 'relative',
-                  borderRadius: '10px',
+                  borderRadius: '12px',
                   overflow: 'hidden',
-                  height: '420px',
+                  ...(aspectRatio === '9:16' ? {
+                    width: '100%',
+                    maxWidth: '300px',
+                    height: '520px',
+                    margin: '0 auto',
+                    boxShadow: '0 12px 36px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.12)'
+                  } : {
+                    width: '100%',
+                    height: '400px'
+                  }),
                   background: '#040507',
                   border: '1px solid rgba(255, 255, 255, 0.1)'
                 }}>
@@ -995,14 +956,14 @@ export default function VideoStudio({
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
               <Eye size={15} color="#34d399" />
               <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#34d399', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
-                PREDICTIVE VISION QA
+                PREDICTED PERFORMANCE
               </span>
             </div>
             <h3 style={{ fontSize: '1.08rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
-              Pre-launch performance review
+              Predicted performance
             </h3>
             <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: '2px 0 0' }}>
-              Gemini 3.8 Flash evaluates hook strength and drops before video distribution.
+              Gemini 3.8 Flash evaluates hook retention and drop-off before distribution.
             </p>
           </div>
 
