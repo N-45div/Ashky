@@ -32,8 +32,8 @@ app.include_router(campaigns.router)
 app.include_router(geo.router)
 app.include_router(grafana.router)
 
-@app.get("/")
-async def root():
+@app.get("/api/info")
+async def api_info():
     return {
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
@@ -82,10 +82,32 @@ if os.path.exists(FRONTEND_DIST):
     if os.path.exists(assets_dir):
         app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
+    @app.get("/favicon.svg")
+    async def serve_favicon():
+        fav = os.path.join(FRONTEND_DIST, "favicon.svg")
+        if os.path.exists(fav):
+            return FileResponse(fav, media_type="image/svg+xml")
+        return Response(status_code=404)
+
+    @app.get("/icons.svg")
+    async def serve_icons():
+        icons = os.path.join(FRONTEND_DIST, "icons.svg")
+        if os.path.exists(icons):
+            return FileResponse(icons, media_type="image/svg+xml")
+        return Response(status_code=404)
+
+    @app.get("/", response_class=FileResponse)
     @app.get("/studio", response_class=FileResponse)
     @app.get("/app", response_class=FileResponse)
-    async def serve_studio():
+    @app.get("/observability", response_class=FileResponse)
+    @app.get("/geo", response_class=FileResponse)
+    async def serve_spa():
         return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
+else:
+    @app.get("/")
+    async def root():
+        return await api_info()
+
 
 if __name__ == "__main__":
     import uvicorn

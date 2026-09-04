@@ -69,7 +69,7 @@ export default function App() {
             Ashky Studio — Google Agentic Cinema Blockbuster Hackathon (Grafana Labs Track)
           </p>
           <p style={{ margin: 0, fontSize: '0.74rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
-            Google Gemini 3.5 Flash Agentic Video Engine • Grafana Cloud Model Context Protocol (MCP)
+            Google Gemini 3.7 Flash Agentic Director & Vision Critic • Gemini 3.1 Flash Image • Grafana Cloud MCP
           </p>
         </div>
       </footer>
