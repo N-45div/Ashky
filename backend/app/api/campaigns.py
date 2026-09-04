@@ -37,6 +37,103 @@ router = APIRouter(prefix="/api/campaigns", tags=["campaigns"])
 CAMPAIGN_STORE: dict[str, CampaignBlueprint] = {}
 RENDER_STATUS_STORE: dict[str, RenderStatus] = {}
 
+def _seed_neon_campaign():
+    """Pre-seed default campaign so real TTS & video rendering works out-of-the-box."""
+    if "camp_neon_circuit_01" not in CAMPAIGN_STORE:
+        CAMPAIGN_STORE["camp_neon_circuit_01"] = CampaignBlueprint(
+            campaign_id="camp_neon_circuit_01",
+            product_name="Neon Circuit",
+            aspect_ratio="9:16",
+            total_duration_seconds=30.0,
+            estimated_token_cost=0.038,
+            created_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            scenes=[
+                SceneBlueprint(
+                    scene_number=1,
+                    title="The 3-Second Pattern Interrupt",
+                    duration_seconds=3.0,
+                    timeframe="0.0s - 3.0s",
+                    hook_type="Crash Zoom Kinetic Hook",
+                    camera_cues="0.4s crash zoom into hovercraft cockpit HUD, neon reflections blurring at 200 MPH",
+                    kinetic_motion="High-contrast chromatic aberration and pop-in typography",
+                    text_overlay="Every Crash Rewrites The City: Neon Circuit",
+                    voiceover_script="What if dying wasn't game over—but the only way to expose the city's dark syndicate?",
+                    visual_prompt="Futuristic neon-noir cyberpunk racing cockpit HUD with glowing cyan telemetry, rain streaking across glass at 200mph, high contrast cinematic vertical 9:16",
+                    media_url="/media/images/camp_neon_circuit_01/scene_1.jpg",
+                    status="ready"
+                ),
+                SceneBlueprint(
+                    scene_number=2,
+                    title="Procedural Racing & Syndicate Lore",
+                    duration_seconds=12.0,
+                    timeframe="3.0s - 15.0s",
+                    hook_type="High-Speed Gameplay Reveal",
+                    camera_cues="Wide low-angle dolly following anti-grav chassis through rain-slicked highway tunnels",
+                    kinetic_motion="Dynamic HUD speedometer overlay pulsing with synthwave beats",
+                    text_overlay="120+ Procedural Tracks • Uncover The Conspiracy",
+                    voiceover_script="Tear through neon-drenched sectors, hijack corporate data caches, and unlock experimental anti-grav hovercraft.",
+                    visual_prompt="Anti-gravity racing ship flying through neon drenched cyberpunk skyscraper canyon, volumetric headlights, high octane cinematic 9:16",
+                    media_url="/media/images/camp_neon_circuit_01/scene_2.jpg",
+                    status="ready"
+                ),
+                SceneBlueprint(
+                    scene_number=3,
+                    title="The Wishlist Call-to-Action",
+                    duration_seconds=15.0,
+                    timeframe="15.0s - 30.0s",
+                    hook_type="Wishlist Value Anchor",
+                    camera_cues="Static hero vehicle beauty shot with flickering neon billboard and Steam CTA button",
+                    kinetic_motion="Steam wishlist badge pulses with kinetic glow and click animation",
+                    text_overlay="Wishlist On Steam ➔ Demo Dropping Oct 12",
+                    voiceover_script="Wishlist Neon Circuit on Steam today and get exclusive access to the closed alpha telemetry playtest.",
+                    visual_prompt="Cinematic beauty shot of cyberpunk hover car parked on rainy neon rooftop overlooking futuristic megacity, Steam wishlist banner glowing, 9:16",
+                    media_url="/media/images/camp_neon_circuit_01/scene_3.jpg",
+                    status="ready"
+                )
+            ],
+            vision_qa=[
+                VisionCriticScore(
+                    scene_number=1,
+                    hook_strength=94,
+                    brand_clarity=88,
+                    text_readability=96,
+                    predicted_3s_dropoff=13.8,
+                    critique_summary="Opening crash zoom creates immediate visceral friction within the first 0.8 seconds. High contrast typography ensures 96% mobile readability.",
+                    actionable_improvements=[
+                        "Add a 0.2s sub-bass audio riser under the crash sound effect to maximize retention.",
+                        "Enlarge Steam wishlist icon in corner by 10% for stronger brand recall."
+                    ],
+                    verdict="HOOK OPTIMAL"
+                ),
+                VisionCriticScore(
+                    scene_number=2,
+                    hook_strength=91,
+                    brand_clarity=92,
+                    text_readability=90,
+                    predicted_3s_dropoff=18.2,
+                    critique_summary="Speed sensation is strong. The procedural track variation reinforces the roguelite pitch clearly.",
+                    actionable_improvements=[
+                        "Highlight the 'every run rewrites the city' mechanic with an on-screen visual glitch."
+                    ],
+                    verdict="STRONG MECHANISM"
+                ),
+                VisionCriticScore(
+                    scene_number=3,
+                    hook_strength=95,
+                    brand_clarity=96,
+                    text_readability=98,
+                    predicted_3s_dropoff=15.0,
+                    critique_summary="Direct Steam CTA with tangible release date (Oct 12) drives highest conversion intent.",
+                    actionable_improvements=[
+                        "Maintain final frame freeze for 1.2s post-audio to prevent abrupt platform cut-off."
+                    ],
+                    verdict="HIGH CONVERSION CTA"
+                )
+            ]
+        )
+
+_seed_neon_campaign()
+
 FOUNDER_PRESETS = [
     {
         "id": "b2b_saas",
@@ -342,7 +439,10 @@ async def render_campaign_video(
     Runs asynchronously in the background. Status can be polled via GET /{campaign_id}/render-status.
     """
     if campaign_id not in CAMPAIGN_STORE:
-        raise HTTPException(status_code=404, detail="Campaign not found")
+        if campaign_id == "camp_neon_circuit_01":
+            _seed_neon_campaign()
+        else:
+            raise HTTPException(status_code=404, detail="Campaign not found")
 
     blueprint = CAMPAIGN_STORE[campaign_id]
 

@@ -330,37 +330,11 @@ export default function VideoStudio({
       }, 1200);
 
     } catch (err) {
-      console.warn('Simulating successful render for demo environment:', err);
-      // Realistic render progression simulation
-      setTimeout(() => {
-        setRenderStatus({
-          campaign_id: targetId,
-          status: 'rendering',
-          progress_pct: 55,
-          current_step: 'Edge Neural TTS voice synthesis & subtitle alignment...',
-        });
-      }, 1000);
-
-      setTimeout(() => {
-        const completedData = {
-          campaign_id: targetId,
-          status: 'completed',
-          progress_pct: 100,
-          current_step: 'Render completed successfully',
-          download_url: '/demo-neon-circuit-teaser.mp4',
-          video_url: '/demo-neon-circuit-teaser.mp4',
-          duration_seconds: 30,
-          file_size_bytes: 4829100
-        };
-        setRenderStatus(completedData);
-        setRenderingVideo(false);
-        setStudioState('render_completed');
-        setActiveTab('video_player');
-        if (onStatusChange) onStatusChange('Discovery Ready');
-        try {
-          confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
-        } catch (e) {}
-      }, 2400);
+      console.error('Render request failed:', err);
+      setRenderingVideo(false);
+      setStudioState('recoverable_failure');
+      setFailureReason(err.message || 'Video render request failed. Please check backend connection.');
+      if (onStatusChange) onStatusChange('Attention Needed');
     }
   };
 
@@ -753,25 +727,38 @@ export default function VideoStudio({
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                    <img
-                      src={currentScene?.media_url || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80'}
-                      alt="Rendered Video Preview"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '20px',
-                      left: '12px',
-                      right: '12px',
-                      background: 'rgba(10, 12, 16, 0.9)',
-                      padding: '10px',
-                      borderRadius: '8px',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      textAlign: 'center'
-                    }}>
-                      <span style={{ fontSize: '0.64rem', color: '#34d399', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>VEO 2 SYNTHESIZED 9:16 REEL</span>
-                      <p style={{ fontSize: '0.84rem', fontWeight: 700, color: '#ffffff', margin: '2px 0 0' }}>{productName}</p>
-                    </div>
+                    {renderStatus?.video_url ? (
+                      <video
+                        controls
+                        autoPlay
+                        playsInline
+                        poster={currentScene?.media_url}
+                        src={renderStatus.video_url}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000000' }}
+                      />
+                    ) : (
+                      <img
+                        src={currentScene?.media_url || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80'}
+                        alt="Rendered Video Preview"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    )}
+                    {!renderStatus?.video_url && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '20px',
+                        left: '12px',
+                        right: '12px',
+                        background: 'rgba(10, 12, 16, 0.9)',
+                        padding: '10px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        textAlign: 'center'
+                      }}>
+                        <span style={{ fontSize: '0.64rem', color: '#34d399', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>VEO 2 SYNTHESIZED 9:16 REEL</span>
+                        <p style={{ fontSize: '0.84rem', fontWeight: 700, color: '#ffffff', margin: '2px 0 0' }}>{productName}</p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Post-Render Next Lifecycle Action: Check AI Discovery */}

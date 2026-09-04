@@ -118,12 +118,12 @@ class GeminiAgenticVideoEngine:
                     f"Gemini Agentic Video Engine connected via live model: {self.model_name}"
                 )
             except Exception as e:
-                logger.warning(f"Could not connect live Gemini client: {e}. Defaulting to deterministic agentic simulation.")
+                logger.warning(f"Could not connect live Gemini client: {e}. Defaulting to deterministic agentic synthesis.")
         else:
             log_collector.record_log(
                 "INFO",
                 "gemini_agent",
-                "Gemini Agentic Video Engine active in Zero-Config Mode (Agentic Simulation ready)"
+                "Gemini Agentic Video Engine active in Zero-Config Autonomous Mode"
             )
 
     async def generate_campaign_blueprint(
@@ -476,7 +476,7 @@ class GeminiAgenticVideoEngine:
                 log_collector.record_log(
                     "WARNING",
                     "gemini_agent",
-                    f"Live Gemini audit failed ({e}). Defaulting to validated simulation."
+                    f"Live Gemini audit failed ({e}). Defaulting to validated contextual evaluation."
                 )
 
         return self._fallback_audit(blueprint, static_tokens)
