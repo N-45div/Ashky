@@ -52,7 +52,7 @@ function LandingRoute({ onSelectPreset }) {
             Ashky Studio — Google Agentic Cinema Blockbuster Hackathon (Grafana Labs Track)
           </p>
           <p style={{ margin: 0, fontSize: '0.74rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
-            Google Gemini 3.7 Flash Agentic Director & Vision Critic • Gemini 3.1 Flash Image • Grafana Cloud MCP
+            Gemini 3.8 Flash · Veo on Google Cloud · Grafana Cloud MCP
           </p>
         </div>
       </footer>

@@ -55,7 +55,7 @@ export default function LandingNavbar() {
           </span>
         </div>
 
-        {/* Right: SRE Status & Single Launch App Button */}
+        {/* Right: Pipeline Status & Single Build a Campaign Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{
             display: 'flex',
@@ -70,13 +70,13 @@ export default function LandingNavbar() {
             fontFamily: 'var(--font-mono)'
           }}>
             <span className="status-dot status-dot-emerald" />
-            <span className="hidden sm:inline">SRE OPTIMAL</span>
+            <span className="hidden sm:inline">PIPELINE HEALTHY</span>
           </div>
 
-          {/* Single Launch App Button -> moves to /app */}
+          {/* Primary CTA Button -> moves to /app/studio */}
           <button
             type="button"
-            onClick={() => navigate('/app')}
+            onClick={() => navigate('/app/studio')}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -101,7 +101,7 @@ export default function LandingNavbar() {
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            <span>Launch App</span>
+            <span>Build a campaign</span>
             <ArrowRight size={15} />
           </button>
         </div>

@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Film, Search, BarChart3, Terminal, Home, 
-  PanelLeftClose, PanelLeft, Plus, Sparkles,
-  Activity, Layers, ArrowUpRight, Zap
+  PanelLeftClose, PanelLeft, Plus, Cloud, Activity, CheckCircle2
 } from 'lucide-react';
 
 export default function AppSidebar({
@@ -16,38 +15,41 @@ export default function AppSidebar({
   setIsCollapsed
 }) {
   const navigate = useNavigate();
-  const location = useLocation();
   const [hoveredTab, setHoveredTab] = useState(null);
 
-  const mainTabs = [
+  const campaignTabs = [
     {
       id: 'studio',
       label: 'Video Studio',
       icon: Film,
-      desc: 'Autonomous 9:16 reels director',
-      badge: '<2s'
+      badge: 'Create'
     },
     {
       id: 'geo',
-      label: 'GEO Engine',
+      label: 'AI Search',
       icon: Search,
-      desc: 'Generative search optimization',
       badge: 'GEO'
-    },
-    {
-      id: 'observability',
-      label: 'Grafana SRE',
-      icon: BarChart3,
-      desc: 'Loki logs & SLO telemetry',
-      badge: 'MCP'
     }
   ];
 
-  const presets = [
+  const opsTabs = [
+    {
+      id: 'observability',
+      label: 'Pipeline Ops',
+      icon: BarChart3,
+      badge: 'Grafana'
+    }
+  ];
+
+  const recentCampaigns = [
+    { name: 'Neon Circuit', category: 'Indie Game' },
     { name: 'LaunchFlow', category: 'B2B SaaS' },
-    { name: 'VectorLite', category: 'Edge Vector DB' },
-    { name: 'AdMorph', category: 'Growth Copilot' },
-    { name: 'CinemaFlow', category: 'Generative Media' }
+    { name: 'VectorLite', category: 'DevTool' }
+  ];
+
+  const connectedServices = [
+    { name: 'Google Cloud', status: 'Active', color: '#34d399' },
+    { name: 'Grafana Cloud', status: 'MCP', color: '#fbbf24' }
   ];
 
   return (
@@ -120,12 +122,12 @@ export default function AppSidebar({
                 borderRadius: '4px',
                 fontFamily: 'var(--font-mono)'
               }}>
-                APP
+                STUDIO
               </span>
             </div>
           )}
 
-          {/* Toggle Sidebar Collapse (ChatGPT style) */}
+          {/* Toggle Sidebar Collapse */}
           <button
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -156,7 +158,7 @@ export default function AppSidebar({
           </button>
         </div>
 
-        {/* New Campaign Action Button (like ChatGPT's + New Chat) */}
+        {/* New Campaign Action Button */}
         <div style={{ padding: isCollapsed ? '12px 10px' : '12px 14px' }}>
           <button
             type="button"
@@ -188,147 +190,283 @@ export default function AppSidebar({
             }}
           >
             <Plus size={16} color="#60a5fa" />
-            {!isCollapsed && <span>New Campaign</span>}
+            {!isCollapsed && <span>New campaign</span>}
           </button>
         </div>
 
-        {/* Navigation Tabs List */}
-        <nav style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '4px',
-          padding: isCollapsed ? '0 10px' : '0 12px'
-        }}>
-          {mainTabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            const Icon = tab.icon;
-
-            return (
-              <div
-                key={tab.id}
-                style={{ position: 'relative' }}
-                onMouseEnter={() => isCollapsed && setHoveredTab(tab.id)}
-                onMouseLeave={() => isCollapsed && setHoveredTab(null)}
-              >
-                <button
-                  type="button"
-                  onClick={() => onSelectTab(tab.id)}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: isCollapsed ? 'center' : 'flex-start',
-                    gap: '12px',
-                    padding: isCollapsed ? '11px 0' : '9px 12px',
-                    borderRadius: '8px',
-                    background: isActive ? 'rgba(59, 130, 246, 0.14)' : 'transparent',
-                    border: isActive 
-                      ? '1px solid rgba(59, 130, 246, 0.35)' 
-                      : '1px solid transparent',
-                    color: isActive ? '#ffffff' : '#94a3b8',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                      e.currentTarget.style.color = '#ffffff';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.background = 'transparent';
-                      e.currentTarget.style.color = '#94a3b8';
-                    }
-                  }}
-                >
-                  <Icon 
-                    size={18} 
-                    color={isActive ? '#60a5fa' : '#94a3b8'} 
-                    style={{ flexShrink: 0 }}
-                  />
-
-                  {!isCollapsed && (
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      flex: 1,
-                      minWidth: 0
-                    }}>
-                      <span style={{
-                        fontSize: '0.86rem',
-                        fontWeight: isActive ? 600 : 500,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis'
-                      }}>
-                        {tab.label}
-                      </span>
-                      {tab.badge && (
-                        <span style={{
-                          fontSize: '0.65rem',
-                          padding: '1px 5px',
-                          borderRadius: '3px',
-                          background: isActive ? 'rgba(59, 130, 246, 0.25)' : 'rgba(255, 255, 255, 0.06)',
-                          color: isActive ? '#93c5fd' : '#64748b',
-                          fontFamily: 'var(--font-mono)'
-                        }}>
-                          {tab.badge}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </button>
-
-                {/* Floating Tooltip in Collapsed Mode (like ChatGPT) */}
-                {isCollapsed && hoveredTab === tab.id && (
-                  <div style={{
-                    position: 'absolute',
-                    left: 'calc(100% + 10px)',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: '#181c24',
-                    color: '#ffffff',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                    fontSize: '0.8rem',
-                    fontWeight: 500,
-                    whiteSpace: 'nowrap',
-                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
-                    pointerEvents: 'none',
-                    zIndex: 100
-                  }}>
-                    {tab.label}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </nav>
-
-        {/* Preset Campaigns (Shown when expanded) */}
-        {!isCollapsed && (
-          <div style={{ padding: '18px 14px 0' }}>
+        {/* CAMPAIGN Group */}
+        <div style={{ padding: isCollapsed ? '0 10px' : '0 12px' }}>
+          {!isCollapsed && (
             <div style={{
-              fontSize: '0.68rem',
+              fontSize: '0.66rem',
               fontWeight: 700,
               color: '#64748b',
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
-              marginBottom: '8px',
+              padding: '6px 8px 4px',
+              fontFamily: 'var(--font-mono)'
+            }}>
+              Campaign
+            </div>
+          )}
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+            {campaignTabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              const Icon = tab.icon;
+
+              return (
+                <div
+                  key={tab.id}
+                  style={{ position: 'relative' }}
+                  onMouseEnter={() => isCollapsed && setHoveredTab(tab.id)}
+                  onMouseLeave={() => isCollapsed && setHoveredTab(null)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => onSelectTab(tab.id)}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: isCollapsed ? 'center' : 'flex-start',
+                      gap: '12px',
+                      padding: isCollapsed ? '10px 0' : '8px 12px',
+                      borderRadius: '8px',
+                      background: isActive ? 'rgba(59, 130, 246, 0.14)' : 'transparent',
+                      border: isActive 
+                        ? '1px solid rgba(59, 130, 246, 0.35)' 
+                        : '1px solid transparent',
+                      color: isActive ? '#ffffff' : '#94a3b8',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                        e.currentTarget.style.color = '#ffffff';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = '#94a3b8';
+                      }
+                    }}
+                  >
+                    <Icon 
+                      size={18} 
+                      color={isActive ? '#60a5fa' : '#94a3b8'} 
+                      style={{ flexShrink: 0 }}
+                    />
+
+                    {!isCollapsed && (
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flex: 1,
+                        minWidth: 0
+                      }}>
+                        <span style={{
+                          fontSize: '0.85rem',
+                          fontWeight: isActive ? 600 : 500,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}>
+                          {tab.label}
+                        </span>
+                        {tab.badge && (
+                          <span style={{
+                            fontSize: '0.65rem',
+                            padding: '1px 5px',
+                            borderRadius: '3px',
+                            background: isActive ? 'rgba(59, 130, 246, 0.25)' : 'rgba(255, 255, 255, 0.06)',
+                            color: isActive ? '#93c5fd' : '#64748b',
+                            fontFamily: 'var(--font-mono)'
+                          }}>
+                            {tab.badge}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Collapsed Tooltip */}
+                  {isCollapsed && hoveredTab === tab.id && (
+                    <div style={{
+                      position: 'absolute',
+                      left: 'calc(100% + 10px)',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: '#181c24',
+                      color: '#ffffff',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      padding: '6px 12px',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      whiteSpace: 'nowrap',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
+                      pointerEvents: 'none',
+                      zIndex: 100
+                    }}>
+                      {tab.label}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* OPERATIONS Group */}
+        <div style={{ padding: isCollapsed ? '8px 10px 0' : '10px 12px 0' }}>
+          {!isCollapsed && (
+            <div style={{
+              fontSize: '0.66rem',
+              fontWeight: 700,
+              color: '#64748b',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              padding: '6px 8px 4px',
+              fontFamily: 'var(--font-mono)'
+            }}>
+              Operations
+            </div>
+          )}
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+            {opsTabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              const Icon = tab.icon;
+
+              return (
+                <div
+                  key={tab.id}
+                  style={{ position: 'relative' }}
+                  onMouseEnter={() => isCollapsed && setHoveredTab(tab.id)}
+                  onMouseLeave={() => isCollapsed && setHoveredTab(null)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => onSelectTab(tab.id)}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: isCollapsed ? 'center' : 'flex-start',
+                      gap: '12px',
+                      padding: isCollapsed ? '10px 0' : '8px 12px',
+                      borderRadius: '8px',
+                      background: isActive ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
+                      border: isActive 
+                        ? '1px solid rgba(245, 158, 11, 0.35)' 
+                        : '1px solid transparent',
+                      color: isActive ? '#ffffff' : '#94a3b8',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                        e.currentTarget.style.color = '#ffffff';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = '#94a3b8';
+                      }
+                    }}
+                  >
+                    <Icon 
+                      size={18} 
+                      color={isActive ? '#fbbf24' : '#94a3b8'} 
+                      style={{ flexShrink: 0 }}
+                    />
+
+                    {!isCollapsed && (
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flex: 1,
+                        minWidth: 0
+                      }}>
+                        <span style={{
+                          fontSize: '0.85rem',
+                          fontWeight: isActive ? 600 : 500,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}>
+                          {tab.label}
+                        </span>
+                        {tab.badge && (
+                          <span style={{
+                            fontSize: '0.65rem',
+                            padding: '1px 5px',
+                            borderRadius: '3px',
+                            background: isActive ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                            color: isActive ? '#fcd34d' : '#64748b',
+                            fontFamily: 'var(--font-mono)'
+                          }}>
+                            {tab.badge}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Collapsed Tooltip */}
+                  {isCollapsed && hoveredTab === tab.id && (
+                    <div style={{
+                      position: 'absolute',
+                      left: 'calc(100% + 10px)',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: '#181c24',
+                      color: '#ffffff',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      padding: '6px 12px',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      whiteSpace: 'nowrap',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
+                      pointerEvents: 'none',
+                      zIndex: 100
+                    }}>
+                      {tab.label}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* RECENT CAMPAIGNS (Shown when expanded) */}
+        {!isCollapsed && (
+          <div style={{ padding: '16px 14px 0' }}>
+            <div style={{
+              fontSize: '0.66rem',
+              fontWeight: 700,
+              color: '#64748b',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              marginBottom: '6px',
               paddingLeft: '4px',
               fontFamily: 'var(--font-mono)'
             }}>
-              Quick Templates
+              Recent Campaigns
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              {presets.map((preset) => (
+              {recentCampaigns.map((camp) => (
                 <button
-                  key={preset.name}
+                  key={camp.name}
                   type="button"
-                  onClick={() => onSelectTab('studio', preset.name)}
+                  onClick={() => onSelectTab('studio', camp.name)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -352,9 +490,57 @@ export default function AppSidebar({
                     e.currentTarget.style.color = '#94a3b8';
                   }}
                 >
-                  <span style={{ fontWeight: 500 }}>{preset.name}</span>
-                  <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{preset.category}</span>
+                  <span style={{ fontWeight: 500 }}>{camp.name}</span>
+                  <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{camp.category}</span>
                 </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* CONNECTED Services (Shown when expanded) */}
+        {!isCollapsed && (
+          <div style={{ padding: '16px 14px 0' }}>
+            <div style={{
+              fontSize: '0.66rem',
+              fontWeight: 700,
+              color: '#64748b',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              marginBottom: '6px',
+              paddingLeft: '4px',
+              fontFamily: 'var(--font-mono)'
+            }}>
+              Connected
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {connectedServices.map((svc) => (
+                <div
+                  key={svc.name}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '5px 8px',
+                    borderRadius: '6px',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    fontSize: '0.76rem',
+                    color: '#94a3b8'
+                  }}
+                >
+                  <span>{svc.name}</span>
+                  <span style={{
+                    fontSize: '0.65rem',
+                    fontWeight: 600,
+                    color: svc.color,
+                    background: `${svc.color}15`,
+                    padding: '1px 6px',
+                    borderRadius: '4px',
+                    fontFamily: 'var(--font-mono)'
+                  }}>
+                    {svc.status}
+                  </span>
+                </div>
               ))}
             </div>
           </div>
@@ -369,11 +555,11 @@ export default function AppSidebar({
         flexDirection: 'column',
         gap: '6px'
       }}>
-        {/* Grafana MCP Copilot Button */}
+        {/* Ashky Pipeline Agent Button */}
         <button
           type="button"
           onClick={onOpenSidecar}
-          title={isCollapsed ? "Grafana MCP Copilot" : ""}
+          title={isCollapsed ? "Ashky Pipeline Agent" : ""}
           style={{
             width: '100%',
             display: 'flex',
@@ -401,16 +587,16 @@ export default function AppSidebar({
           {!isCollapsed && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
               <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#fef3c7' }}>
-                Grafana Copilot
+                Ashky Pipeline Agent
               </span>
-              <span style={{ fontSize: '0.68rem', color: '#fcd34d' }}>
-                Live Agent SRE
+              <span style={{ fontSize: '0.67rem', color: '#fcd34d' }}>
+                Evidence from Grafana Cloud
               </span>
             </div>
           )}
         </button>
 
-        {/* Back to Home / Landing */}
+        {/* Back to Home / Overview */}
         <button
           type="button"
           onClick={() => navigate('/')}
@@ -441,12 +627,12 @@ export default function AppSidebar({
           <Home size={17} style={{ flexShrink: 0 }} />
           {!isCollapsed && (
             <span style={{ fontSize: '0.82rem', fontWeight: 500 }}>
-              Back to Overview
+              Overview
             </span>
           )}
         </button>
 
-        {/* Status indicator */}
+        {/* Pipeline Health indicator */}
         {!isCollapsed && (
           <div style={{
             display: 'flex',
@@ -464,7 +650,7 @@ export default function AppSidebar({
               background: '#10b981',
               boxShadow: '0 0 6px #10b981'
             }} />
-            <span>Gemini 3.7 Flash • Optimal</span>
+            <span>PIPELINE HEALTHY</span>
           </div>
         )}
       </div>

@@ -62,3 +62,7 @@ pnpm-debug.log*
 backend/media/*
 !backend/media/.gitkeep
 
+# Internal Agent Instructions & Local Docs
+GEMINI_3_8_FRONTEND_AGENT_INSTRUCTIONS.md
+*AGENT_INSTRUCTIONS*.md
+
