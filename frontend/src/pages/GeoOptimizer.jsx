@@ -13,6 +13,7 @@ export default function GeoOptimizer({ campaign, onNavigateToStudio }) {
   const [probing, setProbing] = useState(false);
   const [activeTab, setActiveTab] = useState('queries'); // 'queries' | 'sources' | 'opportunities' | 'schema'
   const [copiedKey, setCopiedKey] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     if (campaign?.product_name) {
@@ -67,7 +68,7 @@ export default function GeoOptimizer({ campaign, onNavigateToStudio }) {
       sources: ["reddit.com/r/cyberpunk", "bandcamp.com"],
       gap: "Brand name mentioned in list, but direct wishlist URL omitted due to lack of VideoObject schema.",
       recommendedAction: "Embed generated Schema.org JSON-LD pack on product landing page.",
-      studioAction: "Export Schema Pack"
+      studioAction: "Export AI discovery markup"
     }
   ];
 
@@ -119,7 +120,7 @@ export default function GeoOptimizer({ campaign, onNavigateToStudio }) {
   };
 
   return (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '28px 28px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
       {/* Header */}
       <div>
@@ -131,119 +132,215 @@ export default function GeoOptimizer({ campaign, onNavigateToStudio }) {
             Google Gemini 3.8 Flash • Perplexity Sonar • SearchGPT Benchmark
           </span>
         </div>
-        <h1 style={{ fontSize: '2.1rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
           AI Citation Visibility
         </h1>
-        <p style={{ color: '#9aa4b2', fontSize: '0.94rem', marginTop: '4px', maxWidth: '780px' }}>
+        <p style={{ color: '#9aa4b2', fontSize: '0.9rem', marginTop: '4px', maxWidth: '780px' }}>
           Track how frequently your product is mentioned, which sources support the answer, and where competitors win across a consistent query set.
         </p>
       </div>
 
-      {/* Query-set Controls Bar */}
+      {/* 1. VISIBILITY OUTCOME HERO */}
       <div className="matte-panel" style={{
-        padding: '20px',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr)) auto',
-        gap: '14px',
-        alignItems: 'end',
-        background: '#0d0f14'
-      }}>
-        <div>
-          <label style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
-            PRODUCT
-          </label>
-          <input
-            type="text"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-            className="matte-input"
-            style={{ width: '100%', fontSize: '0.82rem' }}
-          />
-        </div>
-
-        <div>
-          <label style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
-            CATEGORY
-          </label>
-          <input
-            type="text"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="matte-input"
-            style={{ width: '100%', fontSize: '0.82rem' }}
-          />
-        </div>
-
-        <div>
-          <label style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
-            TRACKED COMPETITORS
-          </label>
-          <input
-            type="text"
-            value={competitors}
-            onChange={(e) => setCompetitors(e.target.value)}
-            className="matte-input"
-            style={{ width: '100%', fontSize: '0.82rem' }}
-          />
-        </div>
-
-        <div>
-          <label style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
-            AI ENGINE
-          </label>
-          <select
-            value={selectedEngine}
-            onChange={(e) => setSelectedEngine(e.target.value)}
-            className="matte-input"
-            style={{ width: '100%', fontSize: '0.82rem' }}
-          >
-            <option value="Google Gemini 3.8 Flash">Google Gemini 3.8 Flash</option>
-            <option value="Perplexity Sonar">Perplexity Sonar</option>
-            <option value="SearchGPT Pro">SearchGPT Pro</option>
-          </select>
-        </div>
-
-        <button
-          onClick={handleRunProbe}
-          disabled={probing}
-          className="btn-solid-white"
-          style={{ height: '40px', padding: '0 20px', fontSize: '0.86rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}
-        >
-          {probing ? (
-            <>
-              <RefreshCw size={14} className="animate-spin" />
-              <span>Probing 24 Queries...</span>
-            </>
-          ) : (
-            <>
-              <Search size={14} />
-              <span>Run Query Set Probe</span>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Evaluation Context Disclaimer */}
-      <div style={{
+        padding: '22px 24px',
+        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(13, 15, 20, 0.95) 100%)',
+        border: '1px solid rgba(16, 185, 129, 0.25)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '10px 14px',
-        background: '#090a0d',
-        borderRadius: '6px',
-        border: '1px solid rgba(255, 255, 255, 0.05)',
-        fontSize: '0.76rem',
-        color: '#64748b'
+        flexWrap: 'wrap',
+        gap: '16px'
       }}>
-        <span>
-          Evaluated via <strong>{selectedEngine}</strong> on <strong>{querySetName}</strong> (24 prompts tracked).
-        </span>
-        <span style={{ fontStyle: 'italic' }}>
-          AI answers vary across runs; results reflect the current tracked query set rather than fixed rankings.
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="tag-minimal tag-emerald">VISIBILITY OUTCOME</span>
+            <span style={{ fontSize: '0.74rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+              24 Tracked Answers • {selectedEngine}
+            </span>
+          </div>
+          <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#ffffff', margin: '4px 0 0' }}>
+            {productName} appears in 11 of 24 tracked answers.
+          </h2>
+          <p style={{ fontSize: '0.84rem', color: '#94a3b8', margin: 0 }}>
+            Direct links surfaced in 7 answers (29.2%). Competitors lead in 9 answers.
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            onClick={handleRunProbe}
+            disabled={probing}
+            className="btn-solid-white"
+            style={{ padding: '9px 18px', fontSize: '0.84rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            {probing ? (
+              <>
+                <RefreshCw size={14} className="animate-spin" />
+                <span>Checking AI visibility...</span>
+              </>
+            ) : (
+              <>
+                <Search size={14} />
+                <span>Check AI visibility</span>
+              </>
+            )}
+          </button>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="btn-matte-dark"
+            style={{ padding: '9px 14px', fontSize: '0.82rem', color: '#cbd5e1' }}
+          >
+            {showSettings ? 'Hide scan settings' : 'Edit scan settings'}
+          </button>
+        </div>
       </div>
 
-      {/* Top Summary Metrics with Concrete Denominators */}
+      {/* 2. BIGGEST GAP & RECOMMENDED VIDEO ACTION */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap: '14px'
+      }}>
+        {/* Biggest Gap Card */}
+        <div className="matte-panel" style={{
+          padding: '18px 20px',
+          background: '#0d0f14',
+          borderLeft: '4px solid #f59e0b',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>
+              BIGGEST VISIBILITY GAP
+            </span>
+            <span className="tag-minimal tag-slate" style={{ fontSize: '0.66rem' }}>Release Date Queries</span>
+          </div>
+          <p style={{ fontSize: '0.9rem', fontWeight: 600, color: '#f1f5f9', margin: 0, lineHeight: 1.4 }}>
+            "top indie game demos releasing October 2026 on Steam"
+          </p>
+          <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
+            Release month missing in hook transcripts. Competitor <em>Distance</em> leads with 6 citations.
+          </p>
+        </div>
+
+        {/* Recommended Video Action Card */}
+        <div className="matte-panel" style={{
+          padding: '18px 20px',
+          background: 'rgba(59, 130, 246, 0.06)',
+          border: '1px solid rgba(59, 130, 246, 0.25)',
+          borderLeft: '4px solid #3b82f6',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '14px',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxWidth: '420px' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#60a5fa', fontFamily: 'var(--font-mono)' }}>
+              RECOMMENDED VIDEO ACTION
+            </span>
+            <p style={{ fontSize: '0.88rem', fontWeight: 600, color: '#ffffff', margin: 0 }}>
+              Build comparison teaser video featuring anti-grav physics in Scene 2
+            </p>
+            <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+              Grounding this hook captures 4 additional competitor query prompts.
+            </span>
+          </div>
+
+          {onNavigateToStudio && (
+            <button
+              onClick={onNavigateToStudio}
+              className="btn-solid-white"
+              style={{ padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <Film size={13} />
+              <span>Fix in Video Studio</span>
+              <ArrowRight size={13} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Collapsible Scan Settings */}
+      {showSettings && (
+        <div className="matte-panel" style={{
+          padding: '20px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr)) auto',
+          gap: '14px',
+          alignItems: 'end',
+          background: '#0d0f14',
+          border: '1px solid rgba(255, 255, 255, 0.12)'
+        }}>
+          <div>
+            <label style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
+              PRODUCT
+            </label>
+            <input
+              type="text"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              className="matte-input"
+              style={{ width: '100%', fontSize: '0.82rem' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
+              CATEGORY
+            </label>
+            <input
+              type="text"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="matte-input"
+              style={{ width: '100%', fontSize: '0.82rem' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
+              TRACKED COMPETITORS
+            </label>
+            <input
+              type="text"
+              value={competitors}
+              onChange={(e) => setCompetitors(e.target.value)}
+              className="matte-input"
+              style={{ width: '100%', fontSize: '0.82rem' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
+              AI ENGINE
+            </label>
+            <select
+              value={selectedEngine}
+              onChange={(e) => setSelectedEngine(e.target.value)}
+              className="matte-input"
+              style={{ width: '100%', fontSize: '0.82rem' }}
+            >
+              <option value="Google Gemini 3.8 Flash">Google Gemini 3.8 Flash</option>
+              <option value="Perplexity Sonar">Perplexity Sonar</option>
+              <option value="SearchGPT Pro">SearchGPT Pro</option>
+            </select>
+          </div>
+
+          <button
+            onClick={handleRunProbe}
+            disabled={probing}
+            className="btn-solid-white"
+            style={{ height: '40px', padding: '0 18px', fontSize: '0.84rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            {probing ? <RefreshCw size={14} className="animate-spin" /> : <Search size={14} />}
+            <span>Check AI visibility</span>
+          </button>
+        </div>
+      )}
+
+      {/* 3. METRICS WITH RENAMED HEADERS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
         
         {/* Mention Rate */}
@@ -258,9 +355,9 @@ export default function GeoOptimizer({ campaign, onNavigateToStudio }) {
           </div>
         </div>
 
-        {/* Surfaced URL Rate */}
+        {/* Answers linking to you (formerly Surfaced URL Rate) */}
         <div className="matte-panel" style={{ padding: '16px', background: '#0d0f14', borderLeft: '3px solid #60a5fa' }}>
-          <span style={{ fontSize: '0.7rem', color: '#64748b', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>SURFACED URL RATE</span>
+          <span style={{ fontSize: '0.7rem', color: '#64748b', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>ANSWERS LINKING TO YOU</span>
           <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#60a5fa', marginTop: '3px' }}>
             7 of 24
           </div>
@@ -270,9 +367,9 @@ export default function GeoOptimizer({ campaign, onNavigateToStudio }) {
           </div>
         </div>
 
-        {/* Competitor Win Rate */}
+        {/* Answers led by competitors (formerly Competitor Win Rate) */}
         <div className="matte-panel" style={{ padding: '16px', background: '#0d0f14', borderLeft: '3px solid #fbbf24' }}>
-          <span style={{ fontSize: '0.7rem', color: '#64748b', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>COMPETITOR WIN RATE</span>
+          <span style={{ fontSize: '0.7rem', color: '#64748b', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>ANSWERS LED BY COMPETITORS</span>
           <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#fbbf24', marginTop: '3px' }}>
             9 of 24
           </div>
@@ -290,12 +387,12 @@ export default function GeoOptimizer({ campaign, onNavigateToStudio }) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
             <span>High citation potential</span>
-            <span style={{ color: '#38bdf8' }}>Schema valid</span>
+            <span style={{ color: '#38bdf8' }}>AI discovery markup valid</span>
           </div>
         </div>
       </div>
 
-      {/* Tabs Section: Queries | Sources | Opportunities | Schema pack */}
+      {/* Tabs Section: Queries | Sources | Opportunities | AI discovery markup */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         
         {/* Tab Buttons */}
@@ -309,7 +406,7 @@ export default function GeoOptimizer({ campaign, onNavigateToStudio }) {
             { id: 'queries', label: '1. Queries (4 Tracked)' },
             { id: 'sources', label: '2. Supporting Sources (5)' },
             { id: 'opportunities', label: '3. Video Opportunities' },
-            { id: 'schema', label: '4. Schema Pack (JSON-LD)' }
+            { id: 'schema', label: '4. AI discovery markup' }
           ].map((t) => (
             <button
               key={t.id}
@@ -543,7 +640,7 @@ export default function GeoOptimizer({ campaign, onNavigateToStudio }) {
           </div>
         )}
 
-        {/* Tab 4: Schema Pack (JSON-LD) */}
+        {/* Tab 4: AI discovery markup (JSON-LD) */}
         {activeTab === 'schema' && (
           <div className="matte-panel" style={{ padding: '20px', background: '#0d0f14', display: 'flex', flexDirection: 'column', gap: '14px' }}>
             
@@ -554,7 +651,7 @@ export default function GeoOptimizer({ campaign, onNavigateToStudio }) {
                   <span style={{ fontSize: '0.74rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>Google VideoObject Specification</span>
                 </div>
                 <h4 style={{ fontSize: '1.05rem', fontWeight: 700, margin: '4px 0 0', color: '#ffffff' }}>
-                  Machine-Readable Structured Data Pack
+                  AI discovery markup (Machine-Readable JSON-LD)
                 </h4>
               </div>
 
