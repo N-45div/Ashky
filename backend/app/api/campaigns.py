@@ -1,16 +1,21 @@
+import os
 import asyncio
 import json
 import uuid
 import datetime
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
+import logging
+from typing import Optional
+from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi.responses import StreamingResponse, FileResponse
 from app.models import (
     CampaignRequest,
     CampaignBlueprint,
     SceneBlueprint,
     VisionCriticScore,
     GeminiAgenticInspectionRequest,
-    GeminiAgenticVideoAnalysis
+    GeminiAgenticVideoAnalysis,
+    RenderRequest,
+    RenderStatus,
 )
 from app.services.telemetry import (
     record_campaign_metrics,
@@ -19,12 +24,17 @@ from app.services.telemetry import (
     log_collector
 )
 from app.services.gemini_agent import gemini_agentic_engine
+from app.services.tts_engine import tts_engine, VIDEO_DIR
+from app.services.video_compositor import video_compositor, get_audio_duration
+from app.config import settings
 
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/campaigns", tags=["campaigns"])
 
-# In-memory storage for active campaigns
+# In-memory storage for active campaigns and rendering tasks
 CAMPAIGN_STORE: dict[str, CampaignBlueprint] = {}
+RENDER_STATUS_STORE: dict[str, RenderStatus] = {}
 
 FOUNDER_PRESETS = [
     {
@@ -262,4 +272,182 @@ async def agentic_inspect_direct(request: GeminiAgenticInspectionRequest):
         )
 
     return await gemini_agentic_engine.inspect_campaign_video(blueprint, focus_area=request.target_focus)
+
+
+# ==========================================
+# Real Video & TTS Synthesis Pipeline
+# ==========================================
+
+async def _execute_render(
+    campaign_id: str,
+    blueprint: CampaignBlueprint,
+    voice: Optional[str] = None,
+    aspect_ratio: str = "9:16",
+):
+    """Background task: synthesizes voiceovers per scene and renders full video."""
+    try:
+        chosen_voice = voice or settings.EDGE_TTS_VOICE
+
+        RENDER_STATUS_STORE[campaign_id] = RenderStatus(
+            campaign_id=campaign_id,
+            status="synthesizing_audio",
+            progress_pct=20,
+            current_step="Synthesizing founder voiceovers with Edge TTS...",
+        )
+        log_collector.record_log(
+            "INFO",
+            "tts_engine",
+            f"Generating scene voiceovers for campaign {campaign_id} (voice: {chosen_voice})"
+        )
+
+        audio_paths = await tts_engine.generate_scene_voiceovers(
+            campaign_id=campaign_id,
+            scenes=blueprint.scenes,
+            voice=chosen_voice,
+        )
+
+        RENDER_STATUS_STORE[campaign_id] = RenderStatus(
+            campaign_id=campaign_id,
+            status="rendering_scenes",
+            progress_pct=55,
+            current_step="Compositing visuals and burning in kinetic captions via FFmpeg...",
+        )
+        log_collector.record_log(
+            "INFO",
+            "video_compositor",
+            f"Compositing {len(blueprint.scenes)} scenes with {aspect_ratio} layout for {campaign_id}"
+        )
+
+        final_output = await video_compositor.render_campaign(
+            campaign_id=campaign_id,
+            scenes=blueprint.scenes,
+            audio_paths=audio_paths,
+            aspect_ratio=aspect_ratio,
+        )
+
+        file_size = os.path.getsize(final_output) if os.path.exists(final_output) else 0
+        total_dur = sum(get_audio_duration(ap) + 0.5 for ap in audio_paths)
+
+        RENDER_STATUS_STORE[campaign_id] = RenderStatus(
+            campaign_id=campaign_id,
+            status="completed",
+            progress_pct=100,
+            current_step="Render complete! Video ready for playback & download.",
+            video_url=f"/media/videos/{campaign_id}.mp4",
+            download_url=f"/api/campaigns/{campaign_id}/download",
+            file_size_bytes=file_size,
+            duration_seconds=round(total_dur, 2),
+        )
+        log_collector.record_log(
+            "INFO",
+            "video_compositor",
+            f"Campaign {campaign_id} rendered: {file_size / 1024:.1f} KB, duration {round(total_dur, 2)}s"
+        )
+    except Exception as e:
+        logger.exception(f"Render failed for campaign {campaign_id}: {e}")
+        RENDER_STATUS_STORE[campaign_id] = RenderStatus(
+            campaign_id=campaign_id,
+            status="failed",
+            progress_pct=0,
+            current_step=f"Render failed: {str(e)}",
+            error=str(e),
+        )
+        log_collector.record_log(
+            "ERROR",
+            "video_compositor",
+            f"Render failed for {campaign_id}: {e}"
+        )
+
+
+@router.post("/{campaign_id}/render", response_model=RenderStatus)
+async def render_campaign_video(
+    campaign_id: str,
+    background_tasks: BackgroundTasks,
+    render_request: Optional[RenderRequest] = None,
+):
+    """
+    Trigger full TTS voiceover synthesis and FFmpeg video compositing.
+    Runs asynchronously in the background. Status can be polled via GET /{campaign_id}/render-status.
+    """
+    if campaign_id not in CAMPAIGN_STORE:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    blueprint = CAMPAIGN_STORE[campaign_id]
+
+    # If already rendering, return current status
+    if campaign_id in RENDER_STATUS_STORE:
+        current_status = RENDER_STATUS_STORE[campaign_id]
+        if current_status.status in ("synthesizing_audio", "rendering_scenes", "assembling_video"):
+            return current_status
+
+    aspect_ratio = render_request.aspect_ratio if render_request and render_request.aspect_ratio else blueprint.aspect_ratio
+    voice = render_request.voice if render_request else None
+
+    initial_status = RenderStatus(
+        campaign_id=campaign_id,
+        status="queued",
+        progress_pct=5,
+        current_step="Queued for rendering...",
+    )
+    RENDER_STATUS_STORE[campaign_id] = initial_status
+
+    background_tasks.add_task(
+        _execute_render,
+        campaign_id=campaign_id,
+        blueprint=blueprint,
+        voice=voice,
+        aspect_ratio=aspect_ratio,
+    )
+
+    return initial_status
+
+
+@router.get("/{campaign_id}/render-status", response_model=RenderStatus)
+async def get_render_status(campaign_id: str):
+    """Poll rendering progress of a campaign video."""
+    if campaign_id in RENDER_STATUS_STORE:
+        return RENDER_STATUS_STORE[campaign_id]
+
+    # Check if video was rendered previously and exists on disk
+    video_file = VIDEO_DIR / f"{campaign_id}.mp4"
+    if video_file.exists():
+        file_size = video_file.stat().st_size
+        status = RenderStatus(
+            campaign_id=campaign_id,
+            status="completed",
+            progress_pct=100,
+            current_step="Video ready for playback & download.",
+            video_url=f"/media/videos/{campaign_id}.mp4",
+            download_url=f"/api/campaigns/{campaign_id}/download",
+            file_size_bytes=file_size,
+        )
+        RENDER_STATUS_STORE[campaign_id] = status
+        return status
+
+    if campaign_id not in CAMPAIGN_STORE:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    return RenderStatus(
+        campaign_id=campaign_id,
+        status="queued",
+        progress_pct=0,
+        current_step="Not yet rendered. Call POST /render to start.",
+    )
+
+
+@router.get("/{campaign_id}/download")
+async def download_campaign_video(campaign_id: str):
+    """Download the finalized MP4 video file for a campaign."""
+    video_file = VIDEO_DIR / f"{campaign_id}.mp4"
+    if not video_file.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=f"Rendered video for campaign '{campaign_id}' not found. Please render the video first."
+        )
+
+    return FileResponse(
+        path=str(video_file),
+        media_type="video/mp4",
+        filename=f"ashky_{campaign_id}.mp4",
+    )
 

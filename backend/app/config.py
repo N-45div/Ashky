@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     GRAFANA_CLOUD_USER: Optional[str] = os.getenv("GRAFANA_CLOUD_USER", "")
     GRAFANA_API_KEY: Optional[str] = os.getenv("GRAFANA_API_KEY", "")
 
+    # Edge TTS Settings
+    EDGE_TTS_VOICE: str = os.getenv("EDGE_TTS_VOICE", os.getenv("TTS_VOICE", "en-US-GuyNeural"))
+
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173", "*"]
 

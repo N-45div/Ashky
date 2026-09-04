@@ -1,14 +1,22 @@
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.services.telemetry import get_prometheus_metrics_text, log_collector
+from app.services.tts_engine import MEDIA_ROOT, ensure_media_dirs
 from app.api import campaigns, geo, grafana
+
+# Ensure media storage directories exist
+ensure_media_dirs()
 
 app = FastAPI(
     title=settings.APP_NAME,
     description="Autonomous Video Marketing & AI Search Optimization (GEO) Studio for Solo Founders (Google Agentic Cinema Hackathon)",
     version=settings.APP_VERSION
 )
+
+# Static media route for rendered audio & video assets
+app.mount("/media", StaticFiles(directory=str(MEDIA_ROOT)), name="media")
 
 # CORS
 app.add_middleware(

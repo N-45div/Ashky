@@ -48,6 +48,22 @@ class CampaignBlueprint(BaseModel):
     vision_qa: Optional[List[VisionCriticScore]] = None
     created_at: str
 
+class RenderRequest(BaseModel):
+    voice: Optional[str] = None
+    aspect_ratio: Optional[str] = "9:16"
+    include_subtitles: bool = True
+
+class RenderStatus(BaseModel):
+    campaign_id: str
+    status: str = "queued"  # queued, synthesizing_audio, rendering_scenes, assembling_video, completed, failed
+    progress_pct: int = 0
+    current_step: str = "Queued for rendering..."
+    video_url: Optional[str] = None
+    download_url: Optional[str] = None
+    file_size_bytes: Optional[int] = None
+    duration_seconds: Optional[float] = None
+    error: Optional[str] = None
+
 # ==========================================
 # Generative Engine Optimization (GEO) Models
 # ==========================================
