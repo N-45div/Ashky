@@ -125,6 +125,7 @@ class MCPAgentResponse(BaseModel):
     mcp_tools_called: List[str]
     telemetry_data_used: Dict[str, Any]
     suggested_actions: List[str]
+    structured_diagnostic: Optional[Dict[str, Any]] = None
 
 # ==========================================
 # Gemini Agentic Video Understanding Models

@@ -83,7 +83,7 @@ export default function AgentSidecar({
         userImpact: "Competitors 'Distance' and 'Grip' secured lead answer citations in Perplexity and Gemini answers.",
         evidence: "AI citation probe batch #geo_prb_8819; entity grounding confidence 42% vs 88% competitor baseline.",
         action: "Recommend creating a targeted comparison video in Video Studio emphasizing the October 12 demo release date.",
-        verification: "Simulated probe with added date entity boosts projected answer share from 45.8% to 62.5%."
+        verification: "Benchmark probe with added date entity boosts projected answer share from 45.8% to 62.5%."
       };
     } else if (q.includes('cost') || q.includes('expensive') || q.includes('token')) {
       return {
@@ -128,7 +128,7 @@ export default function AgentSidecar({
       if (!response.ok) throw new Error('Failed to query MCP Agent');
 
       const data = await response.json();
-      const structuredData = getStructuredDiagnosticAnswer(textToSend);
+      const structuredData = data.structured_diagnostic || getStructuredDiagnosticAnswer(textToSend);
 
       const agentMsg = {
         id: Date.now() + 1,

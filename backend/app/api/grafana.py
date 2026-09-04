@@ -67,5 +67,5 @@ async def chat_with_mcp_agent(query: MCPAgentQuery):
         "growth_sre_agent",
         f"Processing founder inquiry: '{query.user_query}'"
     )
-    result = process_agent_inquiry(query.user_query)
+    result = await process_agent_inquiry(query.user_query)
     return MCPAgentResponse(**result)
