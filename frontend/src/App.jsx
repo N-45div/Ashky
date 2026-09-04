@@ -1,68 +1,51 @@
 import React, { useState } from 'react';
-import Navbar from './components/Navbar';
-import AgentSidecar from './components/AgentSidecar';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import LandingNavbar from './components/LandingNavbar';
 import LandingPage from './pages/LandingPage';
-import VideoStudio from './pages/VideoStudio';
-import GeoOptimizer from './pages/GeoOptimizer';
-import Observability from './pages/Observability';
+import AppWorkspace from './pages/AppWorkspace';
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState('landing');
-  const [sidecarOpen, setSidecarOpen] = useState(false);
-  const [selectedPreset, setSelectedPreset] = useState(null);
+function LandingRoute({ onSelectPreset }) {
+  const navigate = useNavigate();
 
   const handleNavigate = (tab) => {
-    setActiveTab(tab);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (tab === 'video_studio' || tab === 'studio') {
+      navigate('/app/studio');
+    } else if (tab === 'geo_optimizer' || tab === 'geo') {
+      navigate('/app/geo');
+    } else if (tab === 'observability') {
+      navigate('/app/observability');
+    } else {
+      navigate('/app');
+    }
   };
 
   const handleSelectPreset = (preset) => {
-    setSelectedPreset(preset);
+    if (onSelectPreset) {
+      onSelectPreset(preset);
+    }
+    navigate('/app/studio');
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', background: 'var(--bg-canvas)' }}>
-      {/* Top Glass Navigation */}
-      <Navbar
-        activeTab={activeTab}
-        setActiveTab={handleNavigate}
-        sidecarOpen={sidecarOpen}
-        setSidecarOpen={setSidecarOpen}
-      />
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#090a0c' }}>
+      {/* Clean Dark Landing Header with single Launch App CTA */}
+      <LandingNavbar />
 
-      {/* Main Content Area */}
-      <main style={{ flex: 1, position: 'relative', zIndex: 10 }}>
-        {activeTab === 'landing' && (
-          <LandingPage 
-            onNavigate={handleNavigate}
-            onSelectPreset={handleSelectPreset}
-          />
-        )}
-        {activeTab === 'video_studio' && (
-          <VideoStudio initialPreset={selectedPreset} />
-        )}
-        {activeTab === 'geo_optimizer' && <GeoOptimizer />}
-        {activeTab === 'observability' && (
-          <Observability onOpenSidecar={() => setSidecarOpen(true)} />
-        )}
+      <main style={{ flex: 1, position: 'relative' }}>
+        <LandingPage 
+          onNavigate={handleNavigate}
+          onSelectPreset={handleSelectPreset}
+        />
       </main>
-
-      {/* Collapsible Grafana MCP Agent Drawer */}
-      <AgentSidecar
-        isOpen={sidecarOpen}
-        onClose={() => setSidecarOpen(false)}
-      />
 
       {/* Footer */}
       <footer style={{
         padding: '24px 28px',
-        borderTop: '1px solid var(--border-subtle)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
         textAlign: 'center',
         fontSize: '0.8rem',
-        color: 'var(--text-muted)',
-        position: 'relative',
-        zIndex: 10,
-        background: 'var(--bg-surface-1)'
+        color: '#64748b',
+        background: '#0a0c10'
       }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <p style={{ margin: 0, color: '#e2e8f0', fontWeight: 600 }}>
@@ -74,5 +57,41 @@ export default function App() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function App() {
+  const [selectedPreset, setSelectedPreset] = useState(null);
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Landing Page Route (Clean Dark Theme, Single Launch App button) */}
+        <Route 
+          path="/" 
+          element={<LandingRoute onSelectPreset={setSelectedPreset} />} 
+        />
+
+        {/* Full App Workspace with ChatGPT-style Collapsible Icon Sidebar */}
+        <Route 
+          path="/app" 
+          element={<AppWorkspace initialPreset={selectedPreset} />} 
+        />
+        <Route 
+          path="/app/:tab" 
+          element={<AppWorkspace initialPreset={selectedPreset} />} 
+        />
+
+        {/* Backwards Compatibility / Direct Links */}
+        <Route path="/studio" element={<Navigate to="/app/studio" replace />} />
+        <Route path="/geo" element={<Navigate to="/app/geo" replace />} />
+        <Route path="/observability" element={<Navigate to="/app/observability" replace />} />
+        <Route path="/video_studio" element={<Navigate to="/app/studio" replace />} />
+        <Route path="/geo_optimizer" element={<Navigate to="/app/geo" replace />} />
+
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
