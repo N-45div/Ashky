@@ -60,13 +60,20 @@ graph TD
 - Benchmarks **Share of Voice (SOV)** and detects citation gaps against incumbents.
 - Generates valid **Schema.org `VideoObject`** and **`SoftwareApplication`** JSON-LD markup to directly ground LLM search engines.
 
-### 4. Grafana Cloud Observability & Model Context Protocol (MCP)
+### 4. Grafana Cloud Observability & Official Hosted MCP Server
+- **Official Hosted MCP Server**: Direct Streamable HTTP integration via `https://mcp.grafana.com/mcp` routing to Grafana Cloud stack `https://giantdumpling1334.grafana.net` with `X-Grafana-URL` authentication.
+- **Official MCP Tools**:
+  - `query_prometheus`: PromQL telemetry execution for video rendering latency, token costs, and 3-second hook drop-off.
+  - `query_loki`: LogQL pipeline log and error trace stream inspection.
+  - `search_dashboards`: Catalog lookup linking the production dashboard (`ashky-telemetry-01`).
+  - `list_alerts`: Real-time monitoring of fired alerts and SLA targets.
+  - `grafana_diagnose_pipeline`: Autonomous multi-agent SRE sweeps synthesizing findings and SLO actions.
+  - `grafana_optimize_retention_loop`: Closed-loop autonomous retention optimization rewriting Scene 1 if hook retention drops below 90.
 - Live `/metrics` Prometheus scrape target tracking:
   - `ashky_scene_render_duration_seconds`
   - `ashky_hook_strength_score`
   - `ashky_llm_share_of_voice_pct`
   - `ashky_token_spend_usd`
-- Model Context Protocol (MCP) server integration (`grafana_query_metrics`, `grafana_query_loki_logs`, `grafana_diagnose_pipeline`) allowing autonomous agents to query telemetry and diagnose pipeline incidents.
 
 ---
 
@@ -77,11 +84,11 @@ graph TD
 - [x] Progressive 3-Scene Video Generation with Server-Sent Events (SSE)
 - [x] Generative Engine Optimization (GEO) prober and Schema.org JSON-LD generator
 - [x] Prometheus metrics instrumentation and Loki log collector
-- [x] Model Context Protocol (MCP) server tools (`grafana_query_metrics`, `grafana_query_loki_logs`, `grafana_diagnose_pipeline`)
-- [x] 100% test coverage with `pytest` (`backend/tests/test_foundation.py`)
+- [x] Official Grafana Cloud MCP server client (`https://mcp.grafana.com/mcp`) with JSON-RPC 2.0 dispatch
+- [x] 100% test coverage with `pytest` (`backend/tests/test_foundation.py` and `backend/tests/test_grafana_cloud.py`)
 
 ### ✅ Day 2: Gemini Agentic Video Model & Interactive Studio
-- [x] **Gemini 3.5 Flash Agentic Video Understanding Engine**: Dynamic timeline inspection with 88% token savings
+- [x] **Gemini 3.7 Flash Agentic Video Understanding Engine**: Dynamic timeline inspection with 88% token savings
 - [x] Dedicated Agentic Video API (`POST /api/campaigns/{id}/agentic-inspect`)
 - [x] **Hollywood-Grade Landing Page** (`frontend/src/pages/LandingPage.jsx`) with live cinematic preview HUD, hackathon track badge, and instant founder pitch sandbox
 - [x] Full React 19 + Vite Dark-Mode Studio Frontend (`frontend/src/`):
@@ -90,8 +97,8 @@ graph TD
   - Gemini Vision Critic scorecard & 3-second drop-off predictor
   - Gemini Agentic Timeline inspector with frame-by-frame retention scoring
   - GEO Intelligence Matrix & 1-click JSON-LD Schema exporter
-  - Real-time Grafana MCP Agent sidecar copilot
-- [x] Comprehensive test suite with 9 passing unit & integration tests (`pytest`)
+  - Real-time Grafana MCP Agent sidecar copilot with live `mcp.grafana.com` connection badge
+- [x] Comprehensive test suite with 13 passing unit & integration tests (`pytest`)
 - [x] Single-port deployment with static bundle mounting
 
 ---
@@ -127,6 +134,7 @@ uvicorn app.main:app --app-dir backend --reload --port 8000
 - API Docs: `http://localhost:8000/docs`
 - Prometheus Metrics: `http://localhost:8000/metrics`
 - Health Check: `http://localhost:8000/health`
+- MCP JSON-RPC 2.0: `http://localhost:8000/mcp`
 
 ### 4. Start Frontend Studio
 ```bash
@@ -141,15 +149,19 @@ Open `http://localhost:5173` to launch the **Ashky Studio**!
 ## 🧪 Verified Test Suite
 
 ```
-backend/tests/test_foundation.py::test_health PASSED                     [ 11%]
-backend/tests/test_foundation.py::test_prometheus_metrics PASSED         [ 22%]
-backend/tests/test_foundation.py::test_campaign_presets PASSED           [ 33%]
-backend/tests/test_foundation.py::test_campaign_create PASSED            [ 44%]
-backend/tests/test_foundation.py::test_geo_probe PASSED                  [ 55%]
-backend/tests/test_foundation.py::test_geo_schema PASSED                 [ 66%]
-backend/tests/test_foundation.py::test_grafana_snapshot_and_mcp PASSED   [ 77%]
-backend/tests/test_gemini_agentic.py::test_gemini_agentic_inspection_direct PASSED [ 88%]
-backend/tests/test_gemini_agentic.py::test_gemini_agentic_inspection_existing_campaign PASSED [100%]
+backend/tests/test_grafana_cloud.py::test_prometheus_metrics_endpoint PASSED     [  7%]
+backend/tests/test_grafana_cloud.py::test_mcp_jsonrpc_initialize_and_tools PASSED [ 15%]
+backend/tests/test_grafana_cloud.py::test_mcp_jsonrpc_tools_call PASSED          [ 23%]
+backend/tests/test_grafana_cloud.py::test_closed_loop_retention_optimization PASSED [ 30%]
+backend/tests/test_grafana_cloud.py::test_official_grafana_mcp_tools PASSED      [ 38%]
+backend/tests/test_foundation.py::test_health PASSED                             [ 46%]
+backend/tests/test_foundation.py::test_prometheus_metrics PASSED                 [ 53%]
+backend/tests/test_foundation.py::test_campaign_presets PASSED                   [ 61%]
+backend/tests/test_foundation.py::test_campaign_create PASSED                    [ 69%]
+backend/tests/test_foundation.py::test_geo_probe PASSED                          [ 76%]
+backend/tests/test_foundation.py::test_geo_schema PASSED                         [ 84%]
+backend/tests/test_foundation.py::test_grafana_snapshot_and_mcp PASSED           [ 92%]
+backend/tests/test_foundation.py::test_neon_circuit_seeded_campaign PASSED       [100%]
 ```
 
 ---
