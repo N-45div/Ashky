@@ -115,3 +115,66 @@ def test_closed_loop_retention_optimization():
     updated_camp = CAMPAIGN_STORE[camp_id]
     assert "SUBZERODB" in updated_camp.scenes[0].text_overlay.upper()
     assert updated_camp.vision_qa[0].hook_strength > 82
+
+def test_official_grafana_mcp_tools():
+    """Verify official Grafana Cloud MCP tools (query_prometheus, query_loki, search_dashboards, list_alerts)."""
+    # 1. query_prometheus
+    res_prom = client.post("/mcp", json={
+        "jsonrpc": "2.0",
+        "id": 10,
+        "method": "tools/call",
+        "params": {
+            "name": "query_prometheus",
+            "arguments": {"query": "ashky_hook_strength_score"}
+        }
+    })
+    assert res_prom.status_code == 200
+    data_prom = res_prom.json()
+    assert "result" in data_prom
+    assert data_prom["result"]["isError"] is False
+
+    # 2. query_loki
+    res_loki = client.post("/mcp", json={
+        "jsonrpc": "2.0",
+        "id": 11,
+        "method": "tools/call",
+        "params": {
+            "name": "query_loki",
+            "arguments": {"query": '{app="ashky"}', "limit": 5}
+        }
+    })
+    assert res_loki.status_code == 200
+    data_loki = res_loki.json()
+    assert "result" in data_loki
+    assert data_loki["result"]["isError"] is False
+
+    # 3. search_dashboards
+    res_dash = client.post("/mcp", json={
+        "jsonrpc": "2.0",
+        "id": 12,
+        "method": "tools/call",
+        "params": {
+            "name": "search_dashboards",
+            "arguments": {"query": "ashky"}
+        }
+    })
+    assert res_dash.status_code == 200
+    data_dash = res_dash.json()
+    assert "result" in data_dash
+    assert data_dash["result"]["isError"] is False
+
+    # 4. list_alerts
+    res_alerts = client.post("/mcp", json={
+        "jsonrpc": "2.0",
+        "id": 13,
+        "method": "tools/call",
+        "params": {
+            "name": "list_alerts",
+            "arguments": {"state": "all"}
+        }
+    })
+    assert res_alerts.status_code == 200
+    data_alerts = res_alerts.json()
+    assert "result" in data_alerts
+    assert data_alerts["result"]["isError"] is False
+
