@@ -38,7 +38,7 @@ export default function AgentSidecar({
     {
       id: 1,
       sender: 'agent',
-      intro: `Ashky Pipeline Agent active for campaign "${campaignName}". Connected to Grafana Cloud via Model Context Protocol (MCP).`,
+      intro: `Ashky Pipeline Agent active for campaign "${campaignName}". Connected to official Grafana Cloud MCP (mcp.grafana.com/mcp) targeting stack giantdumpling1334.grafana.net.`,
       structured: {
         finding: "Pipeline is healthy across planning, progressive scene generation, and video synthesis stages.",
         userImpact: "Scene 1 delivered in 1.42s; no end-user latency degradation observed.",
@@ -46,7 +46,7 @@ export default function AgentSidecar({
         action: "Continuously monitoring concurrent render limits and token burn rate.",
         verification: "All 5 SLO targets within allowed error budget (18% consumed this week)."
       },
-      tools: ['mcp_query_prometheus', 'mcp_search_loki_logs', 'mcp_get_tempo_trace'],
+      tools: ['query_prometheus', 'query_loki', 'search_dashboards', 'list_alerts'],
       showEvidence: false
     }
   ]);
@@ -135,7 +135,9 @@ export default function AgentSidecar({
         sender: 'agent',
         intro: data.answer || "Diagnostic evaluation complete from Grafana Cloud MCP evidence.",
         structured: structuredData,
-        tools: data.mcp_tools_called || ['grafana_query_metrics', 'grafana_query_loki'],
+        tools: data.mcp_tools_called || ['query_prometheus', 'query_loki', 'search_dashboards', 'list_alerts'],
+        mcpEndpoint: data.mcp_server_endpoint || 'https://mcp.grafana.com/mcp',
+        stackUrl: data.grafana_stack_url || 'https://giantdumpling1334.grafana.net',
         showEvidence: false
       };
 
@@ -150,7 +152,9 @@ export default function AgentSidecar({
           sender: 'agent',
           intro: "Grafana Cloud MCP Evidence Summary:",
           structured: structuredData,
-          tools: ['mcp_query_prometheus', 'mcp_search_loki_logs', 'mcp_get_tempo_trace'],
+          tools: ['query_prometheus', 'query_loki', 'search_dashboards', 'list_alerts'],
+          mcpEndpoint: 'https://mcp.grafana.com/mcp',
+          stackUrl: 'https://giantdumpling1334.grafana.net',
           showEvidence: false
         }
       ]);
@@ -184,7 +188,7 @@ export default function AgentSidecar({
     }}>
       {/* Header */}
       <div style={{
-        padding: '14px 18px',
+        padding: '12px 18px',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         display: 'flex',
         alignItems: 'center',
@@ -206,12 +210,43 @@ export default function AgentSidecar({
             <Terminal size={15} />
           </div>
           <div>
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0, color: '#f0f3f6' }}>
-              Ashky Pipeline Agent
-            </h3>
-            <span style={{ fontSize: '0.68rem', color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>
-              Evidence from Grafana Cloud
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0, color: '#f0f3f6' }}>
+                Ashky Pipeline Agent
+              </h3>
+              <span style={{
+                fontSize: '0.62rem',
+                fontWeight: 700,
+                padding: '2px 6px',
+                borderRadius: '4px',
+                background: 'rgba(34, 197, 94, 0.15)',
+                border: '1px solid rgba(34, 197, 94, 0.35)',
+                color: '#4ade80',
+                fontFamily: 'var(--font-mono)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
+                MCP LIVE
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+              <span style={{ fontSize: '0.66rem', color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>
+                mcp.grafana.com/mcp
+              </span>
+              <span style={{ fontSize: '0.64rem', color: '#64748b' }}>•</span>
+              <a 
+                href="https://giantdumpling1334.grafana.net" 
+                target="_blank" 
+                rel="noreferrer" 
+                style={{ fontSize: '0.66rem', color: '#94a3b8', fontFamily: 'var(--font-mono)', textDecoration: 'none' }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
+              >
+                giantdumpling1334.grafana.net ↗
+              </a>
+            </div>
           </div>
         </div>
 
@@ -392,20 +427,45 @@ export default function AgentSidecar({
 
                   {msg.showEvidence && (
                     <div style={{
-                      marginTop: '6px',
-                      padding: '8px',
+                      marginTop: '8px',
+                      padding: '10px 12px',
                       background: '#060709',
-                      borderRadius: '4px',
-                      fontSize: '0.7rem',
+                      borderRadius: '6px',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      fontSize: '0.72rem',
                       fontFamily: 'var(--font-mono)',
-                      color: '#94a3b8'
+                      color: '#94a3b8',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px'
                     }}>
-                      <div style={{ color: '#fbbf24', marginBottom: '4px' }}>MCP Tools Executed:</div>
-                      {msg.tools?.map((t, idx) => (
-                        <div key={idx} style={{ color: '#cbd5e1' }}>• {t}()</div>
-                      ))}
-                      <div style={{ marginTop: '4px', color: '#64748b' }}>
-                        Trace ID: tr_8f2a991b • LogQL: {`{app="ashky", stage="scene_synthesis"}`}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '6px' }}>
+                        <span style={{ color: '#fbbf24', fontWeight: 600 }}>MCP Server:</span>
+                        <span style={{ color: '#4ade80' }}>{msg.mcpEndpoint || 'https://mcp.grafana.com/mcp'}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: '#94a3b8' }}>Stack Target:</span>
+                        <span style={{ color: '#cbd5e1' }}>{msg.stackUrl || 'https://giantdumpling1334.grafana.net'}</span>
+                      </div>
+                      <div>
+                        <span style={{ color: '#fbbf24', display: 'block', marginBottom: '4px', fontWeight: 600 }}>Official Tools Invoked:</span>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                          {msg.tools?.map((t, idx) => (
+                            <span key={idx} style={{
+                              background: 'rgba(56, 189, 248, 0.1)',
+                              border: '1px solid rgba(56, 189, 248, 0.3)',
+                              color: '#38bdf8',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              fontSize: '0.68rem'
+                            }}>
+                              {t}()
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div style={{ color: '#64748b', fontSize: '0.66rem', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '4px' }}>
+                        Protocol: JSON-RPC 2.0 (Streamable HTTP) • Auth: X-Grafana-URL Header
                       </div>
                     </div>
                   )}

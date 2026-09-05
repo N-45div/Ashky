@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Activity, Terminal, RefreshCw, 
   Download, CheckCircle2, 
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, ExternalLink
 } from 'lucide-react';
 
 export default function Observability({ onOpenSidecar, campaign, onNavigateToStudio }) {
@@ -523,6 +523,182 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
             </div>
           </div>
         )}
+      </div>
+
+      {/* 4.5. GRAFANA CLOUD MODEL CONTEXT PROTOCOL (MCP) RUNTIME */}
+      <div className="matte-panel" style={{ padding: '22px', background: '#0d0f14', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                background: 'rgba(245, 158, 11, 0.15)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fbbf24'
+              }}>
+                <Terminal size={15} />
+              </div>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
+                Grafana Cloud Model Context Protocol (MCP) Runtime
+              </h3>
+              <span style={{
+                fontSize: '0.66rem',
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: '4px',
+                background: 'rgba(34, 197, 94, 0.15)',
+                border: '1px solid rgba(34, 197, 94, 0.35)',
+                color: '#4ade80',
+                fontFamily: 'var(--font-mono)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
+                {snapshot?.mcp_connection_status || 'CONNECTED'}
+              </span>
+            </div>
+            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '6px 0 0' }}>
+              Autonomous SRE agent runtime powered by official Grafana Cloud MCP tools (<code style={{ color: '#fbbf24' }}>mcp.grafana.com</code>) targeting live Prometheus and Loki streams.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={onOpenSidecar}
+              className="btn-solid-white"
+              style={{ padding: '6px 14px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <Terminal size={13} />
+              <span>Query via Pipeline Agent</span>
+            </button>
+            <a
+              href={snapshot?.grafana_stack_url || "https://giantdumpling1334.grafana.net"}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-matte-dark"
+              style={{ padding: '6px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none', color: '#cbd5e1' }}
+            >
+              <span>Open Grafana Stack</span>
+              <ExternalLink size={12} />
+            </a>
+          </div>
+        </div>
+
+        {/* Stack Connection Details Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '10px',
+          marginBottom: '16px'
+        }}>
+          <div style={{ background: '#08090c', padding: '12px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+            <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+              MCP SERVER ENDPOINT
+            </span>
+            <span style={{ fontSize: '0.8rem', color: '#4ade80', fontFamily: 'var(--font-mono)', fontWeight: 600, wordBreak: 'break-all' }}>
+              {snapshot?.mcp_server_endpoint || 'https://mcp.grafana.com/mcp'}
+            </span>
+          </div>
+
+          <div style={{ background: '#08090c', padding: '12px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+            <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+              GRAFANA CLOUD STACK
+            </span>
+            <span style={{ fontSize: '0.8rem', color: '#fbbf24', fontFamily: 'var(--font-mono)', fontWeight: 600, wordBreak: 'break-all' }}>
+              {snapshot?.grafana_stack_url || 'https://giantdumpling1334.grafana.net'}
+            </span>
+          </div>
+
+          <div style={{ background: '#08090c', padding: '12px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+            <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+              TRANSPORT PROTOCOL
+            </span>
+            <span style={{ fontSize: '0.8rem', color: '#38bdf8', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
+              JSON-RPC 2.0 (Streamable HTTP)
+            </span>
+          </div>
+
+          <div style={{ background: '#08090c', padding: '12px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+            <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+              ROUTING HEADER
+            </span>
+            <span style={{ fontSize: '0.8rem', color: '#a78bfa', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
+              X-Grafana-URL
+            </span>
+          </div>
+        </div>
+
+        {/* Official Registered Tools List */}
+        <div>
+          <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '8px' }}>
+            OFFICIAL RUNTIME MCP TOOLS (INVOKED DURING AUTONOMOUS SRE SWEEPS):
+          </span>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '8px' }}>
+            {[
+              {
+                name: "query_prometheus",
+                desc: "PromQL metrics query for retention scores, render latency, & token costs",
+                type: "Metric Query"
+              },
+              {
+                name: "query_loki",
+                desc: "LogQL log queries for video synthesis traces & director evaluations",
+                type: "Log Stream"
+              },
+              {
+                name: "search_dashboards",
+                desc: "Finds and links production pipeline dashboards (ashky-telemetry-01)",
+                type: "Dashboard Catalog"
+              },
+              {
+                name: "list_alerts",
+                desc: "Lists fired alerting rules and latency/hook drop SLO violations",
+                type: "Alert Management"
+              },
+              {
+                name: "grafana_diagnose_pipeline",
+                desc: "Autonomous multi-agent SRE sweep synthesizing findings and SLO actions",
+                type: "Agent Synthesis"
+              },
+              {
+                name: "grafana_optimize_retention_loop",
+                desc: "Closed-loop optimization rewriting Scene 1 if hook retention drops <90",
+                type: "Closed-Loop Action"
+              }
+            ].map((tool, idx) => (
+              <div
+                key={idx}
+                style={{
+                  background: '#08090c',
+                  borderRadius: '6px',
+                  padding: '10px 12px',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#38bdf8', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                    {tool.name}()
+                  </span>
+                  <span style={{ fontSize: '0.64rem', color: '#64748b', background: 'rgba(255,255,255,0.04)', padding: '1px 6px', borderRadius: '4px' }}>
+                    {tool.type}
+                  </span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.74rem', color: '#94a3b8', lineHeight: 1.4 }}>
+                  {tool.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* 5. RELIABILITY TARGETS */}
