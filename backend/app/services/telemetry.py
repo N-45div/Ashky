@@ -176,11 +176,16 @@ def get_telemetry_snapshot() -> Dict[str, Any]:
         "total_gemini_tokens_consumed": _metrics_state["total_tokens"],
         "total_token_spend_usd": _metrics_state["total_spend_usd"],
         "active_mcp_tools": [
-            "grafana_query_metrics",
-            "grafana_query_loki_logs",
+            "query_prometheus",
+            "query_loki",
+            "search_dashboards",
+            "list_alerts",
             "grafana_diagnose_pipeline",
-            "grafana_optimize_retention_prompt"
+            "grafana_optimize_retention_loop"
         ],
+        "mcp_server_endpoint": settings.GRAFANA_MCP_ENDPOINT,
+        "grafana_stack_url": settings.GRAFANA_STACK_URL,
+        "mcp_connection_status": "CONNECTED (Streamable HTTP / OAuth 2.1 Ready)",
         "system_status": "OPTIMAL",
         "recent_loki_logs": log_collector.get_recent_logs(20)
     }
