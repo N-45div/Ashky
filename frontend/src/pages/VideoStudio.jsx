@@ -6,7 +6,7 @@ import {
   Download, Video, RotateCcw,
   Play, Pause, Volume2, VolumeX, Shield, Activity, Compass, Crosshair,
   SkipBack, SkipForward, Sliders, Music, Camera,
-  LayoutGrid, Folder, Copy, Type, Undo2, Redo2, Maximize2, Airplay, Repeat, MoreHorizontal
+  LayoutGrid, Folder, Copy, Type, Undo2, Redo2, Maximize2, Airplay, Repeat, MoreHorizontal, X
 } from 'lucide-react';
 
 export default function VideoStudio({ 
@@ -443,8 +443,8 @@ export default function VideoStudio({
       {/* Recoverable failure action banner (only displayed on error) */}
       {studioState === 'recoverable_failure' && (
         <div style={{
-          background: 'rgba(239, 68, 68, 0.08)',
-          border: '1px solid rgba(239, 68, 68, 0.25)',
+          background: 'rgba(239, 68, 68, 0.09)',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
           borderRadius: '6px',
           padding: '6px 12px',
           display: 'flex',
@@ -454,27 +454,47 @@ export default function VideoStudio({
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#f87171', fontSize: '0.76rem' }}>
             <AlertTriangle size={13} />
-            <span>Scene synthesis encountered a network timeout. Ashky isolated the fault.</span>
+            <span>{failureReason || 'Scene synthesis encountered an issue. Ashky isolated the fault.'}</span>
           </div>
-          <button
-            onClick={handleRetryFailedStage}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: '4px 10px',
-              borderRadius: '5px',
-              background: '#dc2626',
-              color: '#ffffff',
-              border: 'none',
-              fontSize: '0.72rem',
-              fontWeight: 600,
-              cursor: 'pointer'
-            }}
-          >
-            <RotateCcw size={11} />
-            <span>Retry Render</span>
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button
+              onClick={handleRetryFailedStage}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '4px 10px',
+                borderRadius: '5px',
+                background: '#dc2626',
+                color: '#ffffff',
+                border: 'none',
+                fontSize: '0.72rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              <RotateCcw size={11} />
+              <span>Retry Render</span>
+            </button>
+            <button
+              onClick={() => {
+                setStudioState(renderStatus?.status === 'completed' ? 'render_completed' : 'review_running');
+                setFailureReason(null);
+              }}
+              title="Dismiss banner"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                padding: '3px',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
+              <X size={13} />
+            </button>
+          </div>
         </div>
       )}
 
@@ -530,9 +550,9 @@ export default function VideoStudio({
           </div>
 
           {/* Form Fields */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div>
-              <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
+              <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '2px' }}>
                 PRODUCT NAME
               </label>
               <input
@@ -540,12 +560,12 @@ export default function VideoStudio({
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
                 className="matte-input"
-                style={{ width: '100%', fontSize: '0.74rem', padding: '3px 7px' }}
+                style={{ width: '100%', fontSize: '0.76rem', padding: '5px 8px' }}
               />
             </div>
 
             <div>
-              <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
+              <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '2px' }}>
                 CATEGORY
               </label>
               <input
@@ -553,26 +573,26 @@ export default function VideoStudio({
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="matte-input"
-                style={{ width: '100%', fontSize: '0.74rem', padding: '3px 7px' }}
+                style={{ width: '100%', fontSize: '0.76rem', padding: '5px 8px' }}
               />
             </div>
 
             <div>
-              <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
+              <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '2px' }}>
                 PRODUCT PITCH
               </label>
               <textarea
                 value={productPitch}
                 onChange={(e) => setProductPitch(e.target.value)}
                 className="matte-input"
-                rows={2}
-                style={{ width: '100%', fontSize: '0.72rem', padding: '3px 7px', resize: 'none', lineHeight: 1.25 }}
+                rows={3}
+                style={{ width: '100%', fontSize: '0.74rem', padding: '5px 8px', resize: 'none', lineHeight: 1.3, minHeight: '62px' }}
               />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
               <div>
-                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
+                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '2px' }}>
                   CAMPAIGN GOAL
                 </label>
                 <input
@@ -580,12 +600,12 @@ export default function VideoStudio({
                   value={campaignGoal}
                   onChange={(e) => setCampaignGoal(e.target.value)}
                   className="matte-input"
-                  style={{ width: '100%', fontSize: '0.72rem', padding: '3px 7px' }}
+                  style={{ width: '100%', fontSize: '0.74rem', padding: '5px 8px' }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
+                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '2px' }}>
                   TARGET AUDIENCE
                 </label>
                 <input
@@ -593,7 +613,7 @@ export default function VideoStudio({
                   value={targetAudience}
                   onChange={(e) => setTargetAudience(e.target.value)}
                   className="matte-input"
-                  style={{ width: '100%', fontSize: '0.72rem', padding: '3px 7px' }}
+                  style={{ width: '100%', fontSize: '0.74rem', padding: '5px 8px' }}
                 />
               </div>
             </div>
@@ -601,14 +621,14 @@ export default function VideoStudio({
             {/* Aspect Ratio & Style */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
               <div>
-                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
+                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '2px' }}>
                   RATIO
                 </label>
                 <select
                   value={aspectRatio}
                   onChange={(e) => setAspectRatio(e.target.value)}
                   className="matte-input"
-                  style={{ width: '100%', fontSize: '0.72rem', padding: '3px 6px' }}
+                  style={{ width: '100%', fontSize: '0.74rem', padding: '5px 6px' }}
                 >
                   <option value="9:16">9:16 (Reels/TikTok)</option>
                   <option value="16:9">16:9 (YouTube)</option>
@@ -616,14 +636,14 @@ export default function VideoStudio({
               </div>
 
               <div>
-                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
+                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '2px' }}>
                   CREATIVE STYLE
                 </label>
                 <select
                   value={style}
                   onChange={(e) => setStyle(e.target.value)}
                   className="matte-input"
-                  style={{ width: '100%', fontSize: '0.72rem', padding: '3px 6px' }}
+                  style={{ width: '100%', fontSize: '0.74rem', padding: '5px 6px' }}
                 >
                   <option value="Neon-Noir Cyberpunk Cinematic">Neon-Noir Cyberpunk</option>
                   <option value="Kinetic High-Tech Dark">Kinetic High-Tech</option>
@@ -657,7 +677,7 @@ export default function VideoStudio({
                     onChange={(e) => setSelectedVoice(e.target.value)}
                     className="matte-input"
                     disabled={renderingVideo}
-                    style={{ width: '100%', fontSize: '0.72rem', padding: '3px 6px' }}
+                    style={{ width: '100%', fontSize: '0.74rem', padding: '5px 6px' }}
                   >
                     <option value="en-US-GuyNeural">Guy (US Male - Founder Crisp)</option>
                     <option value="en-US-JennyNeural">Jenny (US Female - Engaging)</option>
@@ -673,7 +693,7 @@ export default function VideoStudio({
                 onClick={handleCreateAndStream}
                 disabled={studioState === 'creating'}
                 className="btn-solid-white"
-                style={{ width: '100%', padding: '7px 10px', fontSize: '0.8rem', fontWeight: 700, marginTop: '2px' }}
+                style={{ width: '100%', padding: '8px 10px', fontSize: '0.8rem', fontWeight: 700, marginTop: '2px' }}
               >
                 {studioState === 'creating' ? (
                   <>
@@ -694,7 +714,7 @@ export default function VideoStudio({
                   onClick={handleStartRender}
                   disabled={renderingVideo}
                   className="btn-solid-white"
-                  style={{ width: '100%', padding: '7px 10px', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                  style={{ width: '100%', padding: '8px 10px', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
                   {renderingVideo ? (
                     <>
@@ -713,7 +733,7 @@ export default function VideoStudio({
                   onClick={handleCreateAndStream}
                   disabled={studioState === 'creating'}
                   className="btn-matte-dark"
-                  style={{ width: '100%', padding: '4px', fontSize: '0.68rem', color: '#94a3b8' }}
+                  style={{ width: '100%', padding: '5px', fontSize: '0.7rem', color: '#94a3b8' }}
                 >
                   <span>Update Brief & Regenerate</span>
                 </button>
@@ -727,7 +747,7 @@ export default function VideoStudio({
                     handleCreateAndStream();
                   }}
                   className="btn-solid-white"
-                  style={{ width: '100%', padding: '7px 10px', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                  style={{ width: '100%', padding: '8px 10px', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
                   <Sparkles size={13} />
                   <span>Improve Campaign</span>
@@ -737,12 +757,33 @@ export default function VideoStudio({
                   onClick={handleStartRender}
                   disabled={renderingVideo}
                   className="btn-matte-dark"
-                  style={{ width: '100%', padding: '4px', fontSize: '0.68rem', color: '#94a3b8' }}
+                  style={{ width: '100%', padding: '5px', fontSize: '0.7rem', color: '#94a3b8' }}
                 >
                   <span>Re-Render MP4</span>
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Live Synthesis Pipeline Telemetry Widget */}
+          <div style={{
+            marginTop: 'auto',
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(255, 255, 255, 0.07)',
+            borderRadius: '6px',
+            padding: '7px 9px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '3px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>PIPELINE ENGINE</span>
+              <span className="tag-minimal tag-emerald" style={{ fontSize: '0.56rem', padding: '1px 5px' }}>LIVE GPU PIPELINE</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.64rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
+              <span>Gemini 3.8 + Edge-TTS</span>
+              <span style={{ color: '#10b981', fontWeight: 600 }}>● Active</span>
+            </div>
           </div>
         </div>
 
@@ -819,18 +860,29 @@ export default function VideoStudio({
             <div className="master-cinema-stage">
               
               {/* Top Half: Dual-Dock Viewport */}
-              <div style={{ display: 'grid', gridTemplateColumns: '185px 1fr', gap: '8px', alignItems: 'stretch' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(200px, 240px) 1fr',
+                gap: '10px',
+                alignItems: 'stretch',
+                flex: 1,
+                minHeight: 0
+              }}>
                 
                 {/* Left Dock: 9:16 Cinema Monitor with Cyan Safe HUD */}
                 <div style={{
                   position: 'relative',
                   borderRadius: '8px',
                   overflow: 'hidden',
-                  width: '185px',
-                  height: '318px',
+                  height: '100%',
+                  aspectRatio: '9 / 16',
+                  maxHeight: '100%',
                   background: '#040507',
                   border: '1px solid rgba(255, 255, 255, 0.12)',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.8)'
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.8)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}>
                   {activeTab === 'video_player' && renderStatus?.video_url ? (
                     <video
@@ -939,13 +991,13 @@ export default function VideoStudio({
                   background: '#0c0f17',
                   borderRadius: '8px',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
-                  padding: '8px 10px',
+                  padding: '10px 12px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  height: '318px',
+                  height: '100%',
                   boxSizing: 'border-box',
-                  gap: '4px'
+                  gap: '6px'
                 }}>
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1px' }}>
@@ -1275,17 +1327,16 @@ export default function VideoStudio({
           {/* Glowing Amber Circular Hook Gauge (Matching Mockup) */}
           <div style={{
             background: '#07090f',
-            padding: '8px',
+            padding: '7px',
             borderRadius: '7px',
             border: '1px solid rgba(255, 255, 255, 0.06)',
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: '3px'
+            justifyContent: 'space-around',
+            gap: '8px'
           }}>
-            <div style={{ position: 'relative', width: '64px', height: '64px' }}>
-              <svg width="64" height="64" viewBox="0 0 64 64">
+            <div style={{ position: 'relative', width: '58px', height: '58px' }}>
+              <svg width="58" height="58" viewBox="0 0 64 64">
                 <circle cx="32" cy="32" r="25" fill="none" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="5" />
                 <circle
                   cx="32"
@@ -1302,15 +1353,53 @@ export default function VideoStudio({
                 />
               </svg>
               <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
+                <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
                   {currentVisionScore?.hook_strength || 94}
                 </span>
-                <span style={{ fontSize: '0.54rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>100</span>
+                <span style={{ fontSize: '0.5rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>100</span>
               </div>
             </div>
-            <span style={{ fontSize: '0.62rem', color: '#fbbf24', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
-              PREDICTED HOOK STRENGTH
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <span style={{ fontSize: '0.62rem', color: '#fbbf24', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                PREDICTED HOOK
+              </span>
+              <span className="tag-minimal tag-emerald" style={{ fontSize: '0.56rem', padding: '1px 5px', width: 'fit-content' }}>
+                {currentVisionScore?.verdict || 'HOOK OPTIMAL'}
+              </span>
+              <span style={{ fontSize: '0.58rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+                Dropoff: {currentVisionScore?.predicted_3s_dropoff || '13.8'}%
+              </span>
+            </div>
+          </div>
+
+          {/* Vision QA Metric Bars */}
+          <div style={{
+            background: '#07090f',
+            padding: '6px 10px',
+            borderRadius: '7px',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '5px'
+          }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#94a3b8', fontFamily: 'var(--font-mono)', marginBottom: '2px' }}>
+                <span>Brand Clarity</span>
+                <span style={{ color: '#34d399', fontWeight: 700 }}>{currentVisionScore?.brand_clarity || 88}%</span>
+              </div>
+              <div style={{ height: '3px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ width: `${currentVisionScore?.brand_clarity || 88}%`, height: '100%', background: '#34d399', borderRadius: '2px' }} />
+              </div>
+            </div>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#94a3b8', fontFamily: 'var(--font-mono)', marginBottom: '2px' }}>
+                <span>Text Readability</span>
+                <span style={{ color: '#60a5fa', fontWeight: 700 }}>{currentVisionScore?.text_readability || 96}%</span>
+              </div>
+              <div style={{ height: '3px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ width: `${currentVisionScore?.text_readability || 96}%`, height: '100%', background: '#60a5fa', borderRadius: '2px' }} />
+              </div>
+            </div>
           </div>
 
           {/* AI Feedback Card */}
@@ -1332,9 +1421,14 @@ export default function VideoStudio({
               </div>
               <MoreHorizontal size={11} color="#64748b" />
             </div>
-            <p style={{ fontSize: '0.7rem', color: '#94a3b8', margin: 0, lineHeight: 1.35 }}>
+            <p style={{ fontSize: '0.68rem', color: '#94a3b8', margin: 0, lineHeight: 1.35 }}>
               {currentVisionScore?.critique_summary || 'Refine your composition with AI feedback, overlays and iterations you overlayment.'}
             </p>
+            {currentVisionScore?.actionable_improvements?.[0] && (
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '4px', marginTop: '2px', fontSize: '0.64rem', color: '#34d399', lineHeight: 1.25 }}>
+                ✦ {currentVisionScore.actionable_improvements[0]}
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -1373,15 +1467,16 @@ export default function VideoStudio({
         background: '#080a10',
         border: '1px solid rgba(255, 255, 255, 0.08)',
         borderRadius: '10px',
-        padding: '6px 12px',
+        padding: '6px 12px 8px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '4px',
+        justifyContent: 'space-between',
         position: 'relative',
-        height: '148px',
-        minHeight: '148px',
-        maxHeight: '148px',
+        height: '164px',
+        minHeight: '164px',
+        maxHeight: '164px',
         boxSizing: 'border-box',
+        overflow: 'hidden',
         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.7)'
       }}>
 
@@ -1417,7 +1512,7 @@ export default function VideoStudio({
         </div>
 
         {/* Relative Track Workspace with White Needle Playhead */}
-        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '3px', flex: 1, justifyContent: 'space-between' }}>
           
           {/* Vertical White Needle Playhead spanning all tracks */}
           <div style={{
@@ -1640,21 +1735,21 @@ export default function VideoStudio({
           </div>
 
           {/* Track 3: Camera Track (Camera Cues) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <div style={{ width: '68px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.64rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '20px' }}>
+            <div style={{ width: '68px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.62rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
               <Camera size={10} color="#60a5fa" />
               <span>Camera</span>
             </div>
 
-            <div style={{ flex: 1, display: 'flex', gap: '4px', height: '18px' }}>
-              <div style={{ width: '10%', minWidth: '80px', background: '#0e121a', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex', alignItems: 'center', padding: '0 6px', fontSize: '0.56rem', color: '#cbd5e1', fontFamily: 'var(--font-mono)' }}>
-                Camera Cues
+            <div style={{ flex: 1, display: 'flex', gap: '4px', height: '20px' }}>
+              <div style={{ width: '10%', minWidth: '80px', background: '#090d14', borderRadius: '3px', border: '1px solid rgba(96, 165, 250, 0.25)', display: 'flex', alignItems: 'center', padding: '0 6px', fontSize: '0.54rem', color: '#93c5fd', fontFamily: 'var(--font-mono)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                Crash Zoom
               </div>
-              <div style={{ width: '50%', background: '#0e121a', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex', alignItems: 'center', padding: '0 6px', fontSize: '0.56rem', color: '#cbd5e1', fontFamily: 'var(--font-mono)' }}>
-                Camera Cues
+              <div style={{ width: '50%', background: '#090d14', borderRadius: '3px', border: '1px solid rgba(96, 165, 250, 0.25)', display: 'flex', alignItems: 'center', padding: '0 6px', fontSize: '0.54rem', color: '#93c5fd', fontFamily: 'var(--font-mono)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                Low-Angle Dolly
               </div>
-              <div style={{ width: '40%', background: '#0e121a', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex', alignItems: 'center', padding: '0 6px', fontSize: '0.56rem', color: '#cbd5e1', fontFamily: 'var(--font-mono)' }}>
-                Camera Cues
+              <div style={{ width: '40%', background: '#090d14', borderRadius: '3px', border: '1px solid rgba(96, 165, 250, 0.25)', display: 'flex', alignItems: 'center', padding: '0 6px', fontSize: '0.54rem', color: '#93c5fd', fontFamily: 'var(--font-mono)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                Hero Vehicle Shot
               </div>
             </div>
           </div>

@@ -218,7 +218,7 @@ class VideoCompositor:
             f"fontcolor=0xe0e0e0:fontsize={fc['fontsize_subtitle']}:"
             f"x=(w-text_w)/2:y=3*h/4:"
             f"borderw=2:bordercolor=black:"
-            f"enable='gte(t,0.3)'"
+            f"enable='gte(t\\,0.3)'"
         )
 
         fade_filter = f"fade=t=in:st=0:d=0.3,fade=t=out:st={max(0.1, duration - 0.3)}:d=0.3"
