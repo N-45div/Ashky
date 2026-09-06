@@ -61,7 +61,7 @@ graph TD
 - Generates valid **Schema.org `VideoObject`** and **`SoftwareApplication`** JSON-LD markup to directly ground LLM search engines.
 
 ### 4. Grafana Cloud Observability & Official Hosted MCP Server
-- **Official Hosted MCP Server**: Direct Streamable HTTP integration via `https://mcp.grafana.com/mcp` routing to Grafana Cloud stack `https://giantdumpling1334.grafana.net` with `X-Grafana-URL` authentication.
+- **Official Hosted MCP Server**: Direct Streamable HTTP integration via `https://mcp.grafana.com/mcp` routing to your Grafana Cloud stack (`$GRAFANA_STACK_URL`) with `X-Grafana-URL` authentication.
 - **Official MCP Tools**:
   - `query_prometheus`: PromQL telemetry execution for video rendering latency, token costs, and 3-second hook drop-off.
   - `query_loki`: LogQL pipeline log and error trace stream inspection.
