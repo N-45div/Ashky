@@ -25,11 +25,11 @@ export default function VideoStudio({
     }
   }, [initialPreset]);
 
-  // Video & Playback State - initialized to 2.25s matching 01:22:15 in reference
+  // Video & Playback State - initialized to 16.875s matching 01:22:15 in reference
   const videoPlayerRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(2.25);
-  const [duration, setDuration] = useState(5.4);
+  const [currentTime, setCurrentTime] = useState(16.875);
+  const [duration, setDuration] = useState(30.0);
   const [isMuted, setIsMuted] = useState(false);
   const [selectedSceneIndex, setSelectedSceneIndex] = useState(0);
   const [timelineZoom, setTimelineZoom] = useState(1.0);
@@ -62,15 +62,80 @@ export default function VideoStudio({
 
   // Timecode formatter: matches reference 01:22:15 display format
   const formatTimecode = (sec) => {
-    if (!sec && sec !== 0) return '01:22:15';
-    // Calculate normalized offset centered around 01:22:15
-    const baseOffset = 82.6; // 01:22:15
-    const totalSec = baseOffset + (sec - 2.25);
-    const mins = Math.floor(totalSec / 60);
-    const secs = Math.floor(totalSec % 60);
-    const frames = Math.floor((totalSec % 1) * 25);
-    return `01:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`.slice(0, 5) + `:${String(frames).padStart(2, '0')}`;
+    const currentVal = sec !== undefined ? sec : currentTime;
+    const progress = Math.max(0, Math.min(currentVal / duration, 1));
+    const totalSecs = 60 + progress * 40;
+    const mins = Math.floor(totalSecs / 60);
+    const s = Math.floor(totalSecs % 60);
+    const f = Math.floor((totalSecs % 1) * 25);
+    return `0${mins}:${String(s).padStart(2, '0')}:${String(f).padStart(2, '0')}`;
   };
+
+  // Autoplay live preview on mount (muted for browser policy compliance)
+  useEffect(() => {
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.muted = true;
+      setIsMuted(true);
+      videoPlayerRef.current.play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch(() => {
+          // If autoplay is blocked by browser policy without user gesture, user can click play
+        });
+    }
+  }, []);
+
+  // Smooth 60 FPS Video & Playhead Runner Loop
+  useEffect(() => {
+    let animationFrameId;
+    let lastTime = performance.now();
+
+    if (isPlaying) {
+      const tick = (now) => {
+        const dt = (now - lastTime) / 1000;
+        lastTime = now;
+
+        // If real video is playing, keep timeline in 100% sync
+        if (videoPlayerRef.current && !videoPlayerRef.current.paused) {
+          const vTime = videoPlayerRef.current.currentTime;
+          setCurrentTime(vTime);
+          const idx = scenes.findIndex((s) => vTime >= s.timeStart && vTime < s.timeEnd);
+          if (idx !== -1 && idx !== selectedSceneIndex) {
+            setSelectedSceneIndex(idx);
+          }
+        } else {
+          // Continuous smooth 60fps ticker fallback
+          setCurrentTime((prev) => {
+            let next = prev + dt;
+            if (next >= duration) {
+              next = 0;
+              if (videoPlayerRef.current) {
+                videoPlayerRef.current.currentTime = 0;
+                videoPlayerRef.current.play().catch(() => {});
+              }
+            }
+            if (videoPlayerRef.current && Math.abs(videoPlayerRef.current.currentTime - next) > 0.4) {
+              videoPlayerRef.current.currentTime = next;
+            }
+            const idx = scenes.findIndex((s) => next >= s.timeStart && next < s.timeEnd);
+            if (idx !== -1 && idx !== selectedSceneIndex) {
+              setSelectedSceneIndex(idx);
+            }
+            return parseFloat(next.toFixed(3));
+          });
+        }
+
+        animationFrameId = requestAnimationFrame(tick);
+      };
+
+      animationFrameId = requestAnimationFrame(tick);
+    }
+
+    return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  }, [isPlaying, duration, selectedSceneIndex]);
 
   // Pre-configured scenes matching the reference video
   const scenes = [
@@ -78,7 +143,7 @@ export default function VideoStudio({
       scene_number: 14,
       title: 'Night Chase',
       timeStart: 0.0,
-      timeEnd: 5.4,
+      timeEnd: 10.0,
       camera_cues: 'Zoom In / Tracking',
       telemetry: { frame: 2459, time: '01:22' },
       script: 'Scene 14: Night Chase',
@@ -87,8 +152,8 @@ export default function VideoStudio({
     {
       scene_number: 15,
       title: 'Tunnel Drift',
-      timeStart: 5.4,
-      timeEnd: 12.0,
+      timeStart: 10.0,
+      timeEnd: 20.0,
       camera_cues: 'Low-Angle Dolly / Speedometer Blur',
       telemetry: { frame: 3120, time: '01:30' },
       script: 'Scene 15: Tunnel Drift',
@@ -97,8 +162,8 @@ export default function VideoStudio({
     {
       scene_number: 16,
       title: 'Rooftop Climax',
-      timeStart: 12.0,
-      timeEnd: 18.9,
+      timeStart: 20.0,
+      timeEnd: 30.0,
       camera_cues: 'Wide Beauty Shot / Neon Billboard',
       telemetry: { frame: 4500, time: '01:45' },
       script: 'Scene 16: Rooftop Climax',
@@ -110,16 +175,22 @@ export default function VideoStudio({
 
   // Video Play / Pause Toggle
   const toggleTimelinePlayback = () => {
-    if (!videoPlayerRef.current) return;
     if (isPlaying) {
-      videoPlayerRef.current.pause();
       setIsPlaying(false);
+      if (videoPlayerRef.current) {
+        videoPlayerRef.current.pause();
+      }
     } else {
-      videoPlayerRef.current.play().then(() => {
-        setIsPlaying(true);
-      }).catch((err) => {
-        console.warn("Video playback prevented:", err);
-      });
+      setIsPlaying(true);
+      if (videoPlayerRef.current) {
+        videoPlayerRef.current.currentTime = currentTime;
+        videoPlayerRef.current.play().catch(() => {
+          // If unmuted audio playback is restricted, mute and play
+          videoPlayerRef.current.muted = true;
+          setIsMuted(true);
+          videoPlayerRef.current.play().catch(() => {});
+        });
+      }
     }
   };
 
@@ -131,6 +202,7 @@ export default function VideoStudio({
     }
     setIsPlaying(false);
     setCurrentTime(0);
+    setSelectedSceneIndex(0);
   };
 
   // Seek Video
@@ -140,15 +212,24 @@ export default function VideoStudio({
     if (videoPlayerRef.current) {
       videoPlayerRef.current.currentTime = clamped;
     }
+    // Update active scene based on time
+    const idx = scenes.findIndex((s) => clamped >= s.timeStart && clamped < s.timeEnd);
+    if (idx !== -1 && idx !== selectedSceneIndex) {
+      setSelectedSceneIndex(idx);
+    }
   };
 
   // Previous / Next Scene Seek
   const handlePrevScene = () => {
-    handleSeek(0);
+    const prevIdx = Math.max(0, selectedSceneIndex - 1);
+    setSelectedSceneIndex(prevIdx);
+    handleSeek(scenes[prevIdx].timeStart);
   };
 
   const handleNextScene = () => {
-    handleSeek(duration);
+    const nextIdx = Math.min(scenes.length - 1, selectedSceneIndex + 1);
+    setSelectedSceneIndex(nextIdx);
+    handleSeek(scenes[nextIdx].timeStart);
   };
 
   // Audio Voice Preview Toggle
@@ -515,16 +596,21 @@ export default function VideoStudio({
               <video
                 ref={videoPlayerRef}
                 playsInline
-                src="/media/videos/camp_neo_tokyo.mp4"
+                src="/assets/camp_neo_tokyo.mp4"
                 poster="/assets/neo_racing_screen.jpg"
                 muted={isMuted}
-                onTimeUpdate={(e) => {
-                  setCurrentTime(parseFloat(e.target.currentTime.toFixed(2)));
-                }}
+                loop
                 onLoadedMetadata={(e) => {
-                  if (e.target.duration) setDuration(parseFloat(e.target.duration.toFixed(1)));
+                  if (e.target.duration && !isNaN(e.target.duration)) {
+                    setDuration(parseFloat(e.target.duration.toFixed(1)));
+                  }
                 }}
-                onEnded={() => setIsPlaying(false)}
+                onEnded={() => {
+                  if (videoPlayerRef.current) {
+                    videoPlayerRef.current.currentTime = 0;
+                    videoPlayerRef.current.play().catch(() => {});
+                  }
+                }}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -618,7 +704,7 @@ export default function VideoStudio({
                   Telemetry
                 </span>
                 <p style={{ fontSize: '0.72rem', color: '#cbd5e1', margin: '1px 0 0', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-                  Frame: {2459 + Math.floor(currentTime * 25)} | Time: 01:22
+                  Frame: {Math.round(2400 + (currentTime / duration) * 2100)} | Time: {formatTimecode(currentTime).slice(3)}
                 </p>
               </div>
             </div>
@@ -632,7 +718,7 @@ export default function VideoStudio({
               type="range"
               min="0"
               max={duration}
-              step="0.05"
+              step="0.01"
               value={currentTime}
               onChange={(e) => handleSeek(parseFloat(e.target.value))}
               className="timeline-slider-amber"
@@ -644,10 +730,10 @@ export default function VideoStudio({
               }}
             />
 
-            {/* Transport Bar Row: Left Timecode 01:22:15 | Centered Controls | Right Timecode 01:22:15 */}
+            {/* Transport Bar Row: Left Timecode | Centered Controls | Right Timecode */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
               <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: '#94a3b8', fontWeight: 600 }}>
-                01:22:15
+                {formatTimecode(currentTime)}
               </span>
 
               {/* Center Controls: SkipBack, Amber Play/Stop, SkipForward */}
@@ -694,7 +780,7 @@ export default function VideoStudio({
               </div>
 
               <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: '#94a3b8', fontWeight: 600 }}>
-                01:22:15
+                {formatTimecode(duration)}
               </span>
             </div>
           </div>
@@ -1038,9 +1124,7 @@ export default function VideoStudio({
               >
                 <SkipForward size={13} />
               </button>
-            </div>
-
-            {/* Glowing Cyan Timecode Badge 01:22:15 */}
+            </div>            {/* Glowing Cyan Timecode Badge */}
             <div style={{
               background: 'rgba(56, 189, 248, 0.15)',
               border: '1px solid #38bdf8',
@@ -1052,7 +1136,7 @@ export default function VideoStudio({
               fontWeight: 800,
               color: '#38bdf8'
             }}>
-              01:22:15
+              {formatTimecode(currentTime)}
             </div>
           </div>
 
@@ -1060,7 +1144,7 @@ export default function VideoStudio({
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#64748b' }}>
             <button
               type="button"
-              onClick={() => alert(`Marker set at 01:22:15`)}
+              onClick={() => alert(`Marker set at ${formatTimecode(currentTime)}`)}
               title="Add Marker"
               style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '2px' }}
             >
@@ -1127,17 +1211,18 @@ export default function VideoStudio({
           marginTop: '6px'
         }}>
           
-          {/* Vertical Cyan Playhead Needle Aligned to 01:22:15 */}
+          {/* Vertical Cyan Playhead Needle Aligned to currentTime */}
           <div style={{
             position: 'absolute',
             top: 0,
             bottom: 0,
-            left: `calc(134px + (100% - 146px) * 0.49)`,
+            left: `calc(134px + (100% - 146px) * ${Math.max(0, Math.min(currentTime / duration, 1))})`,
             width: '2px',
             background: '#38bdf8',
             boxShadow: '0 0 8px #38bdf8',
             zIndex: 30,
-            pointerEvents: 'none'
+            pointerEvents: 'none',
+            transition: isPlaying ? 'none' : 'left 0.05s ease-out'
           }}>
             <div style={{
               position: 'absolute',
@@ -1154,8 +1239,9 @@ export default function VideoStudio({
           <div 
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
-              const clickX = e.clientX - rect.left;
-              const ratio = Math.max(0, Math.min(clickX / rect.width, 1));
+              const clickX = e.clientX - rect.left - 134;
+              const trackWidth = rect.width - 146;
+              const ratio = Math.max(0, Math.min(clickX / Math.max(1, trackWidth), 1));
               handleSeek(ratio * duration);
             }}
             style={{
