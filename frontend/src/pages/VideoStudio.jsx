@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import confetti from 'canvas-confetti';
 import { 
-  Sparkles, RefreshCw, CheckCircle2, Clock, Film, Video, RotateCcw,
-  Play, Pause, Volume2, VolumeX, Shield, Activity, Crosshair,
-  SkipBack, SkipForward, Sliders, Music, Camera, Zap, Terminal,
-  LayoutGrid, Folder, Copy, Type, Undo2, Redo2, Maximize2, Airplay, Repeat, MoreHorizontal, X, ArrowRight,
-  Scissors, Link, Search
+  Play, Pause, Square, SkipBack, SkipForward,
+  Sliders, MoreVertical, Scissors, Link, Search, Maximize2,
+  Bookmark, Eye, EyeOff, Lock, Unlock, Film, Music, Camera
 } from 'lucide-react';
 
 export default function VideoStudio({ 
@@ -13,298 +10,179 @@ export default function VideoStudio({
   onStatusChange, 
   onNavigateToGeo 
 }) {
-  // Campaign Brief State with Neon Circuit as Default
-  const [productName, setProductName] = useState(initialPreset?.product_name || 'Neon Circuit');
-  const [category, setCategory] = useState(initialPreset?.category || 'Indie Game');
-  const [productPitch, setProductPitch] = useState(initialPreset?.product_pitch || 'A neon-noir racing roguelite where every failed run rewrites the city and reveals a new piece of the conspiracy.');
-  const [campaignGoal, setCampaignGoal] = useState(initialPreset?.campaign_goal || 'Drive wishlists before launch');
+  // Campaign Brief State with Reference Default: Neo-Racing Tokyo & Ashky
+  const [projectName, setProjectName] = useState(initialPreset?.product_name || 'Neo-Racing Tokyo');
+  const [studio, setStudio] = useState(initialPreset?.studio || 'Ashky');
   const [targetAudience, setTargetAudience] = useState(initialPreset?.target_audience || 'Gen Z/Alpha');
-  const [aspectRatio, setAspectRatio] = useState(initialPreset?.aspect_ratio || '9:16');
   const [style, setStyle] = useState(initialPreset?.style || 'Cinematic Neon-Noir');
 
   useEffect(() => {
     if (initialPreset) {
-      if (initialPreset.product_name) setProductName(initialPreset.product_name);
-      if (initialPreset.category) setCategory(initialPreset.category);
-      if (initialPreset.product_pitch) setProductPitch(initialPreset.product_pitch);
-      if (initialPreset.campaign_goal) setCampaignGoal(initialPreset.campaign_goal);
+      if (initialPreset.product_name) setProjectName(initialPreset.product_name);
+      if (initialPreset.studio) setStudio(initialPreset.studio);
       if (initialPreset.target_audience) setTargetAudience(initialPreset.target_audience);
-      if (initialPreset.aspect_ratio) setAspectRatio(initialPreset.aspect_ratio);
       if (initialPreset.style) setStyle(initialPreset.style);
     }
   }, [initialPreset]);
 
-  // Generation & Pipeline States
-  const [studioState, setStudioState] = useState('review_running');
-  const [pipelineProgress, setPipelineProgress] = useState(85);
-  const [failureReason, setFailureReason] = useState(null);
+  // Video & Playback State - initialized to 2.25s matching 01:22:15 in reference
+  const videoPlayerRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(2.25);
+  const [duration, setDuration] = useState(5.4);
+  const [isMuted, setIsMuted] = useState(false);
+  const [selectedSceneIndex, setSelectedSceneIndex] = useState(0);
+  const [timelineZoom, setTimelineZoom] = useState(1.0);
+  const [activeSequence, setActiveSequence] = useState('SEQUENCE 14');
 
-  // Default Neon Circuit Campaign Data for instant demo evaluation
-  const defaultNeonCampaign = {
-    campaign_id: 'camp_neon_circuit_01',
-    product_name: 'Neon Circuit',
-    category: 'Indie Game',
-    scenes: [
-      {
-        scene_number: 1,
-        status: 'ready',
-        title: 'The 3-Second Pattern Interrupt',
-        timeframe: '0.0s - 3.0s',
-        hook_type: 'Crash Zoom Kinetic Hook',
-        text_overlay: 'Every Crash Rewrites The City: Neon Circuit',
-        voiceover_script: "What if dying wasn't game over—but the only way to expose the city's dark syndicate?",
-        camera_cues: 'Zoom In / Tracking (0.4s crash zoom into cockpit HUD)',
-        kinetic_motion: 'High-contrast chromatic aberration and pop-in typography',
-        media_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80',
-        hook_score: 94,
-        dropoff: '13.8%'
-      },
-      {
-        scene_number: 2,
-        status: 'ready',
-        title: 'Procedural Racing & Syndicate Lore',
-        timeframe: '3.0s - 15.0s',
-        hook_type: 'High-Speed Gameplay Reveal',
-        text_overlay: '120+ Procedural Tracks • Uncover The Conspiracy',
-        voiceover_script: 'Tear through neon-drenched sectors, hijack corporate data caches, and unlock experimental anti-grav hovercraft.',
-        camera_cues: 'Wide low-angle dolly following anti-grav chassis through rain-slicked highway tunnels',
-        kinetic_motion: 'Dynamic HUD speedometer overlay pulsing with synthwave beats',
-        media_url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&q=80',
-        hook_score: 91,
-        dropoff: '18.2%'
-      },
-      {
-        scene_number: 3,
-        status: 'ready',
-        title: 'The Wishlist Call-to-Action',
-        timeframe: '15.0s - 30.0s',
-        hook_type: 'Wishlist Value Anchor',
-        text_overlay: 'Wishlist On Steam ➔ Demo Dropping Oct 12',
-        voiceover_script: 'Wishlist Neon Circuit on Steam today and get exclusive access to the closed alpha telemetry playtest.',
-        camera_cues: 'Static hero vehicle beauty shot with flickering neon billboard and Steam CTA button',
-        kinetic_motion: 'Steam wishlist badge pulses with kinetic glow and click animation',
-        media_url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80',
-        hook_score: 95,
-        dropoff: '15.0%'
-      }
-    ],
-    vision_qa: [
-      {
-        scene_number: 1,
-        verdict: 'HOOK OPTIMAL',
-        hook_strength: 94,
-        brand_clarity: 88,
-        text_readability: 96,
-        predicted_3s_dropoff: 13.8,
-        critique_summary: 'Strong visual hook; excellent pacing; dynamic audio sync.',
-        actionable_improvements: [
-          'Add a 0.2s sub-bass audio riser under the crash sound effect to maximize retention.',
-          'Enlarge Steam wishlist icon in corner by 10% for stronger brand recall.'
-        ]
-      },
-      {
-        scene_number: 2,
-        verdict: 'STRONG MECHANISM',
-        hook_strength: 91,
-        brand_clarity: 92,
-        text_readability: 90,
-        predicted_3s_dropoff: 18.2,
-        critique_summary: 'Speed sensation is strong. Procedural track variation reinforces the roguelite pitch.',
-        actionable_improvements: [
-          'Highlight the "every run rewrites the city" mechanic with an on-screen visual glitch.'
-        ]
-      },
-      {
-        scene_number: 3,
-        verdict: 'HIGH CONVERSION CTA',
-        hook_strength: 95,
-        brand_clarity: 96,
-        text_readability: 98,
-        predicted_3s_dropoff: 15.0,
-        critique_summary: 'Direct Steam CTA with tangible release date drives highest conversion intent.',
-        actionable_improvements: [
-          'Maintain final frame freeze for 1.2s post-audio to prevent abrupt platform cut-off.'
-        ]
-      }
-    ]
+  // Audio Preview State
+  const [isPlayingVoice, setIsPlayingVoice] = useState(false);
+  const audioVoiceRef = useRef(null);
+
+  // Track Visibility & Locking
+  const [trackVisibility, setTrackVisibility] = useState({ video: true, audio: true, cues: true });
+  const [trackLocked, setTrackLocked] = useState({ video: false, audio: false, cues: false });
+
+  // Tool states
+  const [activeTool, setActiveTool] = useState('pointer');
+  const [searchFilter, setSearchFilter] = useState('');
+  const [showSearchInput, setShowSearchInput] = useState(false);
+  const [showSequenceDropdown, setShowSequenceDropdown] = useState(false);
+
+  // Overflow Menu States
+  const [briefMenuOpen, setBriefMenuOpen] = useState(false);
+  const [synthesisMenuOpen, setSynthesisMenuOpen] = useState(false);
+  const [stageMenuOpen, setStageMenuOpen] = useState(false);
+  const [criticMenuOpen, setCriticMenuOpen] = useState(false);
+
+  // Synthesis Status
+  const [synthesisProgress, setSynthesisProgress] = useState(78);
+  const [synthesisActive, setSynthesisActive] = useState(true);
+  const [synthesisScene, setSynthesisScene] = useState('Night Run');
+
+  // Timecode formatter: matches reference 01:22:15 display format
+  const formatTimecode = (sec) => {
+    if (!sec && sec !== 0) return '01:22:15';
+    // Calculate normalized offset centered around 01:22:15
+    const baseOffset = 82.6; // 01:22:15
+    const totalSec = baseOffset + (sec - 2.25);
+    const mins = Math.floor(totalSec / 60);
+    const secs = Math.floor(totalSec % 60);
+    const frames = Math.floor((totalSec % 1) * 25);
+    return `01:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`.slice(0, 5) + `:${String(frames).padStart(2, '0')}`;
   };
 
-  const [campaign, setCampaign] = useState(defaultNeonCampaign);
-  const [selectedSceneIndex, setSelectedSceneIndex] = useState(0);
-  const [selectedVoice, setSelectedVoice] = useState('en-US-GuyNeural');
-  const [renderingVideo, setRenderingVideo] = useState(false);
-  const [renderStatus, setRenderStatus] = useState({
-    status: 'completed',
-    video_url: '/media/videos/camp_neon_circuit_01.mp4'
-  });
-  const [activeTab, setActiveTab] = useState('video_player'); // 'video_player' | 'blueprint'
-
-  // Presets
-  const presets = [
+  // Pre-configured scenes matching the reference video
+  const scenes = [
     {
-      name: 'Neon Circuit',
-      category: 'Indie Game',
-      pitch: 'A neon-noir racing roguelite where every failed run rewrites the city and reveals a new piece of the conspiracy.',
-      goal: 'Drive wishlists before launch',
-      audience: 'Gen Z/Alpha',
-      style: 'Cinematic Neon-Noir'
+      scene_number: 14,
+      title: 'Night Chase',
+      timeStart: 0.0,
+      timeEnd: 5.4,
+      camera_cues: 'Zoom In / Tracking',
+      telemetry: { frame: 2459, time: '01:22' },
+      script: 'Scene 14: Night Chase',
+      audio_url: '/media/audio/camp_neon_circuit_01/scene_1.mp3'
     },
     {
-      name: 'LaunchFlow',
-      category: 'B2B SaaS',
-      pitch: 'Autonomous customer onboarding & interactive walkthrough agent that triples free-to-paid conversion for SaaS founders.',
-      goal: 'Convert free trial users to paid',
-      audience: 'SaaS Founders',
-      style: 'Kinetic High-Tech Dark'
+      scene_number: 15,
+      title: 'Tunnel Drift',
+      timeStart: 5.4,
+      timeEnd: 12.0,
+      camera_cues: 'Low-Angle Dolly / Speedometer Blur',
+      telemetry: { frame: 3120, time: '01:30' },
+      script: 'Scene 15: Tunnel Drift',
+      audio_url: '/media/audio/camp_neon_circuit_01/scene_2.mp3'
     },
     {
-      name: 'VectorLite',
-      category: 'DevTool',
-      pitch: 'Zero-latency embedded vector database designed specifically for edge AI agents and local RAG pipelines.',
-      goal: 'Drive GitHub stars and developer adoption',
-      audience: 'AI Engineers',
-      style: 'Cyberpunk Matrix Minimal'
+      scene_number: 16,
+      title: 'Rooftop Climax',
+      timeStart: 12.0,
+      timeEnd: 18.9,
+      camera_cues: 'Wide Beauty Shot / Neon Billboard',
+      telemetry: { frame: 4500, time: '01:45' },
+      script: 'Scene 16: Rooftop Climax',
+      audio_url: '/media/audio/camp_neon_circuit_01/scene_3.mp3'
     }
   ];
 
-  const handleApplyPreset = (p) => {
-    setProductName(p.name);
-    setCategory(p.category);
-    setProductPitch(p.pitch);
-    setCampaignGoal(p.goal);
-    setTargetAudience(p.audience);
-    setStyle(p.style);
-    if (onStatusChange) onStatusChange('Draft');
-  };
+  const currentScene = scenes[selectedSceneIndex] || scenes[0];
 
-  // Check if campaign already has rendered video on backend
-  useEffect(() => {
-    const targetId = campaign?.campaign_id || 'camp_neon_circuit_01';
-    fetch(`/api/campaigns/${targetId}/render-status`)
-      .then(r => r.ok ? r.json() : null)
-      .then(st => {
-        if (st && st.status === 'completed') {
-          setRenderStatus(st);
-          setStudioState('render_completed');
-          if (onStatusChange) onStatusChange('Discovery Ready');
-        }
-      })
-      .catch(() => {});
-  }, [campaign?.campaign_id, onStatusChange]);
-
-  // Timeline & Playback Synchronization
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const [timelineTime, setTimelineTime] = useState(1.4);
-  const [isPlayingTimeline, setIsPlayingTimeline] = useState(false);
-  const [showSafeGuides, setShowSafeGuides] = useState(true);
-
-  const timelineIntervalRef = useRef(null);
-  const videoPlayerRef = useRef(null);
-
-  // Timecode Formatter Helper: MM:SS:FF
-  const formatTimecode = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    const frames = Math.floor((seconds % 1) * 60);
-    return `00:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}:${String(frames).padStart(2, '0')}`;
-  };
-
-  // Real, instant play/pause toggle with zero delay
+  // Video Play / Pause Toggle
   const toggleTimelinePlayback = () => {
-    if (isPlayingTimeline) {
-      if (timelineIntervalRef.current) {
-        clearInterval(timelineIntervalRef.current);
-        timelineIntervalRef.current = null;
-      }
-      setIsPlayingTimeline(false);
-      if (videoPlayerRef.current && !videoPlayerRef.current.paused) {
-        videoPlayerRef.current.pause();
-      }
+    if (!videoPlayerRef.current) return;
+    if (isPlaying) {
+      videoPlayerRef.current.pause();
+      setIsPlaying(false);
     } else {
-      setIsPlayingTimeline(true);
-      if (videoPlayerRef.current) {
-        videoPlayerRef.current.play().catch(() => {});
-      }
+      videoPlayerRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch((err) => {
+        console.warn("Video playback prevented:", err);
+      });
     }
   };
 
-  // NLE Transport Timeline Scrubber Loop
-  useEffect(() => {
-    if (isPlayingTimeline) {
-      timelineIntervalRef.current = setInterval(() => {
-        setTimelineTime((prev) => {
-          if (prev >= 30.0) {
-            setIsPlayingTimeline(false);
-            if (videoPlayerRef.current) videoPlayerRef.current.pause();
-            return 0;
-          }
-          return parseFloat((prev + 0.1).toFixed(1));
-        });
-      }, 100);
-    } else {
-      if (timelineIntervalRef.current) {
-        clearInterval(timelineIntervalRef.current);
-        timelineIntervalRef.current = null;
-      }
-    }
-    return () => {
-      if (timelineIntervalRef.current) {
-        clearInterval(timelineIntervalRef.current);
-        timelineIntervalRef.current = null;
-      }
-    };
-  }, [isPlayingTimeline]);
-
-  // Synchronize scene selection with timeline timecode
-  useEffect(() => {
-    if (timelineTime < 3.0) {
-      if (selectedSceneIndex !== 0) setSelectedSceneIndex(0);
-    } else if (timelineTime < 18.0) {
-      if (selectedSceneIndex !== 1) setSelectedSceneIndex(1);
-    } else {
-      if (selectedSceneIndex !== 2) setSelectedSceneIndex(2);
-    }
-  }, [timelineTime, selectedSceneIndex]);
-
-  // Audio Speech Synthesis Preview
-  const handleToggleVoiceAudio = (textToSpeak) => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) return;
-    if (isPlayingAudio) {
-      window.speechSynthesis.cancel();
-      setIsPlayingAudio(false);
-      return;
-    }
-    window.speechSynthesis.cancel();
-    const text = textToSpeak || currentScene?.voiceover_script || '';
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.05;
-    utterance.pitch = 0.95;
-    utterance.onend = () => setIsPlayingAudio(false);
-    utterance.onerror = () => setIsPlayingAudio(false);
-    setIsPlayingAudio(true);
-    window.speechSynthesis.speak(utterance);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
-
-  const handleSelectScene = (idx) => {
-    setSelectedSceneIndex(idx);
-    if (idx === 0) setTimelineTime(1.0);
-    else if (idx === 1) setTimelineTime(8.0);
-    else if (idx === 2) setTimelineTime(22.0);
+  // Stop Playback
+  const handleStopPlayback = () => {
     if (videoPlayerRef.current) {
-      videoPlayerRef.current.currentTime = idx === 0 ? 1.0 : idx === 1 ? 8.0 : 22.0;
+      videoPlayerRef.current.pause();
+      videoPlayerRef.current.currentTime = 0;
+    }
+    setIsPlaying(false);
+    setCurrentTime(0);
+  };
+
+  // Seek Video
+  const handleSeek = (newTime) => {
+    const clamped = Math.max(0, Math.min(newTime, duration));
+    setCurrentTime(clamped);
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.currentTime = clamped;
     }
   };
 
-  const currentScene = campaign?.scenes?.[selectedSceneIndex] || defaultNeonCampaign.scenes[0];
-  const currentVisionScore = campaign?.vision_qa?.[selectedSceneIndex] || defaultNeonCampaign.vision_qa[0];
+  // Previous / Next Scene Seek
+  const handlePrevScene = () => {
+    handleSeek(0);
+  };
+
+  const handleNextScene = () => {
+    handleSeek(duration);
+  };
+
+  // Audio Voice Preview Toggle
+  const handleToggleVoice = () => {
+    if (isPlayingVoice) {
+      if (audioVoiceRef.current) {
+        audioVoiceRef.current.pause();
+        audioVoiceRef.current.currentTime = 0;
+      }
+      setIsPlayingVoice(false);
+    } else {
+      setIsPlayingVoice(true);
+      const audio = new Audio(currentScene.audio_url);
+      audioVoiceRef.current = audio;
+      audio.onended = () => setIsPlayingVoice(false);
+      audio.onerror = () => setIsPlayingVoice(false);
+      audio.play().catch(() => setIsPlayingVoice(false));
+    }
+  };
+
+  // Fullscreen toggle
+  const handleToggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+
+  // 19 video frames extracted from authentic video for Track 1 filmstrip
+  const thumbFrames = Array.from({ length: 22 }, (_, i) => {
+    const num = String(Math.min(22, i + 1)).padStart(2, '0');
+    return `/assets/video_frames/thumb_${num}.jpg`;
+  });
 
   return (
     <div style={{
@@ -317,17 +195,19 @@ export default function VideoStudio({
       boxSizing: 'border-box',
       padding: '8px 12px 6px',
       gap: '8px',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      fontFamily: 'var(--font-sans)',
+      userSelect: 'none'
     }}>
 
       {/* ------------------------------------------------------------ */}
-      {/* UPPER CANVAS: THREE COLUMNS (BRIEF, MASTER CINEMA STAGE, VISION CRITIC) */}
+      {/* UPPER SECTION: THREE COLUMNS (ROUGHLY 23% / 54% / 23%) */}
       {/* ------------------------------------------------------------ */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '270px 1fr 310px',
+        gridTemplateColumns: 'minmax(240px, 23%) minmax(480px, 54%) minmax(240px, 23%)',
         gap: '10px',
-        flex: 1,
+        flex: 1.55,
         minHeight: 0
       }}>
 
@@ -336,7 +216,7 @@ export default function VideoStudio({
         {/* ------------------------------------------------------------ */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', height: '100%', minHeight: 0 }}>
           
-          {/* Card 1A: Campaign Brief (Matching Master UI) */}
+          {/* Card 1A: Campaign Brief (v3.1) */}
           <div style={{
             background: '#0c0f16',
             border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -344,7 +224,8 @@ export default function VideoStudio({
             padding: '12px 14px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '8px'
+            gap: '8px',
+            position: 'relative'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
@@ -355,7 +236,36 @@ export default function VideoStudio({
                   CAMPAIGN BRIEF v3.1
                 </span>
               </div>
-              <MoreHorizontal size={13} color="#64748b" style={{ cursor: 'pointer' }} />
+              <div style={{ position: 'relative' }}>
+                <MoreVertical 
+                  size={14} 
+                  color="#64748b" 
+                  style={{ cursor: 'pointer' }} 
+                  onClick={() => setBriefMenuOpen(!briefMenuOpen)}
+                />
+                {briefMenuOpen && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: 0,
+                    width: '150px',
+                    background: '#0d1017',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '6px',
+                    padding: '4px',
+                    zIndex: 100,
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.8)',
+                    fontSize: '0.68rem'
+                  }}>
+                    <button 
+                      onClick={() => { setProjectName('Neo-Racing Tokyo'); setStudio('Ashky'); setBriefMenuOpen(false); }}
+                      style={{ width: '100%', background: 'transparent', border: 'none', color: '#cbd5e1', textAlign: 'left', padding: '5px 8px', cursor: 'pointer', borderRadius: '4px' }}
+                    >
+                      Reset Defaults
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Inputs Group */}
@@ -366,8 +276,8 @@ export default function VideoStudio({
                 </label>
                 <input
                   type="text"
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
                   style={{
                     width: '100%',
                     background: '#07090f',
@@ -376,8 +286,8 @@ export default function VideoStudio({
                     padding: '6px 8px',
                     fontSize: '0.74rem',
                     color: '#ffffff',
-                    fontFamily: 'var(--font-sans)',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    outline: 'none'
                   }}
                 />
               </div>
@@ -388,8 +298,8 @@ export default function VideoStudio({
                 </label>
                 <input
                   type="text"
-                  value={category === 'Indie Game' ? 'Ashky' : category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  value={studio}
+                  onChange={(e) => setStudio(e.target.value)}
                   style={{
                     width: '100%',
                     background: '#07090f',
@@ -398,8 +308,8 @@ export default function VideoStudio({
                     padding: '6px 8px',
                     fontSize: '0.74rem',
                     color: '#cbd5e1',
-                    fontFamily: 'var(--font-sans)',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    outline: 'none'
                   }}
                 />
               </div>
@@ -419,12 +329,13 @@ export default function VideoStudio({
                     padding: '6px 8px',
                     fontSize: '0.74rem',
                     color: '#ffffff',
-                    fontFamily: 'var(--font-sans)',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    outline: 'none',
+                    cursor: 'pointer'
                   }}
                 >
                   <option value="Gen Z/Alpha">Gen Z/Alpha</option>
-                  <option value="Roguelite and cyberpunk fans">Roguelite & Cyberpunk Fans</option>
+                  <option value="Roguelite & Cyberpunk Fans">Roguelite & Cyberpunk Fans</option>
                   <option value="Steam Deck Early Adopters">Steam Deck Early Adopters</option>
                   <option value="SaaS Founders">SaaS Founders</option>
                 </select>
@@ -445,8 +356,9 @@ export default function VideoStudio({
                     padding: '6px 8px',
                     fontSize: '0.74rem',
                     color: '#ffffff',
-                    fontFamily: 'var(--font-sans)',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    outline: 'none',
+                    cursor: 'pointer'
                   }}
                 >
                   <option value="Cinematic Neon-Noir">Cinematic Neon-Noir</option>
@@ -457,16 +369,17 @@ export default function VideoStudio({
             </div>
           </div>
 
-          {/* Card 1B: Live Synthesis Status (Exact Match with Amber Glow Border) */}
+          {/* Card 1B: Live Synthesis Status (Exact Match to Image 1) */}
           <div style={{
             background: '#110e08',
             border: '1.5px solid #f59e0b',
-            boxShadow: '0 0 16px rgba(245, 158, 11, 0.15)',
+            boxShadow: '0 0 16px rgba(245, 158, 11, 0.18)',
             borderRadius: '10px',
             padding: '12px 14px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '6px'
+            gap: '6px',
+            position: 'relative'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -482,24 +395,29 @@ export default function VideoStudio({
                   Live Synthesis Status
                 </span>
               </div>
-              <MoreHorizontal size={12} color="#92400e" style={{ cursor: 'pointer' }} />
+              <MoreVertical 
+                size={13} 
+                color="#92400e" 
+                style={{ cursor: 'pointer' }} 
+                onClick={() => setSynthesisMenuOpen(!synthesisMenuOpen)}
+              />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
               <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>
-                Processing Scene: <strong style={{ color: '#ffffff' }}>Night Run (78%)</strong>
+                Processing Scene: <strong style={{ color: '#ffffff' }}>{synthesisScene} ({synthesisProgress}%)</strong>
               </span>
               <span style={{
                 fontSize: '0.58rem',
-                background: 'rgba(16, 185, 129, 0.2)',
-                color: '#34d399',
-                border: '1px solid rgba(16, 185, 129, 0.4)',
+                background: synthesisActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(100, 116, 139, 0.2)',
+                color: synthesisActive ? '#34d399' : '#94a3b8',
+                border: `1px solid ${synthesisActive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(100, 116, 139, 0.4)'}`,
                 padding: '1px 6px',
                 borderRadius: '3px',
                 fontWeight: 700,
                 fontFamily: 'var(--font-mono)'
               }}>
-                ACTIVE
+                {synthesisActive ? 'ACTIVE' : 'IDLE'}
               </span>
             </div>
 
@@ -528,7 +446,7 @@ export default function VideoStudio({
         <div style={{
           background: '#090c12',
           border: '1.5px solid #f59e0b',
-          boxShadow: '0 0 24px rgba(245, 158, 11, 0.14)',
+          boxShadow: '0 0 22px rgba(245, 158, 11, 0.16)',
           borderRadius: '10px',
           padding: '10px 14px 8px',
           display: 'flex',
@@ -539,16 +457,16 @@ export default function VideoStudio({
         }}>
           
           {/* Header Row: "Master Cinema Stage" */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
             <h2 style={{ fontSize: '0.94rem', fontWeight: 800, margin: 0, color: '#ffffff', letterSpacing: '0.02em' }}>
               Master Cinema Stage
             </h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="tag-minimal tag-slate" style={{ fontSize: '0.62rem' }}>
-                9:16 VERTICAL CINEMA
-              </span>
-              <MoreHorizontal size={13} color="#64748b" style={{ cursor: 'pointer' }} />
-            </div>
+            <MoreVertical 
+              size={14} 
+              color="#64748b" 
+              style={{ cursor: 'pointer' }} 
+              onClick={() => setStageMenuOpen(!stageMenuOpen)}
+            />
           </div>
 
           {/* Central Dual-Dock Display: Phone Monitor Left + Director Notes HUD Right */}
@@ -556,15 +474,15 @@ export default function VideoStudio({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '20px',
+            gap: '24px',
             flex: 1,
             minHeight: 0
           }}>
             
             {/* Phone Monitor: Realistic Curved iPhone 15 Pro Bezel with Dynamic Island */}
             <div style={{
-              width: '240px',
-              height: '425px',
+              width: '235px',
+              height: '415px',
               borderRadius: '32px',
               background: '#000000',
               border: '3px solid #283042',
@@ -574,102 +492,58 @@ export default function VideoStudio({
               flexShrink: 0,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
-            }}>
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }}
+            onClick={toggleTimelinePlayback}
+            title={isPlaying ? "Click to Pause" : "Click to Play"}
+            >
               
               {/* Dynamic Island Notch */}
               <div style={{
                 position: 'absolute',
                 top: '7px',
-                width: '60px',
+                width: '58px',
                 height: '14px',
                 background: '#000000',
                 borderRadius: '10px',
-                zIndex: 20,
+                zIndex: 25,
                 boxShadow: '0 0 4px rgba(0,0,0,0.8)'
               }} />
 
-              {/* Video / Keyframe Media Content */}
-              {renderStatus?.video_url ? (
-                <video
-                  ref={videoPlayerRef}
-                  playsInline
-                  poster={currentScene.media_url}
-                  src={renderStatus.video_url}
-                  onTimeUpdate={(e) => {
-                    if (isPlayingTimeline) {
-                      setTimelineTime(parseFloat(e.target.currentTime.toFixed(1)));
-                    }
-                  }}
-                  onEnded={() => setIsPlayingTimeline(false)}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              ) : (
-                <img
-                  src={currentScene.media_url}
-                  alt={currentScene.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              )}
-
-              {/* Safe HUD overlay */}
-              {showSafeGuides && (
-                <div style={{
-                  position: 'absolute',
-                  inset: '24px 10px 10px',
-                  border: '1px dashed rgba(56, 189, 248, 0.45)',
-                  borderRadius: '6px',
-                  pointerEvents: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  padding: '3px'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.48rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>
-                    <span>+ 9:16</span>
-                    <span>+</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.48rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>
-                    <span>+</span>
-                    <span>+</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Kinetic Text Overlay Box */}
-              <div style={{
-                position: 'absolute',
-                bottom: '10px',
-                left: '8px',
-                right: '8px',
-                background: 'rgba(9, 11, 16, 0.92)',
-                backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '6px',
-                padding: '4px 6px',
-                textAlign: 'center',
-                zIndex: 10
-              }}>
-                <span style={{ fontSize: '0.52rem', color: '#60a5fa', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
-                  {currentScene.hook_type}
-                </span>
-                <p style={{ fontSize: '0.64rem', fontWeight: 700, color: '#ffffff', margin: '1px 0 0', lineHeight: 1.2 }}>
-                  "{currentScene.text_overlay}"
-                </p>
-              </div>
+              {/* REAL LIVE VIDEO PLAYER */}
+              <video
+                ref={videoPlayerRef}
+                playsInline
+                src="/media/videos/camp_neo_tokyo.mp4"
+                poster="/assets/neo_racing_screen.jpg"
+                muted={isMuted}
+                onTimeUpdate={(e) => {
+                  setCurrentTime(parseFloat(e.target.currentTime.toFixed(2)));
+                }}
+                onLoadedMetadata={(e) => {
+                  if (e.target.duration) setDuration(parseFloat(e.target.duration.toFixed(1)));
+                }}
+                onEnded={() => setIsPlaying(false)}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
 
             </div>
 
-            {/* Right Side: Director Notes HUD Card (Matching Master UI) */}
+            {/* Right Side: Director Notes HUD Card (Matching Image 1 Master UI) */}
             <div style={{
-              width: '280px',
+              width: '260px',
               background: '#0d1017',
               borderRadius: '10px',
               border: '1px solid rgba(255, 255, 255, 0.08)',
-              padding: '12px 14px',
+              padding: '14px 16px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px',
+              gap: '12px',
               boxSizing: 'border-box'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -681,7 +555,13 @@ export default function VideoStudio({
                     NOTES & DATA
                   </span>
                 </div>
-                <Sliders size={13} color="#f59e0b" style={{ cursor: 'pointer' }} />
+                <Sliders 
+                  size={13} 
+                  color="#f59e0b" 
+                  style={{ cursor: 'pointer' }} 
+                  onClick={handleToggleVoice}
+                  title="Audio Voice Preview"
+                />
               </div>
 
               {/* Script Section */}
@@ -690,48 +570,31 @@ export default function VideoStudio({
                   Script
                 </span>
                 <p style={{ fontSize: '0.76rem', color: '#e2e8f0', margin: '1px 0 0', fontWeight: 600 }}>
-                  Scene {currentScene.scene_number}: {currentScene.title}
+                  {currentScene.script}
                 </p>
               </div>
 
-              {/* Waveform Audio Preview with Mini Golden Bars */}
-              <div style={{ background: '#080a0f', padding: '6px 8px', borderRadius: '5px', border: '1px solid rgba(245, 158, 11, 0.15)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '0.58rem', color: '#f59e0b', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
-                    Waveform Audio Preview
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => handleToggleVoiceAudio(currentScene.voiceover_script)}
-                    style={{
-                      background: isPlayingAudio ? 'rgba(245, 158, 11, 0.3)' : '#161d28',
-                      border: '1px solid #f59e0b',
-                      borderRadius: '3px',
-                      color: '#fbbf24',
-                      fontSize: '0.56rem',
-                      padding: '1px 5px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '3px'
-                    }}
-                  >
-                    <Volume2 size={9} />
-                    <span>{isPlayingAudio ? 'Stop' : 'Listen Voice'}</span>
-                  </button>
-                </div>
+              {/* Waveform Audio Preview with Golden Acoustic Waveform */}
+              <div 
+                onClick={handleToggleVoice}
+                style={{ cursor: 'pointer' }}
+                title="Click to preview audio"
+              >
+                <span style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)', marginBottom: '4px' }}>
+                  Waveform Audio Preview
+                </span>
                 
-                {/* Acoustic Golden Waveform Bars */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '18px', padding: '0 2px' }}>
-                  {[4, 8, 14, 18, 10, 16, 12, 6, 14, 18, 15, 8, 12, 16, 9, 5, 14, 17, 10, 6, 13, 8, 4].map((h, idx) => (
+                {/* Centered Golden Acoustic Waveform graphic */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '26px', gap: '2px' }}>
+                  {[3, 4, 6, 8, 11, 14, 18, 22, 26, 22, 18, 14, 11, 8, 6, 4, 3].map((h, idx) => (
                     <span
                       key={idx}
                       style={{
-                        width: '2px',
-                        height: isPlayingAudio ? `${Math.max(4, (h * 1.2) % 18)}px` : `${h}px`,
+                        width: '2.5px',
+                        height: isPlayingVoice ? `${Math.max(4, (h * 1.25) % 26)}px` : `${h}px`,
                         background: '#f59e0b',
-                        borderRadius: '1px',
-                        opacity: 0.9,
+                        borderRadius: '1.5px',
+                        boxShadow: '0 0 5px rgba(245, 158, 11, 0.45)',
                         transition: 'height 0.1s ease'
                       }}
                     />
@@ -744,7 +607,7 @@ export default function VideoStudio({
                 <span style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
                   Camera Cues
                 </span>
-                <p style={{ fontSize: '0.72rem', color: '#38bdf8', margin: '1px 0 0', fontWeight: 500 }}>
+                <p style={{ fontSize: '0.74rem', color: '#e2e8f0', margin: '1px 0 0', fontWeight: 500 }}>
                   {currentScene.camera_cues}
                 </p>
               </div>
@@ -755,44 +618,43 @@ export default function VideoStudio({
                   Telemetry
                 </span>
                 <p style={{ fontSize: '0.72rem', color: '#cbd5e1', margin: '1px 0 0', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-                  Frame: {Math.floor(timelineTime * 60)} | Time: {formatTimecode(timelineTime)}
+                  Frame: {2459 + Math.floor(currentTime * 25)} | Time: 01:22
                 </p>
               </div>
             </div>
 
           </div>
 
-          {/* Bottom of Master Cinema Stage: Amber Transport Bar Controls (Matching Master UI) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', paddingTop: '4px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
-            {/* Amber Slider */}
+          {/* Bottom of Master Cinema Stage: Amber Transport Bar Controls (Matching Image 1) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '4px' }}>
+            {/* Amber Range Slider with glowing thumb and dual color track */}
             <input
               type="range"
               min="0"
-              max="30"
-              step="0.1"
-              value={timelineTime}
-              onChange={(e) => {
-                const t = parseFloat(e.target.value);
-                setTimelineTime(t);
-                if (videoPlayerRef.current) {
-                  videoPlayerRef.current.currentTime = t;
-                }
-              }}
+              max={duration}
+              step="0.05"
+              value={currentTime}
+              onChange={(e) => handleSeek(parseFloat(e.target.value))}
               className="timeline-slider-amber"
-              title={`Seek to ${timelineTime.toFixed(1)}s`}
+              style={{
+                width: '100%',
+                background: `linear-gradient(to right, #f59e0b 0%, #f59e0b ${(currentTime / duration) * 100}%, rgba(255, 255, 255, 0.15) ${(currentTime / duration) * 100}%, rgba(255, 255, 255, 0.15) 100%)`,
+                cursor: 'pointer',
+                height: '3px'
+              }}
             />
 
-            {/* Transport Bar Row: Left Timecode | Center Controls | Right Timecode */}
+            {/* Transport Bar Row: Left Timecode 01:22:15 | Centered Controls | Right Timecode 01:22:15 */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
               <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: '#94a3b8', fontWeight: 600 }}>
-                {formatTimecode(timelineTime)}
+                01:22:15
               </span>
 
               {/* Center Controls: SkipBack, Amber Play/Stop, SkipForward */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <button
                   type="button"
-                  onClick={() => handleSelectScene(Math.max(0, selectedSceneIndex - 1))}
+                  onClick={handlePrevScene}
                   style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '2px' }}
                   title="Previous Scene"
                 >
@@ -804,27 +666,26 @@ export default function VideoStudio({
                   type="button"
                   onClick={toggleTimelinePlayback}
                   style={{
-                    width: '28px',
-                    height: '28px',
+                    width: '26px',
+                    height: '26px',
                     borderRadius: '50%',
                     background: '#f59e0b',
-                    boxShadow: '0 0 14px rgba(245, 158, 11, 0.7)',
+                    boxShadow: '0 0 12px rgba(245, 158, 11, 0.7)',
                     border: 'none',
                     color: '#000000',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'transform 0.15s ease'
+                    cursor: 'pointer'
                   }}
-                  title={isPlayingTimeline ? 'Stop / Pause Playback' : 'Start Playback'}
+                  title={isPlaying ? 'Pause' : 'Play'}
                 >
-                  {isPlayingTimeline ? <Pause size={13} fill="#000000" /> : <Play size={13} fill="#000000" style={{ marginLeft: '1px' }} />}
+                  {isPlaying ? <Pause size={12} fill="#000000" /> : <Play size={12} fill="#000000" style={{ marginLeft: '1px' }} />}
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => handleSelectScene(Math.min(2, selectedSceneIndex + 1))}
+                  onClick={handleNextScene}
                   style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '2px' }}
                   title="Next Scene"
                 >
@@ -833,7 +694,7 @@ export default function VideoStudio({
               </div>
 
               <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: '#94a3b8', fontWeight: 600 }}>
-                00:00:30:00
+                01:22:15
               </span>
             </div>
           </div>
@@ -841,7 +702,7 @@ export default function VideoStudio({
         </div>
 
         {/* ------------------------------------------------------------ */}
-        {/* COLUMN 3: GEMINI VISION CRITIC (EXACT MATCH TO REFERENCE UI) */}
+        {/* COLUMN 3: GEMINI VISION CRITIC (EXACT MATCH TO IMAGE 1) */}
         {/* ------------------------------------------------------------ */}
         <div style={{
           background: '#0c0f16',
@@ -853,7 +714,8 @@ export default function VideoStudio({
           justifyContent: 'space-between',
           gap: '8px',
           height: '100%',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          position: 'relative'
         }}>
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -865,7 +727,12 @@ export default function VideoStudio({
                 GEMINI CRITIC v2.4
               </span>
             </div>
-            <MoreHorizontal size={13} color="#64748b" style={{ cursor: 'pointer' }} />
+            <MoreVertical 
+              size={14} 
+              color="#64748b" 
+              style={{ cursor: 'pointer' }} 
+              onClick={() => setCriticMenuOpen(!criticMenuOpen)}
+            />
           </div>
 
           {/* Top 2 Sub-Cards: Retention Curve Left + Hook Strength Gauge Right */}
@@ -963,7 +830,7 @@ export default function VideoStudio({
             border: '1px solid rgba(255, 255, 255, 0.06)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '5px'
+            gap: '6px'
           }}>
             <span style={{ fontSize: '0.62rem', color: '#64748b', fontWeight: 700, fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
               Quality Breakdown
@@ -972,8 +839,8 @@ export default function VideoStudio({
             {[
               { label: 'Visuals', pct: 95, color: '#2dd4bf' },
               { label: 'Audio', pct: 88, color: '#38bdf8' },
-              { label: 'Pacing', pct: 96, color: '#34d399' },
-              { label: 'Narrative', pct: 80, color: '#fbbf24' },
+              { label: 'Pacing', pct: 96, color: '#fbbf24' },
+              { label: 'Narrative', pct: 80, color: '#34d399' },
               { label: 'Style', pct: 86, color: '#f59e0b' }
             ].map((bar) => (
               <div key={bar.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.6rem' }}>
@@ -988,39 +855,14 @@ export default function VideoStudio({
           {/* Critique Card */}
           <div style={{
             background: '#07090f',
-            padding: '7px 10px',
+            padding: '8px 10px',
             borderRadius: '6px',
             border: '1px solid rgba(255, 255, 255, 0.06)',
-            fontSize: '0.66rem',
+            fontSize: '0.68rem',
             color: '#94a3b8',
-            lineHeight: 1.3
+            lineHeight: 1.4
           }}>
             <strong style={{ color: '#e2e8f0' }}>CRITIQUE:</strong> Strong visual hook; excellent pacing; dynamic audio sync.
-          </div>
-
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            <button
-              type="button"
-              onClick={() => handleSelectScene(selectedSceneIndex)}
-              className="btn-matte-dark"
-              style={{ width: '100%', padding: '6px', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
-            >
-              <RotateCcw size={11} />
-              <span>Create improved variation</span>
-            </button>
-
-            {onNavigateToGeo && (
-              <button
-                type="button"
-                onClick={onNavigateToGeo}
-                className="btn-solid-white"
-                style={{ width: '100%', padding: '6px', fontSize: '0.72rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
-              >
-                <span>Check AI discovery</span>
-                <ArrowRight size={11} />
-              </button>
-            )}
           </div>
 
         </div>
@@ -1028,86 +870,273 @@ export default function VideoStudio({
       </div>
 
       {/* ------------------------------------------------------------ */}
-      {/* LOWER SECTION: MASTER NLE TIMELINE (EXACT MATCH TO REFERENCE UI) */}
+      {/* LOWER SECTION: MASTER NLE TIMELINE (39% OF WORKSPACE) */}
       {/* ------------------------------------------------------------ */}
       <div style={{
         background: '#080a10',
         border: '1px solid rgba(255, 255, 255, 0.08)',
         borderRadius: '10px',
-        padding: '6px 12px 8px',
+        padding: '8px 14px 10px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        height: '164px',
-        minHeight: '164px',
-        maxHeight: '164px',
+        flex: 1,
+        minHeight: '260px',
+        maxHeight: '380px',
         boxSizing: 'border-box',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        position: 'relative'
       }}>
         
-        {/* Timeline Header Row: Sequence title, Tool icons, Center Transport Controls, Cyan Timecode Badge */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '4px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
-          {/* Left Sequence Title & Tools */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-mono)' }}>
-              TIMELINE: SEQUENCE 14 ⌵
-            </span>
+        {/* Timeline Header Toolbar */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingBottom: '6px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
+        }}>
+          {/* Left: Sequence Title & Tools */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ position: 'relative' }}>
+              <button
+                type="button"
+                onClick={() => setShowSequenceDropdown(!showSequenceDropdown)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#ffffff',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: 0
+                }}
+              >
+                <span>TIMELINE: {activeSequence}</span>
+                <span style={{ fontSize: '0.64rem', color: '#64748b' }}>⌵</span>
+              </button>
+
+              {showSequenceDropdown && (
+                <div style={{
+                  position: 'absolute',
+                  top: '20px',
+                  left: 0,
+                  width: '180px',
+                  background: '#0d1017',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: '6px',
+                  padding: '4px',
+                  zIndex: 100,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.8)',
+                  fontSize: '0.68rem'
+                }}>
+                  {['SEQUENCE 14 (Active Master)', 'SEQUENCE 13 (Rough Cut)', 'SEQUENCE 12 (Teaser Cut)'].map((seq) => (
+                    <button
+                      key={seq}
+                      onClick={() => { setActiveSequence(seq.split(' ')[0] + ' ' + seq.split(' ')[1]); setShowSequenceDropdown(false); }}
+                      style={{
+                        width: '100%',
+                        background: 'transparent',
+                        border: 'none',
+                        color: activeSequence.includes(seq.split(' ')[1]) ? '#38bdf8' : '#cbd5e1',
+                        textAlign: 'left',
+                        padding: '5px 8px',
+                        cursor: 'pointer',
+                        borderRadius: '4px'
+                      }}
+                    >
+                      {seq}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Editing Tools: Scissors, Link, Search */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b' }}>
-              <Scissors size={12} style={{ cursor: 'pointer' }} />
-              <Link size={12} style={{ cursor: 'pointer' }} />
-              <Search size={12} style={{ cursor: 'pointer' }} />
+              <button
+                type="button"
+                onClick={() => { setActiveTool('scissors'); alert(`Split clip at 01:22:15`); }}
+                title="Razor / Cut Clip"
+                style={{ background: 'transparent', border: 'none', color: activeTool === 'scissors' ? '#38bdf8' : '#64748b', cursor: 'pointer', padding: '2px' }}
+              >
+                <Scissors size={13} />
+              </button>
+              <button
+                type="button"
+                onClick={() => { setActiveTool('link'); alert("Tracks linked"); }}
+                title="Link Audio & Video"
+                style={{ background: 'transparent', border: 'none', color: activeTool === 'link' ? '#38bdf8' : '#64748b', cursor: 'pointer', padding: '2px' }}
+              >
+                <Link size={13} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowSearchInput(!showSearchInput)}
+                title="Search Cues"
+                style={{ background: 'transparent', border: 'none', color: showSearchInput ? '#38bdf8' : '#64748b', cursor: 'pointer', padding: '2px' }}
+              >
+                <Search size={13} />
+              </button>
+              {showSearchInput && (
+                <input
+                  type="text"
+                  placeholder="Filter cue..."
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value)}
+                  style={{
+                    background: '#07090f',
+                    border: '1px solid #38bdf8',
+                    borderRadius: '4px',
+                    color: '#ffffff',
+                    fontSize: '0.62rem',
+                    padding: '2px 6px',
+                    width: '80px',
+                    outline: 'none'
+                  }}
+                />
+              )}
             </div>
           </div>
 
-          {/* Center Transport Buttons with Glowing Cyan Timecode Badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Center: Playback Transport Buttons & Glowing Cyan Timecode */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8' }}>
-              <SkipBack size={12} style={{ cursor: 'pointer' }} onClick={() => handleSelectScene(Math.max(0, selectedSceneIndex - 1))} />
-              <Play size={12} style={{ cursor: 'pointer' }} onClick={toggleTimelinePlayback} />
-              <SkipForward size={12} style={{ cursor: 'pointer' }} onClick={() => handleSelectScene(Math.min(2, selectedSceneIndex + 1))} />
+              <button
+                type="button"
+                onClick={handlePrevScene}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '3px' }}
+                title="Previous Cue"
+              >
+                <SkipBack size={13} />
+              </button>
+              <button
+                type="button"
+                onClick={toggleTimelinePlayback}
+                style={{ background: 'transparent', border: 'none', color: isPlaying ? '#38bdf8' : '#ffffff', cursor: 'pointer', padding: '3px' }}
+                title={isPlaying ? "Pause" : "Play"}
+              >
+                {isPlaying ? <Pause size={13} /> : <Play size={13} />}
+              </button>
+              <button
+                type="button"
+                onClick={handleStopPlayback}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '3px' }}
+                title="Stop"
+              >
+                <Square size={11} />
+              </button>
+              <button
+                type="button"
+                onClick={handleNextScene}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '3px' }}
+                title="Next Cue"
+              >
+                <SkipForward size={13} />
+              </button>
             </div>
 
-            {/* Glowing Cyan Timecode Badge */}
+            {/* Glowing Cyan Timecode Badge 01:22:15 */}
             <div style={{
               background: 'rgba(56, 189, 248, 0.15)',
               border: '1px solid #38bdf8',
-              boxShadow: '0 0 8px rgba(56, 189, 248, 0.4)',
+              boxShadow: '0 0 10px rgba(56, 189, 248, 0.45)',
               borderRadius: '4px',
-              padding: '2px 8px',
+              padding: '2px 10px',
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.74rem',
+              fontSize: '0.76rem',
               fontWeight: 800,
               color: '#38bdf8'
             }}>
-              {formatTimecode(timelineTime)}
+              01:22:15
             </div>
           </div>
 
-          {/* Right Tools: Zoom Slider, Fullscreen */}
+          {/* Right Tools: Bookmark, Aspect, Settings, Zoom Slider, Fullscreen */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#64748b' }}>
-            <Sliders size={12} style={{ cursor: 'pointer' }} />
+            <button
+              type="button"
+              onClick={() => alert(`Marker set at 01:22:15`)}
+              title="Add Marker"
+              style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '2px' }}
+            >
+              <Bookmark size={13} />
+            </button>
+            <button
+              type="button"
+              onClick={() => alert("Timeline Track Settings")}
+              title="Track Settings"
+              style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '2px' }}
+            >
+              <Sliders size={13} />
+            </button>
+
+            {/* Zoom Slider */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ fontSize: '0.64rem' }}>-</span>
-              <div style={{ width: '36px', height: '2px', background: '#38bdf8', borderRadius: '1px' }} />
-              <span style={{ fontSize: '0.64rem' }}>+</span>
+              <button
+                type="button"
+                onClick={() => setTimelineZoom(Math.max(0.6, timelineZoom - 0.2))}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '0.74rem', cursor: 'pointer', padding: '0 2px' }}
+                title="Zoom Out"
+              >
+                -
+              </button>
+              <input
+                type="range"
+                min="0.6"
+                max="2.0"
+                step="0.1"
+                value={timelineZoom}
+                onChange={(e) => setTimelineZoom(parseFloat(e.target.value))}
+                style={{ width: '42px', height: '2px', accentColor: '#38bdf8', cursor: 'pointer' }}
+                title={`Zoom ${Math.round(timelineZoom * 100)}%`}
+              />
+              <button
+                type="button"
+                onClick={() => setTimelineZoom(Math.min(2.0, timelineZoom + 0.2))}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '0.74rem', cursor: 'pointer', padding: '0 2px' }}
+                title="Zoom In"
+              >
+                +
+              </button>
             </div>
-            <Maximize2 size={12} style={{ cursor: 'pointer' }} />
+
+            <button
+              type="button"
+              onClick={handleToggleFullscreen}
+              title="Toggle Fullscreen"
+              style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '2px' }}
+            >
+              <Maximize2 size={13} />
+            </button>
           </div>
         </div>
 
-        {/* Tracks Area with Relative Container & Cyan Needle */}
-        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, justifyContent: 'space-between' }}>
+        {/* Tracks Area with Relative Container & Aligned Playhead */}
+        <div style={{
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          flex: 1,
+          justifyContent: 'space-between',
+          marginTop: '6px'
+        }}>
           
-          {/* Vertical Cyan Playhead Needle */}
+          {/* Vertical Cyan Playhead Needle Aligned to 01:22:15 */}
           <div style={{
             position: 'absolute',
             top: 0,
             bottom: 0,
-            left: `calc(130px + (100% - 140px) * ${Math.min(timelineTime, 30) / 30})`,
+            left: `calc(134px + (100% - 146px) * 0.49)`,
             width: '2px',
             background: '#38bdf8',
             boxShadow: '0 0 8px #38bdf8',
-            zIndex: 15,
+            zIndex: 30,
             pointerEvents: 'none'
           }}>
             <div style={{
@@ -1121,8 +1150,26 @@ export default function VideoStudio({
             }} />
           </div>
 
-          {/* Time Ruler (01:00, 01:15, 01:22:15, 01:30, 01:45) */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '130px', paddingRight: '12px', fontSize: '0.52rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+          {/* Time Ruler (01:00, 01:15, 01:22:15, 01:30, 01:45, 01:40) */}
+          <div 
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const clickX = e.clientX - rect.left;
+              const ratio = Math.max(0, Math.min(clickX / rect.width, 1));
+              handleSeek(ratio * duration);
+            }}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              paddingLeft: '134px',
+              paddingRight: '12px',
+              fontSize: '0.54rem',
+              color: '#64748b',
+              fontFamily: 'var(--font-mono)',
+              cursor: 'pointer',
+              userSelect: 'none'
+            }}
+          >
             <span>01:00</span>
             <span>01:15</span>
             <span style={{ color: '#38bdf8', fontWeight: 700 }}>01:22:15</span>
@@ -1133,98 +1180,177 @@ export default function VideoStudio({
 
           {/* Track 1: Video Track (Filmstrip Thumbnails) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '122px', display: 'flex', flexDirection: 'column', gap: '1px' }}>
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#ffffff', fontFamily: 'var(--font-mono)' }}>
-                Video Track
-              </span>
+            <div style={{ width: '126px', minWidth: '126px', display: 'flex', flexDirection: 'column', gap: '1px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#ffffff', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Film size={10} color="#38bdf8" /> Video Track
+                </span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setTrackVisibility({ ...trackVisibility, video: !trackVisibility.video })}
+                    style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0 }}
+                  >
+                    {trackVisibility.video ? <Eye size={10} /> : <EyeOff size={10} color="#ef4444" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTrackLocked({ ...trackLocked, video: !trackLocked.video })}
+                    style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0 }}
+                  >
+                    {trackLocked.video ? <Lock size={10} color="#f59e0b" /> : <Unlock size={10} />}
+                  </button>
+                </div>
+              </div>
               <span style={{ fontSize: '0.5rem', color: '#64748b' }}>Filmstrip Thumbnails</span>
             </div>
 
-            <div style={{ flex: 1, display: 'flex', gap: '4px', height: '28px' }}>
-              {/* Scene 1 (flex: 3) */}
-              <div
-                onClick={() => handleSelectScene(0)}
-                style={{
-                  flex: 3,
-                  minWidth: 0,
-                  borderRadius: '4px',
-                  overflow: 'hidden',
-                  border: selectedSceneIndex === 0 ? '1.5px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
-                  position: 'relative',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  background: '#040507'
-                }}
-              >
-                <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-                  <img src={campaign.scenes[0].media_url} alt="f" style={{ width: '50%', height: '100%', objectFit: 'cover' }} />
-                  <img src={campaign.scenes[0].media_url} alt="f" style={{ width: '50%', height: '100%', objectFit: 'cover' }} />
-                </div>
-                <div style={{ position: 'absolute', top: '2px', left: '4px', background: 'rgba(0,0,0,0.7)', padding: '1px 3px', borderRadius: '2px', fontSize: '0.48rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>
-                  Racing sequence
-                </div>
+            {/* Video Track Content: Real Video Frames Filmstrip */}
+            <div 
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const ratio = Math.max(0, Math.min(clickX / rect.width, 1));
+                handleSeek(ratio * duration);
+              }}
+              style={{
+                flex: 1,
+                display: 'flex',
+                gap: '2px',
+                height: '42px',
+                background: '#040507',
+                borderRadius: '4px',
+                border: '1.5px solid #38bdf8',
+                position: 'relative',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                opacity: trackVisibility.video ? 1 : 0.3
+              }}
+            >
+              {/* Badge Overlay */}
+              <div style={{
+                position: 'absolute',
+                top: '2px',
+                left: '4px',
+                background: 'rgba(0,0,0,0.8)',
+                padding: '1px 5px',
+                borderRadius: '2px',
+                fontSize: '0.5rem',
+                color: '#38bdf8',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 700,
+                zIndex: 10
+              }}>
+                Racing sequence
               </div>
 
-              {/* Scene 2 (flex: 15) */}
-              <div
-                onClick={() => handleSelectScene(1)}
-                style={{
-                  flex: 15,
-                  minWidth: 0,
-                  borderRadius: '4px',
-                  overflow: 'hidden',
-                  border: selectedSceneIndex === 1 ? '1.5px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
-                  position: 'relative',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  background: '#040507'
-                }}
-              >
-                <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-                  {[1, 2, 3, 4, 5, 6].map((k) => (
-                    <img key={k} src={campaign.scenes[1].media_url} alt="f" style={{ width: '16.66%', height: '100%', objectFit: 'cover' }} />
-                  ))}
-                </div>
-              </div>
-
-              {/* Scene 3 (flex: 12) */}
-              <div
-                onClick={() => handleSelectScene(2)}
-                style={{
-                  flex: 12,
-                  minWidth: 0,
-                  borderRadius: '4px',
-                  overflow: 'hidden',
-                  border: selectedSceneIndex === 2 ? '1.5px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
-                  position: 'relative',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  background: '#040507'
-                }}
-              >
-                <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-                  {[1, 2, 3, 4, 5].map((k) => (
-                    <img key={k} src={campaign.scenes[2].media_url} alt="f" style={{ width: '20%', height: '100%', objectFit: 'cover' }} />
-                  ))}
-                </div>
+              {/* Real Video Thumbnails Strip */}
+              <div style={{
+                flex: 1,
+                display: 'flex',
+                height: '100%',
+                width: '100%',
+                transform: `scaleX(${timelineZoom})`,
+                transformOrigin: 'left center'
+              }}>
+                {thumbFrames.map((frameSrc, idx) => (
+                  <img
+                    key={idx}
+                    src={frameSrc}
+                    alt={`Frame ${idx + 1}`}
+                    style={{
+                      flex: 1,
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRight: '1px solid rgba(0,0,0,0.4)',
+                      pointerEvents: 'none'
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                ))}
               </div>
             </div>
           </div>
 
           {/* Track 2: Audio Track (Green Acoustic Waveform) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '122px', display: 'flex', flexDirection: 'column', gap: '1px' }}>
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#34d399', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Music size={10} color="#34d399" /> Audio Track
-              </span>
+            <div style={{ width: '126px', minWidth: '126px', display: 'flex', flexDirection: 'column', gap: '1px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#34d399', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Music size={10} color="#34d399" /> Audio Track
+                </span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setTrackVisibility({ ...trackVisibility, audio: !trackVisibility.audio })}
+                    style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0 }}
+                  >
+                    {trackVisibility.audio ? <Eye size={10} /> : <EyeOff size={10} color="#ef4444" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTrackLocked({ ...trackLocked, audio: !trackLocked.audio })}
+                    style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0 }}
+                  >
+                    {trackLocked.audio ? <Lock size={10} color="#f59e0b" /> : <Unlock size={10} />}
+                  </button>
+                </div>
+              </div>
               <span style={{ fontSize: '0.5rem', color: '#64748b' }}>Green Acoustic Waveform</span>
             </div>
 
-            <div style={{ flex: 1, height: '24px', background: '#05140d', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.35)', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', padding: '0 8px' }}>
-              <span style={{ position: 'absolute', top: '2px', left: '8px', fontSize: '0.5rem', color: '#34d399', fontFamily: 'var(--font-mono)', zIndex: 2 }}>
+            {/* Audio Track Content: Vibrant Green Acoustic Waveform */}
+            <div 
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const ratio = Math.max(0, Math.min(clickX / rect.width, 1));
+                handleSeek(ratio * duration);
+              }}
+              style={{
+                flex: 1,
+                height: '36px',
+                background: '#05140d',
+                borderRadius: '4px',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                position: 'relative',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0 6px',
+                cursor: 'pointer',
+                opacity: trackVisibility.audio ? 1 : 0.3
+              }}
+            >
+              <span style={{
+                position: 'absolute',
+                top: '2px',
+                left: '6px',
+                fontSize: '0.5rem',
+                color: '#34d399',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 700,
+                background: 'rgba(5, 20, 13, 0.85)',
+                padding: '1px 5px',
+                borderRadius: '2px',
+                zIndex: 10
+              }}>
                 Racing SFX
               </span>
-              <svg width="100%" height="20" viewBox="0 0 1000 20" preserveAspectRatio="none" style={{ opacity: 0.95 }}>
+
+              <svg 
+                width="100%" 
+                height="32" 
+                viewBox="0 0 1000 32" 
+                preserveAspectRatio="none" 
+                style={{
+                  opacity: 0.95,
+                  transform: `scaleX(${timelineZoom})`,
+                  transformOrigin: 'left center'
+                }}
+              >
                 <defs>
                   <linearGradient id="waveformNeonGreen" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#34d399" stopOpacity="0.9" />
@@ -1233,7 +1359,7 @@ export default function VideoStudio({
                   </linearGradient>
                 </defs>
                 <path
-                  d="M 0 10 L 5 4 L 10 10 L 15 2 L 20 10 L 25 5 L 30 10 L 35 1 L 40 10 L 45 6 L 50 10 L 55 3 L 60 10 L 65 7 L 70 10 L 75 2 L 80 10 L 85 4 L 90 10 L 95 1 L 100 10 L 105 5 L 110 10 L 115 3 L 120 10 L 125 7 L 130 10 L 135 2 L 140 10 L 145 6 L 150 10 L 155 1 L 160 10 L 165 4 L 170 10 L 175 2 L 180 10 L 185 5 L 190 10 L 195 1 L 200 10 L 205 6 L 210 10 L 215 3 L 220 10 L 225 7 L 230 10 L 235 2 L 240 10 L 245 5 L 250 10 L 255 1 L 260 10 L 265 4 L 270 10 L 275 3 L 280 10 L 285 6 L 290 10 L 295 2 L 300 10 L 305 5 L 310 10 L 315 1 L 320 10 L 325 4 L 330 10 L 335 3 L 340 10 L 345 7 L 350 10 L 355 2 L 360 10 L 365 5 L 370 10 L 375 1 L 380 10 L 385 4 L 390 10 L 395 3 L 400 10 L 405 6 L 410 10 L 415 2 L 420 10 L 425 5 L 430 10 L 435 1 L 440 10 L 445 4 L 450 10 L 455 3 L 460 10 L 465 7 L 470 10 L 475 2 L 480 10 L 485 5 L 490 10 L 495 1 L 500 10 L 505 4 L 510 10 L 515 3 L 520 10 L 525 6 L 530 10 L 535 2 L 540 10 L 545 5 L 550 10 L 555 1 L 560 10 L 565 4 L 570 10 L 575 3 L 580 10 L 585 7 L 590 10 L 595 2 L 600 10 L 605 5 L 610 10 L 615 1 L 620 10 L 625 4 L 630 10 L 635 3 L 640 10 L 645 6 L 650 10 L 655 2 L 660 10 L 665 5 L 670 10 L 675 1 L 680 10 L 685 4 L 690 10 L 695 3 L 700 10 L 705 7 L 710 10 L 715 2 L 720 10 L 725 5 L 730 10 L 735 1 L 740 10 L 745 4 L 750 10 L 755 3 L 760 10 L 765 6 L 770 10 L 775 2 L 780 10 L 785 5 L 790 10 L 795 1 L 800 10 L 805 4 L 810 10 L 815 3 L 820 10 L 825 7 L 830 10 L 835 2 L 840 10 L 845 5 L 850 10 L 855 1 L 860 10 L 865 4 L 870 10 L 875 3 L 880 10 L 885 6 L 890 10 L 895 2 L 900 10 L 905 5 L 910 10 L 915 1 L 920 10 L 925 4 L 930 10 L 935 3 L 940 10 L 945 7 L 950 10 L 955 2 L 960 10 L 965 5 L 970 10 L 975 1 L 980 10 L 985 4 L 990 10 L 995 2 L 1000 10 L 1000 10 L 995 18 L 990 10 L 985 16 L 980 10 L 975 19 L 970 10 L 965 15 L 960 10 L 955 18 L 950 10 L 945 13 L 940 10 L 935 17 L 930 10 L 925 16 L 920 10 L 915 19 L 910 10 L 905 15 L 900 10 L 895 18 L 890 10 L 885 14 L 880 10 L 875 17 L 870 10 L 865 16 L 860 10 L 855 19 L 850 10 L 845 15 L 840 10 L 835 18 L 830 10 L 825 13 L 820 10 L 815 17 L 810 10 L 805 16 L 800 10 L 795 19 L 790 10 L 785 15 L 780 10 L 775 18 L 770 10 L 765 14 L 760 10 L 755 17 L 750 10 L 745 16 L 740 10 L 735 19 L 730 10 L 725 15 L 720 10 L 715 18 L 710 10 L 705 13 L 700 10 L 695 17 L 690 10 L 685 16 L 680 10 L 675 19 L 670 10 L 665 15 L 660 10 L 655 18 L 650 10 L 645 14 L 640 10 L 635 17 L 630 10 L 625 16 L 620 10 L 615 19 L 610 10 L 605 15 L 600 10 L 595 18 L 590 10 L 585 13 L 580 10 L 575 17 L 570 10 L 565 16 L 560 10 L 555 19 L 550 10 L 545 15 L 540 10 L 535 18 L 530 10 L 525 14 L 520 10 L 515 17 L 510 10 L 505 16 L 500 10 L 495 19 L 490 10 L 485 15 L 480 10 L 475 18 L 470 10 L 465 13 L 460 10 L 455 17 L 450 10 L 445 16 L 440 10 L 435 19 L 430 10 L 425 15 L 420 10 L 415 18 L 410 10 L 405 14 L 400 10 L 395 17 L 390 10 L 385 16 L 380 10 L 375 19 L 370 10 L 365 15 L 360 10 L 355 18 L 350 10 L 345 13 L 340 10 L 335 17 L 330 10 L 325 16 L 320 10 L 315 19 L 310 10 L 305 15 L 300 10 L 295 18 L 290 10 L 285 14 L 280 10 L 275 17 L 270 10 L 265 16 L 260 10 L 255 19 L 250 10 L 245 15 L 240 10 L 235 18 L 230 10 L 225 13 L 220 10 L 215 17 L 210 10 L 205 14 L 200 10 L 195 19 L 190 10 L 185 15 L 180 10 L 175 18 L 170 10 L 165 16 L 160 10 L 155 19 L 150 10 L 145 14 L 140 10 L 135 18 L 130 10 L 125 13 L 120 10 L 115 17 L 110 10 L 105 15 L 100 10 L 95 19 L 90 10 L 85 16 L 80 10 L 75 18 L 70 10 L 65 13 L 60 10 L 55 17 L 50 10 L 45 14 L 40 10 L 35 19 L 30 10 L 25 15 L 20 10 L 15 18 L 10 10 L 5 16 Z"
+                  d="M 0 16 L 5 8 L 10 16 L 15 4 L 20 16 L 25 9 L 30 16 L 35 2 L 40 16 L 45 10 L 50 16 L 55 5 L 60 16 L 65 11 L 70 16 L 75 4 L 80 16 L 85 7 L 90 16 L 95 2 L 100 16 L 105 8 L 110 16 L 115 5 L 120 16 L 125 11 L 130 16 L 135 4 L 140 16 L 145 9 L 150 16 L 155 2 L 160 16 L 165 7 L 170 16 L 175 4 L 180 16 L 185 8 L 190 16 L 195 2 L 200 16 L 205 9 L 210 16 L 215 5 L 220 16 L 225 11 L 230 16 L 235 4 L 240 16 L 245 8 L 250 16 L 255 2 L 260 16 L 265 7 L 270 16 L 275 5 L 280 16 L 285 9 L 290 16 L 295 4 L 300 16 L 305 8 L 310 16 L 315 2 L 320 16 L 325 7 L 330 16 L 335 5 L 340 16 L 345 11 L 350 16 L 355 4 L 360 16 L 365 8 L 370 16 L 375 2 L 380 16 L 385 7 L 390 16 L 395 5 L 400 16 L 405 9 L 410 16 L 415 4 L 420 16 L 425 8 L 430 16 L 435 2 L 440 16 L 445 7 L 450 16 L 455 5 L 460 16 L 465 11 L 470 16 L 475 4 L 480 16 L 485 8 L 490 16 L 495 2 L 500 16 L 505 7 L 510 16 L 515 5 L 520 16 L 525 9 L 530 16 L 535 4 L 540 16 L 545 8 L 550 16 L 555 2 L 560 16 L 565 7 L 570 16 L 575 5 L 580 16 L 585 11 L 590 16 L 595 4 L 600 16 L 605 8 L 610 16 L 615 2 L 620 16 L 625 7 L 630 16 L 635 5 L 640 16 L 645 9 L 650 16 L 655 4 L 660 16 L 665 8 L 670 16 L 675 2 L 680 16 L 685 7 L 690 16 L 695 5 L 700 16 L 705 11 L 710 16 L 715 4 L 720 16 L 725 8 L 730 16 L 735 2 L 740 16 L 745 7 L 750 16 L 755 5 L 760 16 L 765 9 L 770 16 L 775 4 L 780 16 L 785 8 L 790 16 L 795 2 L 800 16 L 805 7 L 810 16 L 815 5 L 820 16 L 825 11 L 830 16 L 835 4 L 840 16 L 845 8 L 850 16 L 855 2 L 860 16 L 865 7 L 870 16 L 875 5 L 880 16 L 885 9 L 890 16 L 895 4 L 900 16 L 905 8 L 910 16 L 915 2 L 920 16 L 925 7 L 930 16 L 935 5 L 940 16 L 945 11 L 950 16 L 955 4 L 960 16 L 965 8 L 970 16 L 975 2 L 980 16 L 985 7 L 990 16 L 995 4 L 1000 16 L 1000 16 L 995 28 L 990 16 L 985 25 L 980 16 L 975 30 L 970 16 L 965 24 L 960 16 L 955 28 L 950 16 L 945 21 L 940 16 L 935 27 L 930 16 L 925 25 L 920 16 L 915 30 L 910 16 L 905 24 L 900 16 L 895 28 L 890 16 L 885 22 L 880 16 L 875 27 L 870 16 L 865 25 L 860 16 L 855 30 L 850 16 L 845 24 L 840 16 L 835 28 L 830 16 L 825 21 L 820 16 L 815 27 L 810 16 L 805 25 L 800 16 L 795 30 L 790 16 L 785 24 L 780 16 L 775 28 L 770 16 L 765 22 L 760 16 L 755 27 L 750 16 L 745 25 L 740 16 L 735 30 L 730 16 L 725 24 L 720 16 L 715 28 L 710 16 L 705 21 L 700 16 L 695 27 L 690 16 L 685 25 L 680 16 L 675 30 L 670 16 L 665 24 L 660 16 L 655 28 L 650 16 L 645 22 L 640 16 L 635 27 L 630 16 L 625 25 L 620 16 L 615 30 L 610 16 L 605 24 L 600 16 L 595 28 L 590 16 L 585 21 L 580 16 L 575 27 L 570 16 L 565 25 L 560 16 L 555 30 L 550 16 L 545 24 L 540 16 L 535 28 L 530 16 L 525 22 L 520 16 L 515 27 L 510 16 L 505 25 L 500 16 L 495 30 L 490 16 L 485 24 L 480 16 L 475 28 L 470 16 L 465 21 L 460 16 L 455 27 L 450 16 L 445 25 L 440 16 L 435 30 L 430 16 L 425 24 L 420 16 L 415 28 L 410 16 L 405 22 L 400 16 L 395 27 L 390 16 L 385 25 L 380 16 L 375 30 L 370 16 L 365 24 L 360 16 L 355 28 L 350 16 L 345 21 L 340 16 L 335 27 L 330 16 L 325 25 L 320 16 L 315 30 L 310 16 L 305 24 L 300 16 L 295 28 L 290 16 L 285 22 L 280 16 L 275 27 L 270 16 L 265 25 L 260 16 L 255 30 L 250 16 L 245 24 L 240 16 L 235 28 L 230 16 L 225 21 L 220 16 L 215 27 L 210 16 L 205 22 L 200 16 L 195 30 L 190 16 L 185 24 L 180 16 L 175 28 L 170 16 L 165 25 L 160 16 L 155 30 L 150 16 L 145 22 L 140 16 L 135 28 L 130 16 L 125 21 L 120 16 L 115 27 L 110 16 L 105 24 L 100 16 L 95 30 L 90 16 L 85 25 L 80 16 L 75 28 L 70 16 L 65 21 L 60 16 L 55 27 L 50 16 L 45 22 L 40 16 L 35 30 L 30 16 L 25 24 L 20 16 L 15 28 L 10 16 L 5 25 Z"
                   fill="url(#waveformNeonGreen)"
                   stroke="#34d399"
                   strokeWidth="0.8"
@@ -1242,50 +1368,97 @@ export default function VideoStudio({
             </div>
           </div>
 
-          {/* Track 3: Camera Cues Track (Cue 02) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '20px' }}>
-            <div style={{ width: '122px', display: 'flex', flexDirection: 'column', gap: '1px' }}>
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#38bdf8', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Camera size={10} color="#38bdf8" /> Camera Cues Track
-              </span>
+          {/* Track 3: Camera Cues Track (Cue 02, Cue 03, Cue 04) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '24px' }}>
+            <div style={{ width: '126px', minWidth: '126px', display: 'flex', flexDirection: 'column', gap: '1px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#38bdf8', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Camera size={10} color="#38bdf8" /> Camera Cues Track
+                </span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setTrackVisibility({ ...trackVisibility, cues: !trackVisibility.cues })}
+                    style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0 }}
+                  >
+                    {trackVisibility.cues ? <Eye size={10} /> : <EyeOff size={10} color="#ef4444" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTrackLocked({ ...trackLocked, cues: !trackLocked.cues })}
+                    style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0 }}
+                  >
+                    {trackLocked.cues ? <Lock size={10} color="#f59e0b" /> : <Unlock size={10} />}
+                  </button>
+                </div>
+              </div>
               <span style={{ fontSize: '0.5rem', color: '#64748b' }}>Cue 02</span>
             </div>
 
-            <div style={{ flex: 1, display: 'flex', gap: '8px', height: '20px', alignItems: 'center' }}>
+            {/* Cue Blocks Container matching Image 1 placement */}
+            <div style={{
+              flex: 1,
+              display: 'flex',
+              gap: '12px',
+              height: '24px',
+              alignItems: 'center',
+              position: 'relative',
+              opacity: trackVisibility.cues ? 1 : 0.3
+            }}>
               <div style={{
+                position: 'absolute',
+                left: '35%',
                 background: 'rgba(56, 189, 248, 0.2)',
                 border: '1px solid #38bdf8',
                 borderRadius: '3px',
-                padding: '1px 12px',
-                fontSize: '0.54rem',
+                padding: '2px 14px',
+                fontSize: '0.56rem',
                 color: '#38bdf8',
                 fontFamily: 'var(--font-mono)',
-                fontWeight: 700
-              }}>
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+              onClick={() => handleSeek(1.5)}
+              title="Seek to Cue 02"
+              >
                 Cue 02
               </div>
+
               <div style={{
+                position: 'absolute',
+                left: '52%',
                 background: 'rgba(56, 189, 248, 0.2)',
                 border: '1px solid #38bdf8',
                 borderRadius: '3px',
-                padding: '1px 12px',
-                fontSize: '0.54rem',
+                padding: '2px 14px',
+                fontSize: '0.56rem',
                 color: '#38bdf8',
                 fontFamily: 'var(--font-mono)',
-                fontWeight: 700
-              }}>
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+              onClick={() => handleSeek(3.0)}
+              title="Seek to Cue 03"
+              >
                 Cue 03
               </div>
+
               <div style={{
+                position: 'absolute',
+                left: '75%',
                 background: 'rgba(56, 189, 248, 0.2)',
                 border: '1px solid #38bdf8',
                 borderRadius: '3px',
-                padding: '1px 12px',
-                fontSize: '0.54rem',
+                padding: '2px 14px',
+                fontSize: '0.56rem',
                 color: '#38bdf8',
                 fontFamily: 'var(--font-mono)',
-                fontWeight: 700
-              }}>
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+              onClick={() => handleSeek(4.8)}
+              title="Seek to Cue 04"
+              >
                 Cue 04
               </div>
             </div>
