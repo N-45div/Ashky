@@ -426,22 +426,34 @@ export default function VideoStudio({
   const currentVisionScore = campaign?.vision_qa?.[selectedSceneIndex];
 
   return (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+    <div style={{
+      maxWidth: '1440px',
+      margin: '0 auto',
+      padding: '6px 12px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      gap: '6px',
+      height: '100%',
+      maxHeight: 'calc(100vh - 48px)',
+      boxSizing: 'border-box',
+      overflow: 'hidden'
+    }}>
       
       {/* Recoverable failure action banner (only displayed on error) */}
       {studioState === 'recoverable_failure' && (
         <div style={{
           background: 'rgba(239, 68, 68, 0.08)',
           border: '1px solid rgba(239, 68, 68, 0.25)',
-          borderRadius: '8px',
-          padding: '12px 18px',
+          borderRadius: '6px',
+          padding: '6px 12px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '12px'
+          gap: '8px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', fontSize: '0.84rem' }}>
-            <AlertTriangle size={15} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#f87171', fontSize: '0.76rem' }}>
+            <AlertTriangle size={13} />
             <span>Scene synthesis encountered a network timeout. Ashky isolated the fault.</span>
           </div>
           <button
@@ -449,18 +461,18 @@ export default function VideoStudio({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              borderRadius: '6px',
+              gap: '4px',
+              padding: '4px 10px',
+              borderRadius: '5px',
               background: '#dc2626',
               color: '#ffffff',
               border: 'none',
-              fontSize: '0.78rem',
+              fontSize: '0.72rem',
               fontWeight: 600,
               cursor: 'pointer'
             }}
           >
-            <RotateCcw size={12} />
+            <RotateCcw size={11} />
             <span>Retry Render</span>
           </button>
         </div>
@@ -472,17 +484,27 @@ export default function VideoStudio({
         {/* ------------------------------------------------------------ */}
         {/* COLUMN 1: CAMPAIGN BRIEF & PRESETS */}
         {/* ------------------------------------------------------------ */}
-        <div className="matte-panel" style={{ padding: '20px', background: '#0d0f14', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div className="matte-panel" style={{
+          padding: '12px 14px',
+          background: '#0d0f14',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          gap: '7px',
+          height: '100%',
+          boxSizing: 'border-box',
+          overflowY: 'auto'
+        }}>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#cbd5e1', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#cbd5e1', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
               Campaign Brief
             </span>
-            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>Gemini 3.8 Flash</span>
+            <span style={{ fontSize: '0.64rem', color: '#64748b' }}>Gemini 3.8 Flash</span>
           </div>
 
           {/* Preset Buttons */}
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
             {presets.map((p) => {
               const isSelected = productName === p.name;
               return (
@@ -491,12 +513,12 @@ export default function VideoStudio({
                   type="button"
                   onClick={() => handleApplyPreset(p)}
                   style={{
-                    padding: '4px 8px',
-                    borderRadius: '5px',
-                    border: isSelected ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)',
-                    background: isSelected ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    border: isSelected ? '1px solid rgba(59, 130, 246, 0.5)' : '1px solid rgba(255, 255, 255, 0.08)',
+                    background: isSelected ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
                     color: isSelected ? '#ffffff' : '#94a3b8',
-                    fontSize: '0.72rem',
+                    fontSize: '0.66rem',
                     fontWeight: 600,
                     cursor: 'pointer'
                   }}
@@ -508,9 +530,9 @@ export default function VideoStudio({
           </div>
 
           {/* Form Fields */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
             <div>
-              <label style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
+              <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
                 PRODUCT NAME
               </label>
               <input
@@ -518,12 +540,12 @@ export default function VideoStudio({
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
                 className="matte-input"
-                style={{ width: '100%', fontSize: '0.82rem' }}
+                style={{ width: '100%', fontSize: '0.74rem', padding: '3px 7px' }}
               />
             </div>
 
             <div>
-              <label style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
+              <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
                 CATEGORY
               </label>
               <input
@@ -531,60 +553,62 @@ export default function VideoStudio({
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="matte-input"
-                style={{ width: '100%', fontSize: '0.82rem' }}
+                style={{ width: '100%', fontSize: '0.74rem', padding: '3px 7px' }}
               />
             </div>
 
             <div>
-              <label style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
+              <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
                 PRODUCT PITCH
               </label>
               <textarea
                 value={productPitch}
                 onChange={(e) => setProductPitch(e.target.value)}
                 className="matte-input"
-                rows={3}
-                style={{ width: '100%', fontSize: '0.8rem', resize: 'vertical' }}
+                rows={2}
+                style={{ width: '100%', fontSize: '0.72rem', padding: '3px 7px', resize: 'none', lineHeight: 1.25 }}
               />
             </div>
 
-            <div>
-              <label style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
-                CAMPAIGN GOAL
-              </label>
-              <input
-                type="text"
-                value={campaignGoal}
-                onChange={(e) => setCampaignGoal(e.target.value)}
-                className="matte-input"
-                style={{ width: '100%', fontSize: '0.82rem' }}
-              />
-            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+              <div>
+                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
+                  CAMPAIGN GOAL
+                </label>
+                <input
+                  type="text"
+                  value={campaignGoal}
+                  onChange={(e) => setCampaignGoal(e.target.value)}
+                  className="matte-input"
+                  style={{ width: '100%', fontSize: '0.72rem', padding: '3px 7px' }}
+                />
+              </div>
 
-            <div>
-              <label style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
-                TARGET AUDIENCE
-              </label>
-              <input
-                type="text"
-                value={targetAudience}
-                onChange={(e) => setTargetAudience(e.target.value)}
-                className="matte-input"
-                style={{ width: '100%', fontSize: '0.82rem' }}
-              />
+              <div>
+                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
+                  TARGET AUDIENCE
+                </label>
+                <input
+                  type="text"
+                  value={targetAudience}
+                  onChange={(e) => setTargetAudience(e.target.value)}
+                  className="matte-input"
+                  style={{ width: '100%', fontSize: '0.72rem', padding: '3px 7px' }}
+                />
+              </div>
             </div>
 
             {/* Aspect Ratio & Style */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
               <div>
-                <label style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
+                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
                   RATIO
                 </label>
                 <select
                   value={aspectRatio}
                   onChange={(e) => setAspectRatio(e.target.value)}
                   className="matte-input"
-                  style={{ width: '100%', fontSize: '0.78rem' }}
+                  style={{ width: '100%', fontSize: '0.72rem', padding: '3px 6px' }}
                 >
                   <option value="9:16">9:16 (Reels/TikTok)</option>
                   <option value="16:9">16:9 (YouTube)</option>
@@ -592,14 +616,14 @@ export default function VideoStudio({
               </div>
 
               <div>
-                <label style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '3px' }}>
+                <label style={{ fontSize: '0.64rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '1px' }}>
                   CREATIVE STYLE
                 </label>
                 <select
                   value={style}
                   onChange={(e) => setStyle(e.target.value)}
                   className="matte-input"
-                  style={{ width: '100%', fontSize: '0.78rem' }}
+                  style={{ width: '100%', fontSize: '0.72rem', padding: '3px 6px' }}
                 >
                   <option value="Neon-Noir Cyberpunk Cinematic">Neon-Noir Cyberpunk</option>
                   <option value="Kinetic High-Tech Dark">Kinetic High-Tech</option>
@@ -612,19 +636,19 @@ export default function VideoStudio({
             {/* Voiceover Engine (when campaign exists) */}
             {campaign && (
               <div style={{
-                marginTop: '4px',
-                paddingTop: '10px',
+                marginTop: '2px',
+                paddingTop: '4px',
                 borderTop: '1px solid rgba(255, 255, 255, 0.08)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '8px'
+                gap: '3px'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#f0f3f6', fontFamily: 'var(--font-mono)' }}>
+                  <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#f0f3f6', fontFamily: 'var(--font-mono)' }}>
                     VEO 2 VOICE ENGINE
                   </span>
                   {renderStatus?.status === 'completed' && (
-                    <span className="tag-minimal tag-emerald" style={{ fontSize: '0.62rem' }}>MP4 READY</span>
+                    <span className="tag-minimal tag-emerald" style={{ fontSize: '0.58rem', padding: '1px 4px' }}>MP4 READY</span>
                   )}
                 </div>
                 <div>
@@ -633,7 +657,7 @@ export default function VideoStudio({
                     onChange={(e) => setSelectedVoice(e.target.value)}
                     className="matte-input"
                     disabled={renderingVideo}
-                    style={{ width: '100%', fontSize: '0.78rem' }}
+                    style={{ width: '100%', fontSize: '0.72rem', padding: '3px 6px' }}
                   >
                     <option value="en-US-GuyNeural">Guy (US Male - Founder Crisp)</option>
                     <option value="en-US-JennyNeural">Jenny (US Female - Engaging)</option>
@@ -643,43 +667,43 @@ export default function VideoStudio({
               </div>
             )}
 
-            {/* Exactly One Primary Action Based on Lifecycle State: Generate -> Render -> Improve */}
+            {/* Actions: Generate / Render */}
             {!campaign ? (
               <button
                 onClick={handleCreateAndStream}
                 disabled={studioState === 'creating'}
                 className="btn-solid-white"
-                style={{ width: '100%', padding: '12px', fontSize: '0.88rem', fontWeight: 600, marginTop: '6px' }}
+                style={{ width: '100%', padding: '7px 10px', fontSize: '0.8rem', fontWeight: 700, marginTop: '2px' }}
               >
                 {studioState === 'creating' ? (
                   <>
-                    <RefreshCw size={15} className="animate-spin" />
+                    <RefreshCw size={13} className="animate-spin" />
                     <span>Generating Campaign...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles size={15} />
+                    <Sparkles size={13} />
                     <span>Generate Campaign</span>
                   </>
                 )}
               </button>
             ) : renderStatus?.status !== 'completed' ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '2px' }}>
                 <button
                   type="button"
                   onClick={handleStartRender}
                   disabled={renderingVideo}
                   className="btn-solid-white"
-                  style={{ width: '100%', padding: '12px', fontSize: '0.88rem', fontWeight: 600 }}
+                  style={{ width: '100%', padding: '7px 10px', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
                   {renderingVideo ? (
                     <>
-                      <RefreshCw size={14} className="animate-spin" />
+                      <RefreshCw size={13} className="animate-spin" />
                       <span>Rendering {aspectRatio} Video...</span>
                     </>
                   ) : (
                     <>
-                      <Film size={14} />
+                      <Film size={13} />
                       <span>Render {aspectRatio} MP4</span>
                     </>
                   )}
@@ -689,13 +713,13 @@ export default function VideoStudio({
                   onClick={handleCreateAndStream}
                   disabled={studioState === 'creating'}
                   className="btn-matte-dark"
-                  style={{ width: '100%', padding: '7px', fontSize: '0.76rem', color: '#94a3b8' }}
+                  style={{ width: '100%', padding: '4px', fontSize: '0.68rem', color: '#94a3b8' }}
                 >
                   <span>Update Brief & Regenerate</span>
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '2px' }}>
                 <button
                   type="button"
                   onClick={() => {
@@ -703,9 +727,9 @@ export default function VideoStudio({
                     handleCreateAndStream();
                   }}
                   className="btn-solid-white"
-                  style={{ width: '100%', padding: '12px', fontSize: '0.88rem', fontWeight: 600 }}
+                  style={{ width: '100%', padding: '7px 10px', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
-                  <Sparkles size={14} />
+                  <Sparkles size={13} />
                   <span>Improve Campaign</span>
                 </button>
                 <button
@@ -713,7 +737,7 @@ export default function VideoStudio({
                   onClick={handleStartRender}
                   disabled={renderingVideo}
                   className="btn-matte-dark"
-                  style={{ width: '100%', padding: '7px', fontSize: '0.76rem', color: '#94a3b8' }}
+                  style={{ width: '100%', padding: '4px', fontSize: '0.68rem', color: '#94a3b8' }}
                 >
                   <span>Re-Render MP4</span>
                 </button>
@@ -723,582 +747,470 @@ export default function VideoStudio({
         </div>
 
         {/* ------------------------------------------------------------ */}
+        {/* ------------------------------------------------------------ */}
         {/* COLUMN 2: CENTER SCENE PREVIEW & TIMELINE */}
         {/* ------------------------------------------------------------ */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', height: '100%', boxSizing: 'border-box' }}>
           
-          {/* View mode switcher */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'inline-flex', background: '#090a0d', padding: '3px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <button
-                type="button"
-                onClick={() => setActiveTab('blueprint')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: activeTab === 'blueprint' ? '#1c2230' : 'transparent',
-                  color: activeTab === 'blueprint' ? '#ffffff' : '#717d91',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-              >
-                <Layers size={13} />
-                <span>Scene Blueprint</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('video_player')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: activeTab === 'video_player' ? '#1c2230' : 'transparent',
-                  color: activeTab === 'video_player' ? '#ffffff' : '#717d91',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-              >
-                <Video size={13} />
-                <span>Rendered Player</span>
-                {renderStatus?.status === 'completed' && (
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
-                )}
-              </button>
-            </div>
+          {/* Scene Stepper Navigation Bar (with optional MP4 toggle) */}
+          <div style={{ display: 'flex', gap: '4px', background: '#0a0c10', padding: '3px 4px', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+            {[0, 1, 2].map((idx) => {
+              const sc = campaign?.scenes?.[idx];
+              const isSelected = selectedSceneIndex === idx && activeTab !== 'video_player';
+              const isReady = sc?.status === 'ready';
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setActiveTab('blueprint');
+                    if (sc) handleSelectScene(idx);
+                  }}
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    padding: '4px 6px',
+                    borderRadius: '4px',
+                    border: isSelected ? '1px solid #f59e0b' : '1px solid transparent',
+                    background: isSelected ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
+                    color: isSelected ? '#fbbf24' : '#64748b',
+                    fontSize: '0.68rem',
+                    fontWeight: 600,
+                    cursor: sc ? 'pointer' : 'default',
+                    fontFamily: 'var(--font-mono)',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {isReady ? <CheckCircle2 size={11} color="#10b981" /> : <Clock size={11} color="#f59e0b" />}
+                  <span>Scene {idx + 1} {idx === 0 ? '(Hook 0-3s)' : idx === 1 ? '(Narrative 3-18s)' : '(CTA 18-30s)'}</span>
+                </button>
+              );
+            })}
 
             {renderStatus?.status === 'completed' && (
-              <a
-                href={renderStatus.download_url || '#'}
-                download
-                className="btn-solid-white"
-                style={{ padding: '6px 12px', fontSize: '0.78rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+              <button
+                type="button"
+                onClick={() => setActiveTab(activeTab === 'video_player' ? 'blueprint' : 'video_player')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  border: activeTab === 'video_player' ? '1px solid #10b981' : '1px solid rgba(16, 185, 129, 0.3)',
+                  background: activeTab === 'video_player' ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
+                  color: '#34d399',
+                  fontSize: '0.68rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
               >
-                <Download size={13} />
-                <span>Download MP4</span>
-              </a>
+                <Video size={11} />
+                <span>Rendered MP4</span>
+              </button>
             )}
           </div>
 
-          {/* Center Stage Content */}
-          {activeTab === 'video_player' ? (
-            /* Dedicated Rendered MP4 Player View */
-            <div className="matte-panel" style={{ padding: '24px', background: '#0a0c10', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-              {renderStatus?.status === 'completed' ? (
-                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-                  <div style={{
-                    position: 'relative',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    background: '#000000',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    width: '280px',
-                    height: '490px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    {renderStatus?.video_url ? (
-                      <video
-                        controls
-                        autoPlay
-                        playsInline
-                        poster={currentScene?.media_url}
-                        src={renderStatus.video_url}
-                        style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000000' }}
-                      />
-                    ) : (
-                      <img
-                        src={currentScene?.media_url || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80'}
-                        alt="Rendered Video Preview"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    )}
-                    {!renderStatus?.video_url && (
-                      <div style={{
-                        position: 'absolute',
-                        bottom: '20px',
-                        left: '12px',
-                        right: '12px',
-                        background: 'rgba(10, 12, 16, 0.9)',
-                        padding: '10px',
-                        borderRadius: '8px',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        textAlign: 'center'
-                      }}>
-                        <span style={{ fontSize: '0.64rem', color: '#34d399', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>VEO 2 SYNTHESIZED 9:16 REEL</span>
-                        <p style={{ fontSize: '0.84rem', fontWeight: 700, color: '#ffffff', margin: '2px 0 0' }}>{productName}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Post-Render Next Lifecycle Action: Check AI Discovery */}
-                  <div style={{
-                    width: '100%',
-                    padding: '16px 20px',
-                    background: 'rgba(56, 189, 248, 0.08)',
-                    border: '1px solid rgba(56, 189, 248, 0.25)',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '12px'
-                  }}>
-                    <div>
-                      <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#38bdf8', fontFamily: 'var(--font-mono)', display: 'block' }}>
-                        NEXT LIFECYCLE ACTION:
-                      </span>
-                      <span style={{ fontSize: '0.86rem', fontWeight: 600, color: '#ffffff' }}>
-                        Verify AI Citation Visibility for {productName}
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={onNavigateToGeo}
-                      className="btn-solid-white"
-                      style={{ padding: '8px 16px', fontSize: '0.84rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}
-                    >
-                      <span>Check AI discovery</span>
-                      <ArrowRight size={14} />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ padding: '40px 20px', textAlign: 'center', color: '#94a3b8' }}>
-                  <Film size={32} color="#64748b" style={{ margin: '0 auto 12px' }} />
-                  <h4 style={{ color: '#ffffff', margin: '0 0 6px' }}>Video Not Yet Synthesized</h4>
-                  <p style={{ fontSize: '0.84rem', maxWidth: '360px', margin: '0 auto 16px' }}>
-                    Click "Render 9:16 MP4" to trigger neural voiceover generation and Veo 2 scene synthesis.
-                  </p>
-                  <button onClick={handleStartRender} className="btn-solid-white" style={{ padding: '8px 18px', fontSize: '0.82rem' }}>
-                    Render Video Now
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            /* Hollywood Master Cinema Stage with Amber/Gold Bezel */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* Master Cinema Stage Container with Glowing Amber Border */}
+          {currentScene && (
+            <div className="master-cinema-stage">
               
-              {/* Scene Stepper Navigation Bar */}
-              <div style={{ display: 'flex', gap: '6px', background: '#0a0c10', padding: '5px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                {[0, 1, 2].map((idx) => {
-                  const sc = campaign?.scenes?.[idx];
-                  const isSelected = selectedSceneIndex === idx;
-                  const isReady = sc?.status === 'ready';
+              {/* Top Half: Dual-Dock Viewport */}
+              <div style={{ display: 'grid', gridTemplateColumns: '185px 1fr', gap: '8px', alignItems: 'stretch' }}>
+                
+                {/* Left Dock: 9:16 Cinema Monitor with Cyan Safe HUD */}
+                <div style={{
+                  position: 'relative',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  width: '185px',
+                  height: '318px',
+                  background: '#040507',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.8)'
+                }}>
+                  {activeTab === 'video_player' && renderStatus?.video_url ? (
+                    <video
+                      controls
+                      autoPlay
+                      playsInline
+                      poster={currentScene.media_url}
+                      src={renderStatus.video_url}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000000' }}
+                    />
+                  ) : (
+                    <img
+                      src={currentScene.media_url}
+                      alt={currentScene.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.92 }}
+                    />
+                  )}
 
-                  return (
+                  {/* Top Inset Scene Pill */}
+                  <div style={{ position: 'absolute', top: '8px', left: '8px', right: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'none' }}>
+                    <span style={{ background: 'rgba(9, 10, 12, 0.92)', color: '#cbd5e1', padding: '2px 6px', borderRadius: '3px', border: '1px solid rgba(255, 255, 255, 0.12)', fontSize: '0.58rem', fontFamily: 'var(--font-mono)' }}>
+                      SCENE {currentScene.scene_number} • {currentScene.timeframe}
+                    </span>
                     <button
-                      key={idx}
-                      onClick={() => sc && handleSelectScene(idx)}
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setShowSafeGuides(!showSafeGuides); }}
                       style={{
-                        flex: 1,
+                        pointerEvents: 'auto',
+                        background: showSafeGuides ? 'rgba(56, 189, 248, 0.25)' : 'rgba(9, 10, 12, 0.8)',
+                        border: showSafeGuides ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.12)',
+                        borderRadius: '3px',
+                        padding: '2px 5px',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        padding: '6px 8px',
-                        borderRadius: '6px',
-                        border: isSelected ? '1px solid #f59e0b' : '1px solid transparent',
-                        background: isSelected ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-                        color: isSelected ? '#fbbf24' : '#64748b',
-                        fontSize: '0.74rem',
-                        fontWeight: 600,
-                        cursor: sc ? 'pointer' : 'default',
-                        fontFamily: 'var(--font-mono)',
-                        transition: 'all 0.15s ease'
+                        gap: '2px',
+                        color: showSafeGuides ? '#38bdf8' : '#94a3b8',
+                        fontSize: '0.56rem',
+                        cursor: 'pointer',
+                        fontFamily: 'var(--font-mono)'
                       }}
                     >
-                      {isReady ? <CheckCircle2 size={12} color="#10b981" /> : <Clock size={12} color="#f59e0b" />}
-                      <span>Scene {idx + 1} {idx === 0 ? '(Hook 0-3s)' : idx === 1 ? '(Narrative 3-18s)' : '(CTA 18-30s)'}</span>
+                      <Crosshair size={10} />
+                      <span>HUD</span>
                     </button>
-                  );
-                })}
-              </div>
+                  </div>
 
-              {/* Master Cinema Stage Container with Glowing Amber Border */}
-              {currentScene && (
-                <div className="master-cinema-stage">
-                  
-                  {/* Top Half: Dual-Dock Viewport */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '14px', alignItems: 'stretch' }}>
-                    
-                    {/* Left Dock: 9:16 Cinema Monitor with Cyan Safe HUD */}
+                  {/* 9:16 Cyan Safe Interactive Guides */}
+                  {showSafeGuides && (
                     <div style={{
-                      position: 'relative',
-                      borderRadius: '10px',
-                      overflow: 'hidden',
-                      width: '250px',
-                      height: '430px',
-                      background: '#040507',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      boxShadow: '0 12px 32px rgba(0, 0, 0, 0.8)'
-                    }}>
-                      <img
-                        src={currentScene.media_url}
-                        alt={currentScene.title}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.92 }}
-                      />
-
-                      {/* Top Inset Scene Pill */}
-                      <div style={{ position: 'absolute', top: '10px', left: '10px', right: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'none' }}>
-                        <span style={{ background: 'rgba(9, 10, 12, 0.92)', color: '#cbd5e1', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.12)', fontSize: '0.62rem', fontFamily: 'var(--font-mono)' }}>
-                          SCENE {currentScene.scene_number} • {currentScene.timeframe}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); setShowSafeGuides(!showSafeGuides); }}
-                          style={{
-                            pointerEvents: 'auto',
-                            background: showSafeGuides ? 'rgba(56, 189, 248, 0.25)' : 'rgba(9, 10, 12, 0.8)',
-                            border: showSafeGuides ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.12)',
-                            borderRadius: '4px',
-                            padding: '3px 6px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '3px',
-                            color: showSafeGuides ? '#38bdf8' : '#94a3b8',
-                            fontSize: '0.6rem',
-                            cursor: 'pointer',
-                            fontFamily: 'var(--font-mono)'
-                          }}
-                        >
-                          <Crosshair size={11} />
-                          <span>HUD</span>
-                        </button>
-                      </div>
-
-                      {/* 9:16 Cyan Safe Interactive Guides (TikTok & IG Reels) */}
-                      {showSafeGuides && (
-                        <div style={{
-                          position: 'absolute',
-                          top: '32px',
-                          bottom: '68px',
-                          left: '12px',
-                          right: '12px',
-                          border: '1.5px dashed rgba(56, 189, 248, 0.55)',
-                          borderRadius: '6px',
-                          pointerEvents: 'none',
-                          boxShadow: 'inset 0 0 18px rgba(56, 189, 248, 0.08)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                          padding: '6px'
-                        }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ fontSize: '0.58rem', color: '#38bdf8', fontWeight: 700, fontFamily: 'var(--font-mono)', background: 'rgba(9, 10, 12, 0.8)', padding: '1px 4px', borderRadius: '3px' }}>
-                              + 9:16 SAFE ZONE
-                            </span>
-                            <span style={{ fontSize: '0.58rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>+</span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', paddingRight: '2px' }}>
-                            <span style={{ fontSize: '0.54rem', color: 'rgba(255, 255, 255, 0.55)', fontFamily: 'var(--font-mono)', writingMode: 'vertical-rl', background: 'rgba(0,0,0,0.5)', padding: '3px 2px', borderRadius: '2px' }}>
-                              ACTIONS GUTTER
-                            </span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ fontSize: '0.58rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>+</span>
-                            <span style={{ fontSize: '0.58rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>+</span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Kinetic Text Overlay Box */}
-                      <div style={{
-                        position: 'absolute',
-                        bottom: '10px',
-                        left: '8px',
-                        right: '8px',
-                        background: 'rgba(10, 12, 16, 0.94)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        borderRadius: '8px',
-                        padding: '8px 10px',
-                        textAlign: 'center'
-                      }}>
-                        <span style={{ fontSize: '0.6rem', color: '#60a5fa', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
-                          {currentScene.hook_type}
-                        </span>
-                        <p style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ffffff', margin: '2px 0 0', lineHeight: 1.25 }}>
-                          "{currentScene.text_overlay}"
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Right Dock: DIRECTOR NOTES HUD */}
-                    <div style={{
-                      background: '#0d111a',
-                      borderRadius: '10px',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      padding: '14px',
+                      position: 'absolute',
+                      top: '28px',
+                      bottom: '56px',
+                      left: '8px',
+                      right: '8px',
+                      border: '1.2px dashed rgba(56, 189, 248, 0.55)',
+                      borderRadius: '4px',
+                      pointerEvents: 'none',
+                      boxShadow: 'inset 0 0 14px rgba(56, 189, 248, 0.08)',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
-                      gap: '10px'
+                      padding: '4px'
                     }}>
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                          <span style={{ fontSize: '0.74rem', color: '#f59e0b', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
-                            DIRECTOR NOTES
-                          </span>
-                          <span className="tag-minimal tag-slate" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.3)', fontSize: '0.64rem' }}>
-                            SCENE {currentScene.scene_number}
-                          </span>
-                        </div>
-                        <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
-                          Came your vidae guidess, 9:16 vertical, syithpwave nees neon scene.
-                        </p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.52rem', color: '#38bdf8', fontWeight: 700, fontFamily: 'var(--font-mono)', background: 'rgba(9, 10, 12, 0.8)', padding: '1px 3px', borderRadius: '2px' }}>
+                          + 9:16 SAFE ZONE
+                        </span>
+                        <span style={{ fontSize: '0.52rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>+</span>
                       </div>
-
-                      {/* Voiceover Script Block with Audio Preview */}
-                      <div style={{ background: '#07090f', padding: '10px 12px', borderRadius: '6px', borderLeft: '3px solid #f59e0b', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '0.64rem', color: '#94a3b8', fontWeight: 700, fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <Volume2 size={11} color="#f59e0b" />
-                            VOICEOVER SCRIPT (VEO 2):
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleToggleVoiceAudio(currentScene.voiceover_script)}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              padding: '2px 7px',
-                              borderRadius: '4px',
-                              background: isPlayingAudio ? 'rgba(245, 158, 11, 0.25)' : '#161d28',
-                              border: isPlayingAudio ? '1px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.1)',
-                              color: isPlayingAudio ? '#fbbf24' : '#e2e8f0',
-                              fontSize: '0.65rem',
-                              fontWeight: 600,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            {isPlayingAudio ? <Pause size={10} /> : <Play size={10} />}
-                            <span>{isPlayingAudio ? 'Speaking...' : 'Listen Voice'}</span>
-                            {isPlayingAudio && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '2px', height: '10px' }}>
-                                <span className="wave-bar" style={{ background: '#f59e0b' }} />
-                                <span className="wave-bar" style={{ background: '#f59e0b' }} />
-                                <span className="wave-bar" style={{ background: '#f59e0b' }} />
-                              </div>
-                            )}
-                          </button>
-                        </div>
-                        <p style={{ fontSize: '0.82rem', color: '#f8fafc', margin: 0, lineHeight: 1.4, fontWeight: 500 }}>
-                          "{currentScene.voiceover_script}"
-                        </p>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', paddingRight: '2px' }}>
+                        <span style={{ fontSize: '0.5rem', color: 'rgba(255, 255, 255, 0.55)', fontFamily: 'var(--font-mono)', writingMode: 'vertical-rl', background: 'rgba(0,0,0,0.5)', padding: '2px 1px', borderRadius: '2px' }}>
+                          ACTIONS GUTTER
+                        </span>
                       </div>
-
-                      {/* Camera Cues & Kinetic Motion */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.74rem' }}>
-                        <div style={{ background: '#07090f', padding: '8px', borderRadius: '6px' }}>
-                          <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: '0.62rem', marginBottom: '2px' }}>
-                            <Camera size={10} color="#60a5fa" />
-                            CAMERA CUES
-                          </span>
-                          <span style={{ color: '#cbd5e1', lineHeight: 1.3 }}>{currentScene.camera_cues}</span>
-                        </div>
-                        <div style={{ background: '#07090f', padding: '8px', borderRadius: '6px' }}>
-                          <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: '0.62rem', marginBottom: '2px' }}>
-                            <Activity size={10} color="#34d399" />
-                            KINETIC MOTION
-                          </span>
-                          <span style={{ color: '#cbd5e1', lineHeight: 1.3 }}>{currentScene.kinetic_motion}</span>
-                        </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.52rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>+</span>
+                        <span style={{ fontSize: '0.52rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>+</span>
                       </div>
-
-                      {/* Scene Telemetry */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', background: '#07090f', padding: '6px 8px', borderRadius: '6px' }}>
-                        <div>
-                          <span style={{ fontSize: '0.58rem', color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>HOOK FRICTION</span>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#34d399' }}>{currentScene.hook_score || 94}/100</span>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '0.58rem', color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>DROPOFF EST</span>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fbbf24' }}>{currentScene.dropoff || '13.8%'}</span>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '0.58rem', color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>TARGET RATIO</span>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#94a3b8' }}>9:16</span>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '0.58rem', color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>FRAMERATE</span>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#60a5fa' }}>60 FPS</span>
-                        </div>
-                      </div>
-
                     </div>
+                  )}
 
+                  {/* Kinetic Text Overlay Box */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '8px',
+                    left: '6px',
+                    right: '6px',
+                    background: 'rgba(10, 12, 16, 0.94)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '6px',
+                    padding: '5px 8px',
+                    textAlign: 'center'
+                  }}>
+                    <span style={{ fontSize: '0.56rem', color: '#60a5fa', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+                      {currentScene.hook_type}
+                    </span>
+                    <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#ffffff', margin: '1px 0 0', lineHeight: 1.2 }}>
+                      "{currentScene.text_overlay}"
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right Dock: DIRECTOR NOTES HUD */}
+                <div style={{
+                  background: '#0c0f17',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  padding: '8px 10px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  height: '318px',
+                  boxSizing: 'border-box',
+                  gap: '4px'
+                }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1px' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+                        DIRECTOR NOTES
+                      </span>
+                      <span className="tag-minimal tag-slate" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.3)', fontSize: '0.6rem', padding: '1px 5px' }}>
+                        SCENE {currentScene.scene_number}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '0.7rem', color: '#94a3b8', margin: 0, lineHeight: 1.25 }}>
+                      Came your video guidess. 9:16 vertical, synthwave neon scene.
+                    </p>
                   </div>
 
-                  {/* Bottom Half: Integrated Cinema Transport Bar (Amber scrubber & controls) */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '4px' }}>
-                    {/* Amber Timeline Scrub Slider */}
-                    <input
-                      type="range"
-                      min="0"
-                      max="30"
-                      step="0.1"
-                      value={timelineTime}
-                      onChange={(e) => {
-                        const t = parseFloat(e.target.value);
-                        setTimelineTime(t);
-                        if (t < 3.0 && selectedSceneIndex !== 0) setSelectedSceneIndex(0);
-                        else if (t >= 3.0 && t < 18.0 && selectedSceneIndex !== 1) setSelectedSceneIndex(1);
-                        else if (t >= 18.0 && selectedSceneIndex !== 2) setSelectedSceneIndex(2);
-                      }}
-                      className="timeline-slider-amber"
-                      title={`Seek to ${timelineTime.toFixed(1)}s`}
-                    />
-
-                    {/* Transport Bar Controls Row */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
-                      {/* Left: Timecode Readout */}
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', fontWeight: 700, color: '#ffffff' }}>
-                        {formatTimecode(timelineTime)}
-                      </div>
-
-                      {/* Center: Play/Pause and Step Controls */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <button
-                          type="button"
-                          onClick={() => handleSelectScene(Math.max(0, selectedSceneIndex - 1))}
-                          style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
-                          title="Previous Scene"
-                        >
-                          <SkipBack size={15} />
-                        </button>
-                        
-                        {/* Glowing Amber Play/Pause Button */}
-                        <button
-                          type="button"
-                          onClick={() => setIsPlayingTimeline(!isPlayingTimeline)}
-                          style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '50%',
-                            background: '#f59e0b',
-                            boxShadow: '0 0 14px rgba(245, 158, 11, 0.6)',
-                            border: 'none',
-                            color: '#000000',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            transition: 'transform 0.15s ease, background 0.15s ease'
-                          }}
-                          title={isPlayingTimeline ? 'Pause' : 'Play'}
-                        >
-                          {isPlayingTimeline ? <Pause size={15} fill="#000000" /> : <Play size={15} fill="#000000" style={{ marginLeft: '2px' }} />}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleSelectScene(Math.min(2, selectedSceneIndex + 1))}
-                          style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
-                          title="Next Scene"
-                        >
-                          <SkipForward size={15} />
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => { setTimelineTime(0); }}
-                          style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '4px' }}
-                          title="Restart Timeline"
-                        >
-                          <Repeat size={13} />
-                        </button>
-                      </div>
-
-                      {/* Right: Resolution and View Controls */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.68rem', color: '#cbd5e1', background: '#05070a', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.08)', fontFamily: 'var(--font-mono)' }}>
-                          1080x1920
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setShowSafeGuides(!showSafeGuides)}
-                          style={{
-                            background: 'transparent',
-                            border: 'none',
-                            color: showSafeGuides ? '#38bdf8' : '#64748b',
-                            cursor: 'pointer',
-                            padding: '3px'
-                          }}
-                          title="Toggle Safe HUD"
-                        >
-                          <Crosshair size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '3px' }}
-                          title="Fullscreen Preview"
-                        >
-                          <Maximize2 size={14} />
-                        </button>
-                      </div>
-
+                  {/* Voiceover Script Block with Audio Preview */}
+                  <div style={{ background: '#07090f', padding: '6px 8px', borderRadius: '5px', borderLeft: '3px solid #f59e0b', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        <Volume2 size={10} color="#f59e0b" />
+                        VOICEOVER SCRIPT (VEO 2):
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleVoiceAudio(currentScene.voiceover_script)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          padding: '1px 5px',
+                          borderRadius: '3px',
+                          background: isPlayingAudio ? 'rgba(245, 158, 11, 0.25)' : '#161d28',
+                          border: isPlayingAudio ? '1px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.1)',
+                          color: isPlayingAudio ? '#fbbf24' : '#e2e8f0',
+                          fontSize: '0.6rem',
+                          fontWeight: 600,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {isPlayingAudio ? <Pause size={9} /> : <Play size={9} />}
+                        <span>{isPlayingAudio ? 'Speaking...' : 'Listen Voice'}</span>
+                        {isPlayingAudio && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '2px', height: '8px' }}>
+                            <span className="wave-bar" style={{ background: '#f59e0b' }} />
+                            <span className="wave-bar" style={{ background: '#f59e0b' }} />
+                            <span className="wave-bar" style={{ background: '#f59e0b' }} />
+                          </div>
+                        )}
+                      </button>
                     </div>
+                    <p style={{ fontSize: '0.74rem', color: '#f8fafc', margin: 0, lineHeight: 1.3, fontWeight: 500 }}>
+                      "{currentScene.voiceover_script}"
+                    </p>
+                  </div>
 
+                  {/* Camera Cues & Kinetic Motion */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px', fontSize: '0.68rem' }}>
+                    <div style={{ background: '#07090f', padding: '5px 7px', borderRadius: '5px' }}>
+                      <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '3px', fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: '0.56rem', marginBottom: '1px' }}>
+                        <Camera size={9} color="#60a5fa" />
+                        CAMERA CUES
+                      </span>
+                      <span style={{ color: '#cbd5e1', lineHeight: 1.2, display: 'block', fontSize: '0.64rem' }}>{currentScene.camera_cues}</span>
+                    </div>
+                    <div style={{ background: '#07090f', padding: '5px 7px', borderRadius: '5px' }}>
+                      <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '3px', fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: '0.56rem', marginBottom: '1px' }}>
+                        <Activity size={9} color="#34d399" />
+                        KINETIC MOTION
+                      </span>
+                      <span style={{ color: '#cbd5e1', lineHeight: 1.2, display: 'block', fontSize: '0.64rem' }}>{currentScene.kinetic_motion}</span>
+                    </div>
+                  </div>
+
+                  {/* Scene Telemetry */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', background: '#07090f', padding: '4px 6px', borderRadius: '5px' }}>
+                    <div>
+                      <span style={{ fontSize: '0.52rem', color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>HOOK FRICTION</span>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#34d399' }}>{currentScene.hook_score || 94}/100</span>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '0.52rem', color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>DROPOFF EST</span>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fbbf24' }}>{currentScene.dropoff || '13.8%'}</span>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '0.52rem', color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>TARGET RATIO</span>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8' }}>9:16</span>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '0.52rem', color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>FRAMERATE</span>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#60a5fa' }}>60 FPS</span>
+                    </div>
                   </div>
 
                 </div>
-              )}
+
+              </div>
+
+              {/* Bottom Half: Integrated Cinema Transport Bar (Amber scrubber & controls) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '2px' }}>
+                {/* Amber Timeline Scrub Slider */}
+                <input
+                  type="range"
+                  min="0"
+                  max="30"
+                  step="0.1"
+                  value={timelineTime}
+                  onChange={(e) => {
+                    const t = parseFloat(e.target.value);
+                    setTimelineTime(t);
+                    if (t < 3.0 && selectedSceneIndex !== 0) setSelectedSceneIndex(0);
+                    else if (t >= 3.0 && t < 18.0 && selectedSceneIndex !== 1) setSelectedSceneIndex(1);
+                    else if (t >= 18.0 && selectedSceneIndex !== 2) setSelectedSceneIndex(2);
+                  }}
+                  className="timeline-slider-amber"
+                  title={`Seek to ${timelineTime.toFixed(1)}s`}
+                />
+
+                {/* Transport Bar Controls Row */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                  {/* Left: Timecode Readout */}
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', fontWeight: 700, color: '#ffffff' }}>
+                    {formatTimecode(timelineTime)}
+                  </div>
+
+                  {/* Center: Play/Pause and Step Controls */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectScene(Math.max(0, selectedSceneIndex - 1))}
+                      style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '3px' }}
+                      title="Previous Scene"
+                    >
+                      <SkipBack size={13} />
+                    </button>
+                    
+                    {/* Glowing Amber Play/Pause Button */}
+                    <button
+                      type="button"
+                      onClick={() => setIsPlayingTimeline(!isPlayingTimeline)}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        background: '#f59e0b',
+                        boxShadow: '0 0 12px rgba(245, 158, 11, 0.6)',
+                        border: 'none',
+                        color: '#000000',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'transform 0.15s ease, background 0.15s ease'
+                      }}
+                      title={isPlayingTimeline ? 'Pause' : 'Play'}
+                    >
+                      {isPlayingTimeline ? <Pause size={13} fill="#000000" /> : <Play size={13} fill="#000000" style={{ marginLeft: '1px' }} />}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSelectScene(Math.min(2, selectedSceneIndex + 1))}
+                      style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '3px' }}
+                      title="Next Scene"
+                    >
+                      <SkipForward size={13} />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => { setTimelineTime(0); }}
+                      style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '3px' }}
+                      title="Restart Timeline"
+                    >
+                      <Repeat size={12} />
+                    </button>
+                  </div>
+
+                  {/* Right: Resolution and View Controls */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '0.62rem', color: '#cbd5e1', background: '#05070a', padding: '2px 5px', borderRadius: '3px', border: '1px solid rgba(255, 255, 255, 0.08)', fontFamily: 'var(--font-mono)' }}>
+                      1080x1920
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowSafeGuides(!showSafeGuides)}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: showSafeGuides ? '#38bdf8' : '#64748b',
+                        cursor: 'pointer',
+                        padding: '2px'
+                      }}
+                      title="Toggle Safe HUD"
+                    >
+                      <Crosshair size={13} />
+                    </button>
+                    <button
+                      type="button"
+                      style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '2px' }}
+                      title="Fullscreen Preview"
+                    >
+                      <Maximize2 size={13} />
+                    </button>
+                  </div>
+
+                </div>
+
+              </div>
 
             </div>
           )}
+
         </div>
 
         {/* ------------------------------------------------------------ */}
         {/* COLUMN 3: GEMINI VISION CRITIC (MATCHING MOCKUP) */}
         {/* ------------------------------------------------------------ */}
-        <div className="matte-panel" style={{ padding: '16px', background: '#0d0f14', display: 'flex', flexDirection: 'column', gap: '12px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+        <div className="matte-panel" style={{
+          padding: '12px 14px',
+          background: '#0d0f14',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          gap: '8px',
+          borderRadius: '10px',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          height: '100%',
+          boxSizing: 'border-box'
+        }}>
           
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Sparkles size={14} color="#f59e0b" />
-              <h3 style={{ fontSize: '0.94rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Sparkles size={13} color="#f59e0b" />
+              <h3 style={{ fontSize: '0.84rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
                 Gemini Vision Critic
               </h3>
             </div>
-            <MoreHorizontal size={14} color="#64748b" style={{ cursor: 'pointer' }} />
+            <MoreHorizontal size={13} color="#64748b" style={{ cursor: 'pointer' }} />
           </div>
 
-          {/* Viewer Retention • Score Curve (Matching Image 1) */}
+          {/* Viewer Retention • Score Curve (Matching Image 1 & Mockup) */}
           <div style={{
             background: '#07090f',
-            padding: '10px 12px',
-            borderRadius: '8px',
+            padding: '8px 10px',
+            borderRadius: '7px',
             border: '1px solid rgba(255, 255, 255, 0.06)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '6px'
+            gap: '4px'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.7rem', color: '#cbd5e1', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+              <span style={{ fontSize: '0.68rem', color: '#cbd5e1', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
                 Viewer Retention
               </span>
-              <span style={{ fontSize: '0.66rem', color: '#f59e0b', fontWeight: 700, fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ fontSize: '0.64rem', color: '#f59e0b', fontWeight: 700, fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'center', gap: '3px' }}>
                 <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#f59e0b' }} />
                 Score
               </span>
             </div>
 
             {/* Golden Trajectory Area Chart with Axes */}
-            <div style={{ position: 'relative', width: '100%', height: '80px', display: 'flex', alignItems: 'center' }}>
+            <div style={{ position: 'relative', width: '100%', height: '56px', display: 'flex', alignItems: 'center' }}>
               {/* Y-axis labels */}
-              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '68px', paddingRight: '6px', fontSize: '0.56rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '50px', paddingRight: '4px', fontSize: '0.52rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
                 <span>100</span>
                 <span>75</span>
                 <span>50</span>
@@ -1307,30 +1219,30 @@ export default function VideoStudio({
               </div>
 
               {/* Chart SVG */}
-              <div style={{ flex: 1, height: '68px', position: 'relative' }}>
-                <svg width="100%" height="68" viewBox="0 0 240 68" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+              <div style={{ flex: 1, height: '50px', position: 'relative' }}>
+                <svg width="100%" height="50" viewBox="0 0 240 50" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
                   <defs>
                     <linearGradient id="goldRetentionGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.4" />
+                      <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.45" />
                       <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.0" />
                     </linearGradient>
                   </defs>
 
                   {/* Horizontal Grid lines */}
                   <line x1="0" y1="2" x2="240" y2="2" stroke="rgba(255,255,255,0.04)" strokeDasharray="2,2" />
-                  <line x1="0" y1="18" x2="240" y2="18" stroke="rgba(255,255,255,0.04)" strokeDasharray="2,2" />
-                  <line x1="0" y1="36" x2="240" y2="36" stroke="rgba(255,255,255,0.04)" strokeDasharray="2,2" />
-                  <line x1="0" y1="52" x2="240" y2="52" stroke="rgba(255,255,255,0.04)" strokeDasharray="2,2" />
+                  <line x1="0" y1="14" x2="240" y2="14" stroke="rgba(255,255,255,0.04)" strokeDasharray="2,2" />
+                  <line x1="0" y1="26" x2="240" y2="26" stroke="rgba(255,255,255,0.04)" strokeDasharray="2,2" />
+                  <line x1="0" y1="38" x2="240" y2="38" stroke="rgba(255,255,255,0.04)" strokeDasharray="2,2" />
 
                   {/* Golden Gradient Area */}
                   <path
-                    d="M 0 10 Q 25 15 45 28 T 100 38 T 160 48 T 240 52 L 240 68 L 0 68 Z"
+                    d="M 0 6 Q 25 10 45 18 T 100 27 T 160 36 T 240 40 L 240 50 L 0 50 Z"
                     fill="url(#goldRetentionGrad)"
                   />
 
                   {/* Golden Curve Stroke */}
                   <path
-                    d="M 0 10 Q 25 15 45 28 T 100 38 T 160 48 T 240 52"
+                    d="M 0 6 Q 25 10 45 18 T 100 27 T 160 36 T 240 40"
                     fill="none"
                     stroke="#f59e0b"
                     strokeWidth="2"
@@ -1339,7 +1251,7 @@ export default function VideoStudio({
                   {/* Playhead Marker */}
                   <circle
                     cx={(Math.min(timelineTime, 30) / 30) * 240}
-                    cy={10 + (Math.min(timelineTime, 30) / 30) * 42}
+                    cy={6 + (Math.min(timelineTime, 30) / 30) * 34}
                     r="3.5"
                     fill="#fbbf24"
                     stroke="#000000"
@@ -1350,7 +1262,7 @@ export default function VideoStudio({
             </div>
 
             {/* X-axis labels */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '22px', fontSize: '0.56rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '18px', fontSize: '0.52rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
               <span>0</span>
               <span>6</span>
               <span>12</span>
@@ -1360,94 +1272,95 @@ export default function VideoStudio({
             </div>
           </div>
 
-          {/* Glowing Amber Circular Hook Gauge (Matching Image 1) */}
+          {/* Glowing Amber Circular Hook Gauge (Matching Mockup) */}
           <div style={{
             background: '#07090f',
-            padding: '12px',
-            borderRadius: '8px',
+            padding: '8px',
+            borderRadius: '7px',
             border: '1px solid rgba(255, 255, 255, 0.06)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '4px'
+            gap: '3px'
           }}>
-            <div style={{ position: 'relative', width: '78px', height: '78px' }}>
-              <svg width="78" height="78" viewBox="0 0 78 78">
-                <circle cx="39" cy="39" r="31" fill="none" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="6" />
+            <div style={{ position: 'relative', width: '64px', height: '64px' }}>
+              <svg width="64" height="64" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="25" fill="none" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="5" />
                 <circle
-                  cx="39"
-                  cy="39"
-                  r="31"
+                  cx="32"
+                  cy="32"
+                  r="25"
                   fill="none"
                   stroke="#f59e0b"
-                  strokeWidth="6"
-                  strokeDasharray="194.7"
-                  strokeDashoffset={194.7 * (1 - (currentVisionScore?.hook_strength || 94) / 100)}
+                  strokeWidth="5"
+                  strokeDasharray="157.1"
+                  strokeDashoffset={157.1 * (1 - (currentVisionScore?.hook_strength || 94) / 100)}
                   strokeLinecap="round"
-                  transform="rotate(-90 39 39)"
-                  style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.6))' }}
+                  transform="rotate(-90 32 32)"
+                  style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.65))' }}
                 />
               </svg>
               <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: '1.35rem', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
+                <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
                   {currentVisionScore?.hook_strength || 94}
                 </span>
-                <span style={{ fontSize: '0.58rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>100</span>
+                <span style={{ fontSize: '0.54rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>100</span>
               </div>
             </div>
-            <span style={{ fontSize: '0.64rem', color: '#fbbf24', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+            <span style={{ fontSize: '0.62rem', color: '#fbbf24', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
               PREDICTED HOOK STRENGTH
             </span>
           </div>
 
-          {/* AI Feedback Card (Matching Image 1) */}
+          {/* AI Feedback Card */}
           <div style={{
             background: '#07090f',
-            padding: '10px 12px',
-            borderRadius: '8px',
+            padding: '8px 10px',
+            borderRadius: '7px',
             border: '1px solid rgba(255, 255, 255, 0.06)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '5px'
+            gap: '4px'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Sparkles size={12} color="#a855f7" />
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#e2e8f0', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Sparkles size={11} color="#a855f7" />
+                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#e2e8f0', fontFamily: 'var(--font-mono)' }}>
                   AI Feedback
                 </span>
               </div>
-              <MoreHorizontal size={12} color="#64748b" />
+              <MoreHorizontal size={11} color="#64748b" />
             </div>
-            <p style={{ fontSize: '0.76rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
-              {currentVisionScore?.critique_summary || 'Relite your conomperition with AI feedback, owisiolirds and kleations you oveanament.'}
+            <p style={{ fontSize: '0.7rem', color: '#94a3b8', margin: 0, lineHeight: 1.35 }}>
+              {currentVisionScore?.critique_summary || 'Refine your composition with AI feedback, overlays and iterations you overlayment.'}
             </p>
           </div>
 
-          {/* Create Improved Variation Action */}
-          <button
-            type="button"
-            onClick={() => {
-              setStyle('Kinetic High-Tech Dark');
-              handleCreateAndStream();
-            }}
-            className="btn-matte-dark"
-            style={{ width: '100%', padding: '8px', fontSize: '0.76rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-          >
-            <RotateCcw size={12} />
-            <span>Create improved variation</span>
-          </button>
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '2px' }}>
+            <button
+              type="button"
+              onClick={() => {
+                setStyle('Kinetic High-Tech Dark');
+                handleCreateAndStream();
+              }}
+              className="btn-matte-dark"
+              style={{ width: '100%', padding: '6px', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
+            >
+              <RotateCcw size={11} />
+              <span>Create improved variation</span>
+            </button>
 
-          {/* Lifecycle Continuity Banner */}
-          <button
-            onClick={onNavigateToGeo}
-            className="btn-solid-white"
-            style={{ width: '100%', padding: '7px', fontSize: '0.76rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-          >
-            <span>Check AI discovery</span>
-            <ArrowRight size={12} />
-          </button>
+            <button
+              onClick={onNavigateToGeo}
+              className="btn-solid-white"
+              style={{ width: '100%', padding: '6px', fontSize: '0.72rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
+            >
+              <span>Check AI discovery</span>
+              <ArrowRight size={11} />
+            </button>
+          </div>
 
         </div>
 
@@ -1457,60 +1370,64 @@ export default function VideoStudio({
       {/* GRAND HOLLYWOOD MULTI-TRACK NLE TIMELINE EDITOR (FULL-WIDTH) */}
       {/* ------------------------------------------------------------ */}
       <div style={{
-        background: '#090c13',
+        background: '#080a10',
         border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '12px',
-        padding: '12px 16px',
+        borderRadius: '10px',
+        padding: '6px 12px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '10px',
+        gap: '4px',
         position: 'relative',
-        boxShadow: '0 12px 32px rgba(0, 0, 0, 0.7)'
+        height: '148px',
+        minHeight: '148px',
+        maxHeight: '148px',
+        boxSizing: 'border-box',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.7)'
       }}>
 
         {/* Top NLE Timeline Toolbar */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '4px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
           
           {/* Left Tools */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#94a3b8' }}>
-            <LayoutGrid size={14} style={{ cursor: 'pointer' }} />
-            <Folder size={14} style={{ cursor: 'pointer' }} />
-            <Copy size={14} style={{ cursor: 'pointer' }} />
-            <Type size={14} style={{ cursor: 'pointer' }} />
-            <Undo2 size={14} style={{ cursor: 'pointer' }} />
-            <Redo2 size={14} style={{ cursor: 'pointer' }} />
-            <Sparkles size={14} color="#f59e0b" style={{ cursor: 'pointer' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#94a3b8' }}>
+            <LayoutGrid size={12} style={{ cursor: 'pointer' }} />
+            <Folder size={12} style={{ cursor: 'pointer' }} />
+            <Copy size={12} style={{ cursor: 'pointer' }} />
+            <Type size={12} style={{ cursor: 'pointer' }} />
+            <Undo2 size={12} style={{ cursor: 'pointer' }} />
+            <Redo2 size={12} style={{ cursor: 'pointer' }} />
+            <Sparkles size={12} color="#f59e0b" style={{ cursor: 'pointer' }} />
           </div>
 
           {/* Center Timecode Display */}
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem', fontWeight: 700, color: '#ffffff' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', fontWeight: 700, color: '#ffffff' }}>
             {formatTimecode(timelineTime)}
           </div>
 
           {/* Right Tools */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#94a3b8' }}>
-            <Airplay size={14} style={{ cursor: 'pointer' }} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Volume2 size={14} />
-              <div style={{ width: '40px', height: '3px', background: '#f59e0b', borderRadius: '2px' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#94a3b8' }}>
+            <Airplay size={12} style={{ cursor: 'pointer' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Volume2 size={12} />
+              <div style={{ width: '32px', height: '3px', background: '#f59e0b', borderRadius: '2px' }} />
             </div>
-            <Sliders size={14} style={{ cursor: 'pointer' }} />
-            <Maximize2 size={14} style={{ cursor: 'pointer' }} />
+            <Sliders size={12} style={{ cursor: 'pointer' }} />
+            <Maximize2 size={12} style={{ cursor: 'pointer' }} />
           </div>
         </div>
 
         {/* Relative Track Workspace with White Needle Playhead */}
-        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           
           {/* Vertical White Needle Playhead spanning all tracks */}
           <div style={{
             position: 'absolute',
             top: 0,
             bottom: 0,
-            left: `calc(100px + (100% - 110px) * ${Math.min(timelineTime, 30) / 30})`,
+            left: `calc(75px + (100% - 85px) * ${Math.min(timelineTime, 30) / 30})`,
             width: '2px',
             background: '#ffffff',
-            boxShadow: '0 0 8px rgba(255, 255, 255, 0.9)',
+            boxShadow: '0 0 6px rgba(255, 255, 255, 0.9)',
             zIndex: 10,
             pointerEvents: 'none',
             transition: isPlayingTimeline ? 'none' : 'left 0.1s ease'
@@ -1518,18 +1435,18 @@ export default function VideoStudio({
             {/* Playhead Knob */}
             <div style={{
               position: 'absolute',
-              top: '-4px',
-              left: '-5px',
-              width: '12px',
-              height: '10px',
+              top: '-3px',
+              left: '-4px',
+              width: '10px',
+              height: '8px',
               background: '#ffffff',
               clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)',
-              boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)'
+              boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)'
             }} />
           </div>
 
-          {/* Time Ruler (0.0s, 2.0s, 4.0s ... 30.0s) */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '100px', paddingRight: '10px', fontSize: '0.62rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+          {/* Time Ruler (0.0s, 3.0s, 6.0s ... 30.0s) */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '75px', paddingRight: '8px', fontSize: '0.54rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
             <span>0.0s</span>
             <span style={{ color: '#f59e0b', fontWeight: 700 }}>3.0s</span>
             <span>6.0s</span>
@@ -1542,17 +1459,17 @@ export default function VideoStudio({
           </div>
 
           {/* Scene Section Markers Bar */}
-          <div style={{ display: 'flex', paddingLeft: '100px', gap: '6px' }}>
+          <div style={{ display: 'flex', paddingLeft: '75px', gap: '4px' }}>
             <div
               onClick={() => handleSelectScene(0)}
               style={{
                 width: '10%',
-                minWidth: '100px',
-                padding: '4px 8px',
+                minWidth: '80px',
+                padding: '2px 6px',
                 background: selectedSceneIndex === 0 ? 'rgba(245, 158, 11, 0.15)' : '#07090f',
                 border: selectedSceneIndex === 0 ? '1px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '4px',
-                fontSize: '0.66rem',
+                borderRadius: '3px',
+                fontSize: '0.6rem',
                 fontWeight: 700,
                 color: selectedSceneIndex === 0 ? '#fbbf24' : '#94a3b8',
                 cursor: 'pointer',
@@ -1569,11 +1486,11 @@ export default function VideoStudio({
               onClick={() => handleSelectScene(1)}
               style={{
                 width: '50%',
-                padding: '4px 8px',
+                padding: '2px 6px',
                 background: selectedSceneIndex === 1 ? 'rgba(245, 158, 11, 0.15)' : '#07090f',
                 border: selectedSceneIndex === 1 ? '1px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '4px',
-                fontSize: '0.66rem',
+                borderRadius: '3px',
+                fontSize: '0.6rem',
                 fontWeight: 700,
                 color: selectedSceneIndex === 1 ? '#fbbf24' : '#94a3b8',
                 cursor: 'pointer',
@@ -1590,11 +1507,11 @@ export default function VideoStudio({
               onClick={() => handleSelectScene(2)}
               style={{
                 width: '40%',
-                padding: '4px 8px',
+                padding: '2px 6px',
                 background: selectedSceneIndex === 2 ? 'rgba(245, 158, 11, 0.15)' : '#07090f',
                 border: selectedSceneIndex === 2 ? '1px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '4px',
-                fontSize: '0.66rem',
+                borderRadius: '3px',
+                fontSize: '0.6rem',
                 fontWeight: 700,
                 color: selectedSceneIndex === 2 ? '#fbbf24' : '#94a3b8',
                 cursor: 'pointer',
@@ -1609,20 +1526,20 @@ export default function VideoStudio({
           </div>
 
           {/* Track 1: Video Filmstrip (Scene 1) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '92px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', color: '#ffffff', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
-              <Play size={12} fill="#ffffff" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '68px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.64rem', color: '#ffffff', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+              <Play size={10} fill="#ffffff" />
               <span>Scene 1</span>
             </div>
 
-            <div style={{ flex: 1, display: 'flex', gap: '6px', height: '48px' }}>
+            <div style={{ flex: 1, display: 'flex', gap: '4px', height: '28px' }}>
               {/* Scene 1 Filmstrip (10%) */}
               <div
                 onClick={() => handleSelectScene(0)}
                 style={{
                   width: '10%',
-                  minWidth: '100px',
-                  borderRadius: '6px',
+                  minWidth: '80px',
+                  borderRadius: '4px',
                   overflow: 'hidden',
                   border: selectedSceneIndex === 0 ? '1.5px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.1)',
                   position: 'relative',
@@ -1635,9 +1552,9 @@ export default function VideoStudio({
                   <img src={campaign?.scenes?.[0]?.media_url} alt="F1" style={{ width: '50%', height: '100%', objectFit: 'cover', opacity: 0.85 }} />
                   <img src={campaign?.scenes?.[0]?.media_url} alt="F2" style={{ width: '50%', height: '100%', objectFit: 'cover', opacity: 0.85 }} />
                 </div>
-                <div style={{ position: 'absolute', top: '4px', left: '6px', background: 'rgba(0,0,0,0.75)', padding: '1px 5px', borderRadius: '3px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Camera size={9} color="#ffffff" />
-                  <span style={{ fontSize: '0.56rem', color: '#ffffff', fontFamily: 'var(--font-mono)' }}>Camera</span>
+                <div style={{ position: 'absolute', top: '2px', left: '4px', background: 'rgba(0,0,0,0.75)', padding: '1px 4px', borderRadius: '2px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                  <Camera size={8} color="#ffffff" />
+                  <span style={{ fontSize: '0.52rem', color: '#ffffff', fontFamily: 'var(--font-mono)' }}>Camera</span>
                 </div>
               </div>
 
@@ -1646,7 +1563,7 @@ export default function VideoStudio({
                 onClick={() => handleSelectScene(1)}
                 style={{
                   width: '50%',
-                  borderRadius: '6px',
+                  borderRadius: '4px',
                   overflow: 'hidden',
                   border: selectedSceneIndex === 1 ? '1.5px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.1)',
                   position: 'relative',
@@ -1660,9 +1577,9 @@ export default function VideoStudio({
                     <img key={k} src={campaign?.scenes?.[1]?.media_url} alt="F" style={{ width: '16.66%', height: '100%', objectFit: 'cover', opacity: 0.85 }} />
                   ))}
                 </div>
-                <div style={{ position: 'absolute', top: '4px', left: '6px', background: 'rgba(0,0,0,0.75)', padding: '1px 5px', borderRadius: '3px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Camera size={9} color="#ffffff" />
-                  <span style={{ fontSize: '0.56rem', color: '#ffffff', fontFamily: 'var(--font-mono)' }}>Camera</span>
+                <div style={{ position: 'absolute', top: '2px', left: '4px', background: 'rgba(0,0,0,0.75)', padding: '1px 4px', borderRadius: '2px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                  <Camera size={8} color="#ffffff" />
+                  <span style={{ fontSize: '0.52rem', color: '#ffffff', fontFamily: 'var(--font-mono)' }}>Camera</span>
                 </div>
               </div>
 
@@ -1671,7 +1588,7 @@ export default function VideoStudio({
                 onClick={() => handleSelectScene(2)}
                 style={{
                   width: '40%',
-                  borderRadius: '6px',
+                  borderRadius: '4px',
                   overflow: 'hidden',
                   border: selectedSceneIndex === 2 ? '1.5px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.1)',
                   position: 'relative',
@@ -1685,51 +1602,58 @@ export default function VideoStudio({
                     <img key={k} src={campaign?.scenes?.[2]?.media_url} alt="F" style={{ width: '20%', height: '100%', objectFit: 'cover', opacity: 0.85 }} />
                   ))}
                 </div>
-                <div style={{ position: 'absolute', top: '4px', left: '6px', background: 'rgba(0,0,0,0.75)', padding: '1px 5px', borderRadius: '3px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Camera size={9} color="#ffffff" />
-                  <span style={{ fontSize: '0.56rem', color: '#ffffff', fontFamily: 'var(--font-mono)' }}>Camera</span>
+                <div style={{ position: 'absolute', top: '2px', left: '4px', background: 'rgba(0,0,0,0.75)', padding: '1px 4px', borderRadius: '2px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                  <Camera size={8} color="#ffffff" />
+                  <span style={{ fontSize: '0.52rem', color: '#ffffff', fontFamily: 'var(--font-mono)' }}>Camera</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Track 2: Audio Track (Waveform) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '92px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
-              <Music size={12} color="#10b981" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '68px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.64rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
+              <Music size={10} color="#10b981" />
               <span>Audio</span>
             </div>
 
-            <div style={{ flex: 1, height: '38px', background: '#0e1815', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.25)', display: 'flex', alignItems: 'center', padding: '0 10px', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: '4px', left: '10px', fontSize: '0.56rem', color: '#34d399', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+            <div style={{ flex: 1, height: '24px', background: '#071510', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', padding: '0 8px', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: '2px', left: '8px', fontSize: '0.5rem', color: '#34d399', fontFamily: 'var(--font-mono)', fontWeight: 700, zIndex: 2 }}>
                 Waveform
               </div>
-              <svg width="100%" height="26" viewBox="0 0 1000 26" preserveAspectRatio="none" style={{ opacity: 0.85, marginTop: '8px' }}>
+              <svg width="100%" height="20" viewBox="0 0 1000 20" preserveAspectRatio="none" style={{ opacity: 0.9, marginTop: '2px' }}>
+                <defs>
+                  <linearGradient id="audioAcousticGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#34d399" stopOpacity="0.85" />
+                    <stop offset="50%" stopColor="#10b981" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#34d399" stopOpacity="0.85" />
+                  </linearGradient>
+                </defs>
                 <path
-                  d="M 0 13 Q 10 2, 20 13 T 40 13 T 60 3 T 80 13 T 100 13 T 120 7 T 140 13 T 160 4 T 180 13 T 200 13 T 220 8 T 240 13 T 260 6 T 280 13 T 300 13 T 320 8 T 340 13 T 360 4 T 380 13 T 400 13 T 420 7 T 440 13 T 460 3 T 480 13 T 500 13 T 520 8 T 540 13 T 560 5 T 580 13 T 600 13 T 620 6 T 640 13 T 660 3 T 680 13 T 700 13 T 720 7 T 740 13 T 760 4 T 780 13 T 800 13 T 820 8 T 840 13 T 860 5 T 880 13 T 900 13 T 920 6 T 940 13 T 960 3 T 980 13 T 1000 13"
-                  fill="none"
+                  d="M 0 10 L 5 4 L 10 10 L 15 2 L 20 10 L 25 5 L 30 10 L 35 1 L 40 10 L 45 6 L 50 10 L 55 3 L 60 10 L 65 7 L 70 10 L 75 2 L 80 10 L 85 4 L 90 10 L 95 1 L 100 10 L 105 5 L 110 10 L 115 3 L 120 10 L 125 7 L 130 10 L 135 2 L 140 10 L 145 6 L 150 10 L 155 1 L 160 10 L 165 4 L 170 10 L 175 2 L 180 10 L 185 5 L 190 10 L 195 1 L 200 10 L 205 6 L 210 10 L 215 3 L 220 10 L 225 7 L 230 10 L 235 2 L 240 10 L 245 5 L 250 10 L 255 1 L 260 10 L 265 4 L 270 10 L 275 3 L 280 10 L 285 6 L 290 10 L 295 2 L 300 10 L 305 5 L 310 10 L 315 1 L 320 10 L 325 4 L 330 10 L 335 3 L 340 10 L 345 7 L 350 10 L 355 2 L 360 10 L 365 5 L 370 10 L 375 1 L 380 10 L 385 4 L 390 10 L 395 3 L 400 10 L 405 6 L 410 10 L 415 2 L 420 10 L 425 5 L 430 10 L 435 1 L 440 10 L 445 4 L 450 10 L 455 3 L 460 10 L 465 7 L 470 10 L 475 2 L 480 10 L 485 5 L 490 10 L 495 1 L 500 10 L 505 4 L 510 10 L 515 3 L 520 10 L 525 6 L 530 10 L 535 2 L 540 10 L 545 5 L 550 10 L 555 1 L 560 10 L 565 4 L 570 10 L 575 3 L 580 10 L 585 7 L 590 10 L 595 2 L 600 10 L 605 5 L 610 10 L 615 1 L 620 10 L 625 4 L 630 10 L 635 3 L 640 10 L 645 6 L 650 10 L 655 2 L 660 10 L 665 5 L 670 10 L 675 1 L 680 10 L 685 4 L 690 10 L 695 3 L 700 10 L 705 7 L 710 10 L 715 2 L 720 10 L 725 5 L 730 10 L 735 1 L 740 10 L 745 4 L 750 10 L 755 3 L 760 10 L 765 6 L 770 10 L 775 2 L 780 10 L 785 5 L 790 10 L 795 1 L 800 10 L 805 4 L 810 10 L 815 3 L 820 10 L 825 7 L 830 10 L 835 2 L 840 10 L 845 5 L 850 10 L 855 1 L 860 10 L 865 4 L 870 10 L 875 3 L 880 10 L 885 6 L 890 10 L 895 2 L 900 10 L 905 5 L 910 10 L 915 1 L 920 10 L 925 4 L 930 10 L 935 3 L 940 10 L 945 7 L 950 10 L 955 2 L 960 10 L 965 5 L 970 10 L 975 1 L 980 10 L 985 4 L 990 10 L 995 2 L 1000 10 L 1000 10 L 995 18 L 990 10 L 985 16 L 980 10 L 975 19 L 970 10 L 965 15 L 960 10 L 955 18 L 950 10 L 945 13 L 940 10 L 935 17 L 930 10 L 925 16 L 920 10 L 915 19 L 910 10 L 905 15 L 900 10 L 895 18 L 890 10 L 885 14 L 880 10 L 875 17 L 870 10 L 865 16 L 860 10 L 855 19 L 850 10 L 845 15 L 840 10 L 835 18 L 830 10 L 825 13 L 820 10 L 815 17 L 810 10 L 805 16 L 800 10 L 795 19 L 790 10 L 785 15 L 780 10 L 775 18 L 770 10 L 765 14 L 760 10 L 755 17 L 750 10 L 745 16 L 740 10 L 735 19 L 730 10 L 725 15 L 720 10 L 715 18 L 710 10 L 705 13 L 700 10 L 695 17 L 690 10 L 685 16 L 680 10 L 675 19 L 670 10 L 665 15 L 660 10 L 655 18 L 650 10 L 645 14 L 640 10 L 635 17 L 630 10 L 625 16 L 620 10 L 615 19 L 610 10 L 605 15 L 600 10 L 595 18 L 590 10 L 585 13 L 580 10 L 575 17 L 570 10 L 565 16 L 560 10 L 555 19 L 550 10 L 545 15 L 540 10 L 535 18 L 530 10 L 525 14 L 520 10 L 515 17 L 510 10 L 505 16 L 500 10 L 495 19 L 490 10 L 485 15 L 480 10 L 475 18 L 470 10 L 465 13 L 460 10 L 455 17 L 450 10 L 445 16 L 440 10 L 435 19 L 430 10 L 425 15 L 420 10 L 415 18 L 410 10 L 405 14 L 400 10 L 395 17 L 390 10 L 385 16 L 380 10 L 375 19 L 370 10 L 365 15 L 360 10 L 355 18 L 350 10 L 345 13 L 340 10 L 335 17 L 330 10 L 325 16 L 320 10 L 315 19 L 310 10 L 305 15 L 300 10 L 295 18 L 290 10 L 285 14 L 280 10 L 275 17 L 270 10 L 265 16 L 260 10 L 255 19 L 250 10 L 245 15 L 240 10 L 235 18 L 230 10 L 225 13 L 220 10 L 215 17 L 210 10 L 205 14 L 200 10 L 195 19 L 190 10 L 185 15 L 180 10 L 175 18 L 170 10 L 165 16 L 160 10 L 155 19 L 150 10 L 145 14 L 140 10 L 135 18 L 130 10 L 125 13 L 120 10 L 115 17 L 110 10 L 105 15 L 100 10 L 95 19 L 90 10 L 85 16 L 80 10 L 75 18 L 70 10 L 65 13 L 60 10 L 55 17 L 50 10 L 45 14 L 40 10 L 35 19 L 30 10 L 25 15 L 20 10 L 15 18 L 10 10 L 5 16 Z"
+                  fill="url(#audioAcousticGrad)"
                   stroke="#10b981"
-                  strokeWidth="1.8"
+                  strokeWidth="0.8"
                 />
               </svg>
             </div>
           </div>
 
           {/* Track 3: Camera Track (Camera Cues) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '92px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
-              <Camera size={12} color="#60a5fa" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '68px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.64rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
+              <Camera size={10} color="#60a5fa" />
               <span>Camera</span>
             </div>
 
-            <div style={{ flex: 1, display: 'flex', gap: '6px', height: '32px' }}>
-              <div style={{ width: '10%', minWidth: '100px', background: '#0e121a', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex', alignItems: 'center', padding: '0 8px', fontSize: '0.62rem', color: '#cbd5e1', fontFamily: 'var(--font-mono)' }}>
+            <div style={{ flex: 1, display: 'flex', gap: '4px', height: '18px' }}>
+              <div style={{ width: '10%', minWidth: '80px', background: '#0e121a', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex', alignItems: 'center', padding: '0 6px', fontSize: '0.56rem', color: '#cbd5e1', fontFamily: 'var(--font-mono)' }}>
                 Camera Cues
               </div>
-              <div style={{ width: '50%', background: '#0e121a', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex', alignItems: 'center', padding: '0 8px', fontSize: '0.62rem', color: '#cbd5e1', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ width: '50%', background: '#0e121a', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex', alignItems: 'center', padding: '0 6px', fontSize: '0.56rem', color: '#cbd5e1', fontFamily: 'var(--font-mono)' }}>
                 Camera Cues
               </div>
-              <div style={{ width: '40%', background: '#0e121a', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex', alignItems: 'center', padding: '0 8px', fontSize: '0.62rem', color: '#cbd5e1', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ width: '40%', background: '#0e121a', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex', alignItems: 'center', padding: '0 6px', fontSize: '0.56rem', color: '#cbd5e1', fontFamily: 'var(--font-mono)' }}>
                 Camera Cues
               </div>
             </div>

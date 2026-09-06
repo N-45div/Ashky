@@ -133,16 +133,16 @@ export default function AppWorkspace({ initialPreset = null }) {
       <div style={{
         flex: 1,
         height: '100vh',
-        overflowY: 'auto',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         minWidth: 0,
         position: 'relative'
       }}>
-        {/* Single Unified 62px Header */}
+        {/* Single Unified 48px Header */}
         <header style={{
-          height: '62px',
-          padding: '0 22px',
+          height: '48px',
+          padding: '0 16px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -257,7 +257,14 @@ export default function AppWorkspace({ initialPreset = null }) {
         </header>
 
         {/* Tab Content */}
-        <main style={{ flex: 1, padding: '0', position: 'relative' }}>
+        <main style={{
+          flex: 1,
+          height: 'calc(100vh - 48px)',
+          maxHeight: 'calc(100vh - 48px)',
+          padding: '0',
+          position: 'relative',
+          overflow: activeTab === 'studio' ? 'hidden' : 'auto'
+        }}>
           {activeTab === 'studio' && (
             <VideoStudio 
               key={campaignKey} 
