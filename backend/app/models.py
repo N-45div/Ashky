@@ -116,7 +116,7 @@ class TelemetrySnapshot(BaseModel):
     system_status: str = "HEALTHY"
     recent_loki_logs: List[Dict[str, Any]] = []
     mcp_server_endpoint: Optional[str] = "https://mcp.grafana.com/mcp"
-    grafana_stack_url: Optional[str] = "https://giantdumpling1334.grafana.net"
+    grafana_stack_url: Optional[str] = None
     mcp_connection_status: Optional[str] = "CONNECTED"
 
 class MCPAgentQuery(BaseModel):
@@ -130,7 +130,7 @@ class MCPAgentResponse(BaseModel):
     suggested_actions: List[str]
     structured_diagnostic: Optional[Dict[str, Any]] = None
     mcp_server_endpoint: Optional[str] = "https://mcp.grafana.com/mcp"
-    grafana_stack_url: Optional[str] = "https://giantdumpling1334.grafana.net"
+    grafana_stack_url: Optional[str] = None
 
 # ==========================================
 # Gemini Agentic Video Understanding Models

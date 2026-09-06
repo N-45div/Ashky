@@ -34,11 +34,30 @@ export default function AgentSidecar({
 
   const initialPrompts = getContextPrompts(activeTab);
 
+  const [mcpMeta, setMcpMeta] = useState({
+    endpoint: 'https://mcp.grafana.com/mcp',
+    stackUrl: ''
+  });
+
+  useEffect(() => {
+    fetch('/api/grafana/snapshot')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) {
+          setMcpMeta({
+            endpoint: data.mcp_server_endpoint || 'https://mcp.grafana.com/mcp',
+            stackUrl: data.grafana_stack_url || ''
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const [messages, setMessages] = useState([
     {
       id: 1,
       sender: 'agent',
-      intro: `Ashky Pipeline Agent active for campaign "${campaignName}". Connected to official Grafana Cloud MCP (mcp.grafana.com/mcp) targeting stack giantdumpling1334.grafana.net.`,
+      intro: `Ashky Pipeline Agent active for campaign "${campaignName}". Connected to official Grafana Cloud MCP.`,
       structured: {
         finding: "Pipeline is healthy across planning, progressive scene generation, and video synthesis stages.",
         userImpact: "Scene 1 delivered in 1.42s; no end-user latency degradation observed.",
@@ -136,8 +155,8 @@ export default function AgentSidecar({
         intro: data.answer || "Diagnostic evaluation complete from Grafana Cloud MCP evidence.",
         structured: structuredData,
         tools: data.mcp_tools_called || ['query_prometheus', 'query_loki', 'search_dashboards', 'list_alerts'],
-        mcpEndpoint: data.mcp_server_endpoint || 'https://mcp.grafana.com/mcp',
-        stackUrl: data.grafana_stack_url || 'https://giantdumpling1334.grafana.net',
+        mcpEndpoint: data.mcp_server_endpoint || mcpMeta.endpoint,
+        stackUrl: data.grafana_stack_url || mcpMeta.stackUrl,
         showEvidence: false
       };
 
@@ -153,8 +172,8 @@ export default function AgentSidecar({
           intro: "Grafana Cloud MCP Evidence Summary:",
           structured: structuredData,
           tools: ['query_prometheus', 'query_loki', 'search_dashboards', 'list_alerts'],
-          mcpEndpoint: 'https://mcp.grafana.com/mcp',
-          stackUrl: 'https://giantdumpling1334.grafana.net',
+          mcpEndpoint: mcpMeta.endpoint,
+          stackUrl: mcpMeta.stackUrl,
           showEvidence: false
         }
       ]);
@@ -233,19 +252,23 @@ export default function AgentSidecar({
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
               <span style={{ fontSize: '0.66rem', color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>
-                mcp.grafana.com/mcp
+                {mcpMeta.endpoint.replace(/^https?:\/\//, '')}
               </span>
-              <span style={{ fontSize: '0.64rem', color: '#64748b' }}>•</span>
-              <a 
-                href="https://giantdumpling1334.grafana.net" 
-                target="_blank" 
-                rel="noreferrer" 
-                style={{ fontSize: '0.66rem', color: '#94a3b8', fontFamily: 'var(--font-mono)', textDecoration: 'none' }}
-                onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
-                onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
-              >
-                giantdumpling1334.grafana.net ↗
-              </a>
+              {mcpMeta.stackUrl && (
+                <>
+                  <span style={{ fontSize: '0.64rem', color: '#64748b' }}>•</span>
+                  <a 
+                    href={mcpMeta.stackUrl} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    style={{ fontSize: '0.66rem', color: '#94a3b8', fontFamily: 'var(--font-mono)', textDecoration: 'none' }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
+                  >
+                    {mcpMeta.stackUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '')} ↗
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -445,7 +468,7 @@ export default function AgentSidecar({
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ color: '#94a3b8' }}>Stack Target:</span>
-                        <span style={{ color: '#cbd5e1' }}>{msg.stackUrl || 'https://giantdumpling1334.grafana.net'}</span>
+                        <span style={{ color: '#cbd5e1' }}>{msg.stackUrl || mcpMeta.stackUrl || 'Configured via .env'}</span>
                       </div>
                       <div>
                         <span style={{ color: '#fbbf24', display: 'block', marginBottom: '4px', fontWeight: 600 }}>Official Tools Invoked:</span>

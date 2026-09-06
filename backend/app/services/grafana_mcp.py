@@ -494,7 +494,7 @@ async def handle_mcp_jsonrpc(request_data: Dict[str, Any]) -> Dict[str, Any]:
 async def process_agent_inquiry(user_query: str) -> Dict[str, Any]:
     """
     Autonomous SRE agent inquiry processor for Studio chat with live Prometheus & Loki telemetry context.
-    Connects to Grafana Cloud MCP (https://mcp.grafana.com/mcp) targeting stack giantdumpling1334.grafana.net.
+    Connects to Grafana Cloud MCP (https://mcp.grafana.com/mcp) targeting stack configured in settings.GRAFANA_STACK_URL.
     Leverages live Gemini 3.7 Flash model when connected, with dynamic deterministic fallback.
     """
     import asyncio

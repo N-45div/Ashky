@@ -577,16 +577,18 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
               <Terminal size={13} />
               <span>Query via Pipeline Agent</span>
             </button>
-            <a
-              href={snapshot?.grafana_stack_url || "https://giantdumpling1334.grafana.net"}
-              target="_blank"
-              rel="noreferrer"
-              className="btn-matte-dark"
-              style={{ padding: '6px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none', color: '#cbd5e1' }}
-            >
-              <span>Open Grafana Stack</span>
-              <ExternalLink size={12} />
-            </a>
+            {snapshot?.grafana_stack_url && (
+              <a
+                href={snapshot.grafana_stack_url}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-matte-dark"
+                style={{ padding: '6px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none', color: '#cbd5e1' }}
+              >
+                <span>Open Grafana Stack</span>
+                <ExternalLink size={12} />
+              </a>
+            )}
           </div>
         </div>
 
@@ -611,7 +613,7 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
               GRAFANA CLOUD STACK
             </span>
             <span style={{ fontSize: '0.8rem', color: '#fbbf24', fontFamily: 'var(--font-mono)', fontWeight: 600, wordBreak: 'break-all' }}>
-              {snapshot?.grafana_stack_url || 'https://giantdumpling1334.grafana.net'}
+              {snapshot?.grafana_stack_url || 'Configured via .env'}
             </span>
           </div>
 

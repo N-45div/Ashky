@@ -24,8 +24,8 @@ class Settings(BaseSettings):
 
 
     # Grafana Cloud Settings
-    GRAFANA_CLOUD_URL: Optional[str] = os.getenv("GRAFANA_CLOUD_URL", "https://giantdumpling1334.grafana.net")
-    GRAFANA_STACK_URL: str = os.getenv("GRAFANA_STACK_URL", "https://giantdumpling1334.grafana.net")
+    GRAFANA_CLOUD_URL: Optional[str] = os.getenv("GRAFANA_CLOUD_URL", "")
+    GRAFANA_STACK_URL: str = os.getenv("GRAFANA_STACK_URL", "")
     GRAFANA_MCP_ENDPOINT: str = os.getenv("GRAFANA_MCP_ENDPOINT", "https://mcp.grafana.com/mcp")
     GRAFANA_LOKI_URL: Optional[str] = os.getenv("GRAFANA_LOKI_URL", "")
     GRAFANA_CLOUD_USER: Optional[str] = os.getenv("GRAFANA_CLOUD_USER", "")
