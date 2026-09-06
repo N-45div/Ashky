@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { 
   Activity, Terminal, RefreshCw, 
   Download, CheckCircle2, 
-  ChevronDown, ChevronUp, ExternalLink
+  ChevronDown, ChevronUp, ExternalLink,
+  Clock, Shield, Cpu, Flame, Database, Film, ArrowRight
 } from 'lucide-react';
 
 export default function Observability({ onOpenSidecar, campaign, onNavigateToStudio }) {
   const [snapshot, setSnapshot] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [expandedStep, setExpandedStep] = useState(null);
-  const [recoveryOpen, setRecoveryOpen] = useState(false);
+  const [expandedStep, setExpandedStep] = useState("media");
+  const [activeTelemetryTab, setActiveTelemetryTab] = useState("traces"); // 'traces' | 'metrics' | 'slos'
 
   const productName = campaign?.product_name || 'Neon Circuit';
 
@@ -52,7 +53,6 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
     }
   };
 
-  // Quality & Spend Summary Metrics
   const qualityMetrics = [
     {
       label: "CAMPAIGN SUCCESS RATE",
@@ -67,32 +67,31 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
       value: `${snapshot?.avg_scene1_render_latency_ms || 1420} ms`,
       trend: "-120 ms",
       target: "<2000 ms",
-      state: "Healthy",
-      color: "#34d399"
+      state: "Optimal",
+      color: "#38bdf8"
     },
     {
       label: "AGENT QUALITY PASS RATE",
       value: "97.6%",
       trend: "+1.1%",
       target: ">95.0%",
-      state: "Healthy",
+      state: "High",
       color: "#34d399"
     },
     {
-      label: "CAMPAIGN SPEND",
+      label: "PIPELINE TOKEN SPEND",
       value: `$${snapshot?.total_token_spend_usd || '0.038'}`,
       trend: "-$0.006",
       target: "<$0.080",
-      state: "Healthy",
+      state: "Under Budget",
       color: "#fbbf24"
     }
   ];
 
-  // Campaign Run Workflow Steps
   const workflowSteps = [
     {
       id: "brief",
-      name: "Brief accepted",
+      name: "Brief accepted & validated",
       agent: "Gemini 3.8 Flash Director",
       duration: "0.24s",
       tokens: "640 tokens",
@@ -104,7 +103,7 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
     },
     {
       id: "plan",
-      name: "Director plan generated",
+      name: "Director 3-Scene Blueprint",
       agent: "Gemini 3.8 Flash Agentic Cinema",
       duration: "0.82s",
       tokens: "1,850 tokens",
@@ -116,7 +115,7 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
     },
     {
       id: "prompts",
-      name: "Scene prompts prepared",
+      name: "Veo Cinematics & Camera Prompts",
       agent: "Veo 2 Prompt Engineer",
       duration: "0.36s",
       tokens: "920 tokens",
@@ -128,10 +127,10 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
     },
     {
       id: "media",
-      name: "Media generated",
+      name: "Veo 2 Video Synthesis Pipeline",
       agent: "Google Veo 2 on Google Cloud",
-      duration: "1.42s (Scene 1 stream)",
-      tokens: "N/A (Video Synthesis)",
+      duration: "1.42s (First Frame)",
+      tokens: "Video Synthesis",
       cost: "$0.016",
       tools: ["veo_stream_firstframe", "dispatch_concurrent_renders"],
       retries: 1,
@@ -140,7 +139,7 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
     },
     {
       id: "review",
-      name: "Vision review completed",
+      name: "Gemini Vision Critic QA",
       agent: "Gemini 3.8 Flash Vision Critic",
       duration: "0.64s",
       tokens: "1,420 tokens",
@@ -152,612 +151,322 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
     },
     {
       id: "render",
-      name: "Video rendered",
+      name: "FFmpeg Mux & Edge Neural Audio",
       agent: "FFmpeg Pipeline & Edge Neural TTS",
-      duration: "14.2s",
-      tokens: "N/A (Audio + Video Mux)",
+      duration: "20.3s (Full MP4)",
+      tokens: "Mux & Compress",
       cost: "$0.002",
       tools: ["edge_tts_synthesize", "mux_subtitles_h264"],
       retries: 0,
       result: "Downloadable 1080x1920 MP4 compiled",
       traceId: "tr_8fa06"
-    },
-    {
-      id: "discovery",
-      name: "Discovery probe completed",
-      agent: "GEO Probe Engine",
-      duration: "1.18s",
-      tokens: "2,200 tokens",
-      cost: "$0.008",
-      tools: ["query_gemini_citation", "validate_video_object_schema"],
-      retries: 0,
-      result: "11 of 24 prompts surfaced; VideoObject schema exported",
-      traceId: "tr_8fa07"
     }
   ];
 
-  // Reliability Targets (SLOs & Error Budgets)
   const reliabilitySLOs = [
-    {
-      title: "First scene available within 2.0 seconds",
-      target: "99.0%",
-      current: "99.4%",
-      errorBudgetUsed: "12%",
-      burnRate: "Normal (0.4x)"
-    },
-    {
-      title: "Campaign generation succeeds without manual restart",
-      target: "98.0%",
-      current: "99.2%",
-      errorBudgetUsed: "18%",
-      burnRate: "Normal (0.6x)"
-    },
-    {
-      title: "Discovery probes complete successfully",
-      target: "99.5%",
-      current: "100.0%",
-      errorBudgetUsed: "0%",
-      burnRate: "Zero"
-    },
-    {
-      title: "Agent outputs pass required JSON/schema checks",
-      target: "99.0%",
-      current: "99.8%",
-      errorBudgetUsed: "4%",
-      burnRate: "Normal (0.2x)"
-    },
-    {
-      title: "Daily AI spend remains within budget ($50.00/day)",
-      target: "100.0%",
-      current: "100.0% ($14.20 used)",
-      errorBudgetUsed: "28%",
-      burnRate: "Within Budget"
-    }
+    { title: "First scene available within 2.0s", target: "99.0%", current: "99.4%", errorBudget: "12% used", state: "Normal" },
+    { title: "Campaign generation succeeds without restart", target: "98.0%", current: "99.2%", errorBudget: "18% used", state: "Normal" },
+    { title: "Agent outputs pass required schema checks", target: "99.0%", current: "99.8%", errorBudget: "4% used", state: "Optimal" },
+    { title: "Daily AI spend within budget ($50.00/day)", target: "100.0%", current: "$14.20 used", errorBudget: "28% used", state: "Safe" }
   ];
 
   return (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+    <div style={{
+      maxWidth: '1540px',
+      margin: '0 auto',
+      padding: '16px 20px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '14px',
+      boxSizing: 'border-box'
+    }}>
       
-      {/* 1. MARKETER-FACING CAMPAIGN STATUS HERO */}
-      <div className="matte-panel" style={{
-        padding: '24px 28px',
-        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(13, 15, 20, 0.96) 100%)',
-        border: '1px solid rgba(16, 185, 129, 0.28)',
-        borderRadius: '12px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '20px'
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              background: '#10b981',
-              boxShadow: '0 0 10px #10b981'
-            }} />
-            <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
-              {productName} is healthy
-            </h2>
-          </div>
-          <div style={{ fontSize: '0.92rem', color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <span>3/3 scenes completed</span>
-            <span style={{ color: '#475569' }}>·</span>
-            <span style={{ color: '#34d399' }}>1 issue recovered automatically</span>
-            <span style={{ color: '#475569' }}>·</span>
-            <span style={{ color: '#fbbf24' }}>${snapshot?.total_token_spend_usd || '0.038'} spent</span>
-          </div>
-          <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>
-            No action needed
+      {/* Top Header & Telemetry Controls */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.96rem', fontWeight: 800, color: '#ffffff' }}>
+            {productName}
+          </span>
+          <span style={{ color: '#475569' }}>/</span>
+          <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#cbd5e1' }}>
+            Agent Observability & Pipeline Ops
+          </span>
+          <span className="tag-minimal tag-emerald" style={{ marginLeft: '6px', fontSize: '0.66rem' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+            Grafana Cloud MCP Active
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {onNavigateToStudio && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            onClick={handleDownloadDashboard}
+            className="btn-matte-dark"
+            style={{ padding: '6px 12px', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+            title="Download Grafana Dashboard JSON for import"
+          >
+            <Download size={12} />
+            <span>Dashboard JSON</span>
+          </button>
+
+          <button
+            onClick={fetchTelemetry}
+            disabled={loading}
+            className="btn-matte-dark"
+            style={{ padding: '6px 12px', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+          >
+            <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
+            <span>Refresh</span>
+          </button>
+
+          {onOpenSidecar && (
             <button
-              onClick={onNavigateToStudio}
+              onClick={onOpenSidecar}
               className="btn-solid-white"
-              style={{ padding: '9px 18px', fontSize: '0.84rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{ padding: '6px 14px', fontSize: '0.74rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}
             >
-              <span>View campaign</span>
+              <Terminal size={12} />
+              <span>Ask Ashky Sidecar</span>
             </button>
           )}
-          <button
-            onClick={onOpenSidecar}
-            className="btn-matte-dark"
-            style={{
-              padding: '9px 16px',
-              fontSize: '0.84rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              color: '#fbbf24',
-              border: '1px solid rgba(245, 158, 11, 0.3)'
-            }}
-          >
-            <Terminal size={14} />
-            <span>Open Grafana evidence</span>
-          </button>
         </div>
       </div>
 
-      {/* 2. CAMPAIGN RUN TIMELINE */}
-      <div className="matte-panel" style={{ padding: '22px', background: '#0d0f14' }}>
-        <div style={{ marginBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
-            <h3 style={{ fontSize: '1.08rem', fontWeight: 700, margin: '0 0 2px', color: '#ffffff' }}>
-              Campaign run
-            </h3>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
-              End-to-end execution flow from creative brief through rendering and discovery verification.
-            </p>
-          </div>
-          <span className="tag-minimal tag-emerald" style={{ fontSize: '0.72rem' }}>
-            All 6 Steps Verified
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {workflowSteps.map((step) => {
-            const isExpanded = expandedStep === step.id;
-
-            return (
-              <div
-                key={step.id}
-                style={{
-                  background: isExpanded ? '#141822' : '#08090c',
-                  border: isExpanded ? '1px solid rgba(59, 130, 246, 0.35)' : '1px solid rgba(255, 255, 255, 0.05)',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                {/* Step Header */}
-                <div
-                  onClick={() => setExpandedStep(isExpanded ? null : step.id)}
-                  style={{
-                    padding: '12px 16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer',
-                    userSelect: 'none'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <CheckCircle2 size={15} color="#34d399" />
-                    <span style={{ fontSize: '0.86rem', fontWeight: 600, color: '#f0f3f6' }}>
-                      {step.name}
-                    </span>
-                    <span style={{ fontSize: '0.72rem', color: '#64748b' }}>({step.agent})</span>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <span style={{ fontSize: '0.76rem', color: '#34d399', fontFamily: 'var(--font-mono)' }}>
-                      {step.duration}
-                    </span>
-                    <span style={{ fontSize: '0.74rem', color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>
-                      {step.cost}
-                    </span>
-                    {isExpanded ? <ChevronUp size={14} color="#94a3b8" /> : <ChevronDown size={14} color="#94a3b8" />}
-                  </div>
-                </div>
-
-                {/* Expanded Details */}
-                {isExpanded && (
-                  <div style={{
-                    padding: '14px 16px',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-                    background: '#060709',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                    gap: '12px',
-                    fontSize: '0.78rem'
-                  }}>
-                    <div>
-                      <span style={{ color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>AGENT MODEL:</span>
-                      <span style={{ color: '#cbd5e1' }}>{step.agent}</span>
-                    </div>
-                    <div>
-                      <span style={{ color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>TOKENS & SPEND:</span>
-                      <span style={{ color: '#cbd5e1' }}>{step.tokens} • {step.cost}</span>
-                    </div>
-                    <div>
-                      <span style={{ color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>TOOL CALLS:</span>
-                      <span style={{ color: '#60a5fa' }}>{step.tools.join(', ')}</span>
-                    </div>
-                    <div>
-                      <span style={{ color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>RESULT:</span>
-                      <span style={{ color: '#34d399' }}>{step.result}</span>
-                    </div>
-                    <div>
-                      <span style={{ color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)' }}>TRACE EVIDENCE:</span>
-                      <span style={{ color: '#a78bfa', fontFamily: 'var(--font-mono)' }}>Tempo #{step.traceId}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 3. QUALITY AND SPEND SUMMARY */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+      {/* 1. TOP 4 TELEMETRY CARDS (Matching Observability Mockup) */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: '10px'
+      }}>
         {qualityMetrics.map((m, idx) => (
           <div
             key={idx}
             className="matte-panel"
             style={{
-              padding: '16px',
+              padding: '12px 14px',
               background: '#0d0f14',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               borderLeft: `3px solid ${m.color}`,
               display: 'flex',
               flexDirection: 'column',
-              gap: '4px'
+              justifyContent: 'space-between',
+              minHeight: '82px'
             }}
           >
-            <span style={{ fontSize: '0.68rem', color: '#64748b', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-              {m.label}
-            </span>
-            <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#ffffff' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.62rem', color: '#64748b', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                {m.label}
+              </span>
+              <span style={{ fontSize: '0.62rem', color: m.color, fontWeight: 700 }}>
+                {m.trend}
+              </span>
+            </div>
+            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#ffffff', margin: '2px 0' }}>
               {m.value}
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.66rem', color: '#94a3b8' }}>
               <span>Target: {m.target}</span>
-              <span style={{ color: m.color, fontWeight: 600 }}>{m.trend} ({m.state})</span>
+              <span style={{ color: m.color, fontWeight: 600 }}>{m.state}</span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* 4. COLLAPSED LAST AUTOMATIC RECOVERY CARD */}
-      <div className="matte-panel" style={{
-        background: '#0d0f14',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '10px',
-        overflow: 'hidden'
+      {/* 2. DUAL-STAGE WORKSPACE (Left: Trace DAG Waterfall, Right: Live Grafana Telemetry) */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1.35fr 1fr',
+        gap: '12px'
       }}>
-        <div
-          onClick={() => setRecoveryOpen(!recoveryOpen)}
-          style={{
-            padding: '16px 20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            cursor: 'pointer',
-            userSelect: 'none',
-            background: recoveryOpen ? '#10131a' : '#0d0f14',
-            transition: 'background 0.15s ease'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            <span style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              background: '#34d399',
-              boxShadow: '0 0 6px #34d399'
-            }} />
-            <span style={{ fontSize: '0.92rem', fontWeight: 600, color: '#ffffff' }}>
-              Last automatic recovery: Scene 2 render stalled
-            </span>
-            <span className="tag-minimal tag-emerald" style={{ fontSize: '0.64rem' }}>
-              RESOLVED AUTOMATICALLY IN 41s
+        {/* Left Side: Agent Execution Trace Waterfall (Tempo DAG) */}
+        <div className="matte-panel" style={{
+          padding: '14px 16px',
+          background: '#0d0f14',
+          borderRadius: '8px',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Activity size={13} color="#34d399" />
+              <h3 style={{ fontSize: '0.86rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
+                Agent Execution Trace Waterfall (Tempo DAG)
+              </h3>
+            </div>
+            <span style={{ fontSize: '0.64rem', color: '#34d399', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+              Trace ID: #tr_8fa00 · 6 Spans OK
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', fontSize: '0.8rem' }}>
-            <span>{recoveryOpen ? 'Hide recovery details' : 'View recovery details'}</span>
-            {recoveryOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {workflowSteps.map((step) => {
+              const isExpanded = expandedStep === step.id;
+
+              return (
+                <div
+                  key={step.id}
+                  style={{
+                    background: isExpanded ? '#121620' : '#07090f',
+                    border: isExpanded ? '1px solid rgba(56, 189, 248, 0.35)' : '1px solid rgba(255, 255, 255, 0.05)',
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <div
+                    onClick={() => setExpandedStep(isExpanded ? null : step.id)}
+                    style={{
+                      padding: '8px 12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: 'pointer',
+                      userSelect: 'none'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <CheckCircle2 size={13} color="#34d399" />
+                      <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#ffffff' }}>
+                        {step.name}
+                      </span>
+                      <span style={{ fontSize: '0.64rem', color: '#64748b' }}>({step.agent})</span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
+                        {step.duration}
+                      </span>
+                      <span style={{ fontSize: '0.7rem', color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>
+                        {step.cost}
+                      </span>
+                      {isExpanded ? <ChevronUp size={12} color="#94a3b8" /> : <ChevronDown size={12} color="#94a3b8" />}
+                    </div>
+                  </div>
+
+                  {isExpanded && (
+                    <div style={{
+                      padding: '10px 12px',
+                      borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                      background: '#040508',
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(3, 1fr)',
+                      gap: '8px',
+                      fontSize: '0.72rem'
+                    }}>
+                      <div>
+                        <span style={{ color: '#64748b', display: 'block', fontSize: '0.6rem', fontFamily: 'var(--font-mono)' }}>AGENT MODEL</span>
+                        <span style={{ color: '#e2e8f0' }}>{step.agent}</span>
+                      </div>
+                      <div>
+                        <span style={{ color: '#64748b', display: 'block', fontSize: '0.6rem', fontFamily: 'var(--font-mono)' }}>TOKENS & SPEND</span>
+                        <span style={{ color: '#e2e8f0' }}>{step.tokens} · {step.cost}</span>
+                      </div>
+                      <div>
+                        <span style={{ color: '#64748b', display: 'block', fontSize: '0.6rem', fontFamily: 'var(--font-mono)' }}>TEMPO TRACE</span>
+                        <span style={{ color: '#a78bfa', fontFamily: 'var(--font-mono)' }}>{step.traceId}</span>
+                      </div>
+                      <div style={{ gridColumn: 'span 3' }}>
+                        <span style={{ color: '#64748b', display: 'block', fontSize: '0.6rem', fontFamily: 'var(--font-mono)' }}>TOOL CALLS DISPATCHED</span>
+                        <span style={{ color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>{step.tools.join('  ➔  ')}</span>
+                      </div>
+                      <div style={{ gridColumn: 'span 3' }}>
+                        <span style={{ color: '#64748b', display: 'block', fontSize: '0.6rem', fontFamily: 'var(--font-mono)' }}>RESULT</span>
+                        <span style={{ color: '#34d399' }}>{step.result}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {recoveryOpen && (
-          <div style={{
-            padding: '20px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+        {/* Right Side: Live Grafana Cloud Telemetry Panel */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          
+          {/* Gauge & Burn Rate Card */}
+          <div className="matte-panel" style={{
+            padding: '14px 16px',
+            background: '#0d0f14',
+            borderRadius: '8px',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px',
-            background: '#08090c'
+            gap: '8px'
           }}>
-            <p style={{ fontSize: '0.84rem', color: '#cbd5e1', margin: 0 }}>
-              <strong>User Impact:</strong> Campaign delivery delayed by 41s; approved Scene 1 preserved and 0 user state lost.
-            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.74rem', color: '#f59e0b', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                LATENCY & BURN RATE TELEMETRY
+              </span>
+              <span className="tag-minimal tag-emerald" style={{ fontSize: '0.58rem' }}>Live Stream</span>
+            </div>
 
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '12px'
-            }}>
-              {/* What Ashky checked */}
-              <div style={{ background: '#0d0f14', padding: '14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 700, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '6px' }}>
-                  1. WHAT ASHKY CHECKED
-                </span>
-                <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.78rem', color: '#94a3b8', lineHeight: 1.5 }}>
-                  <li>Render p95 crossed 30s target in Prometheus</li>
-                  <li>Matching provider-throttle 429 errors appeared in Loki</li>
-                  <li>Tempo trace #tr_scene2 isolated retries to synthesis step</li>
-                </ul>
-              </div>
-
-              {/* What Ashky fixed */}
-              <div style={{ background: '#0d0f14', padding: '14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                <span style={{ fontSize: '0.7rem', color: '#fbbf24', fontWeight: 700, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '6px' }}>
-                  2. WHAT ASHKY FIXED
-                </span>
-                <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.78rem', color: '#94a3b8', lineHeight: 1.5 }}>
-                  <li>Reduced concurrent render requests from 4 to 2</li>
-                  <li>Requeued only Scene 2 (preserved Scene 1 & 3)</li>
-                  <li>Added deployment annotation to Grafana timeline</li>
-                </ul>
-              </div>
-
-              {/* Result */}
-              <div style={{ background: '#0d0f14', padding: '14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                <span style={{ fontSize: '0.7rem', color: '#34d399', fontWeight: 700, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '6px' }}>
-                  3. RESULT
-                </span>
-                <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.78rem', color: '#94a3b8', lineHeight: 1.5 }}>
-                  <li>Scene 2 completed synthesis in 41s</li>
-                  <li>Full campaign returned to healthy status</li>
-                  <li>Error budget preserved (18% of allowance used)</li>
-                </ul>
+            {/* P95 Latency Area Graph */}
+            <div style={{ height: '70px', position: 'relative', marginTop: '4px' }}>
+              <svg width="100%" height="70" viewBox="0 0 300 70" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="latencyAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.45" />
+                    <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.0" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M 0 50 Q 50 35 100 42 T 200 25 T 300 18 L 300 70 L 0 70 Z"
+                  fill="url(#latencyAreaGrad)"
+                />
+                <path
+                  d="M 0 50 Q 50 35 100 42 T 200 25 T 300 18"
+                  fill="none"
+                  stroke="#38bdf8"
+                  strokeWidth="2"
+                />
+              </svg>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#64748b', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
+                <span>-60s</span>
+                <span>-30s</span>
+                <span>P95 1,420ms (Now)</span>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', paddingTop: '4px' }}>
-              <button
-                onClick={onOpenSidecar}
-                className="btn-matte-dark"
-                style={{ padding: '7px 14px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px', color: '#fbbf24' }}
-              >
-                <Terminal size={13} />
-                <span>Ask Agent about this recovery</span>
-              </button>
+            {/* Reliability Targets & Error Budget */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '4px' }}>
+              {reliabilitySLOs.map((slo, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.68rem', padding: '4px 6px', background: '#07090f', borderRadius: '4px' }}>
+                  <span style={{ color: '#cbd5e1' }}>{slo.title}</span>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ color: '#34d399', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{slo.current}</span>
+                    <span style={{ color: '#64748b', fontSize: '0.6rem' }}>{slo.errorBudget}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        )}
-      </div>
 
-      {/* 4.5. GRAFANA CLOUD MODEL CONTEXT PROTOCOL (MCP) RUNTIME */}
-      <div className="matte-panel" style={{ padding: '22px', background: '#0d0f14', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
-        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '6px',
-                background: 'rgba(245, 158, 11, 0.15)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
+          {/* Quick Studio Navigation Action */}
+          {onNavigateToStudio && (
+            <button
+              onClick={onNavigateToStudio}
+              className="btn-matte-dark"
+              style={{
+                width: '100%',
+                padding: '10px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#fbbf24'
-              }}>
-                <Terminal size={15} />
-              </div>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
-                Grafana Cloud Model Context Protocol (MCP) Runtime
-              </h3>
-              <span style={{
-                fontSize: '0.66rem',
-                fontWeight: 700,
-                padding: '2px 8px',
-                borderRadius: '4px',
-                background: 'rgba(34, 197, 94, 0.15)',
-                border: '1px solid rgba(34, 197, 94, 0.35)',
-                color: '#4ade80',
-                fontFamily: 'var(--font-mono)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
-                {snapshot?.mcp_connection_status || 'CONNECTED'}
-              </span>
-            </div>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '6px 0 0' }}>
-              Autonomous SRE agent runtime powered by official Grafana Cloud MCP tools (<code style={{ color: '#fbbf24' }}>mcp.grafana.com</code>) targeting live Prometheus and Loki streams.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button
-              onClick={onOpenSidecar}
-              className="btn-solid-white"
-              style={{ padding: '6px 14px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <Terminal size={13} />
-              <span>Query via Pipeline Agent</span>
-            </button>
-            {snapshot?.grafana_stack_url && (
-              <a
-                href={snapshot.grafana_stack_url}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-matte-dark"
-                style={{ padding: '6px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none', color: '#cbd5e1' }}
-              >
-                <span>Open Grafana Stack</span>
-                <ExternalLink size={12} />
-              </a>
-            )}
-          </div>
-        </div>
-
-        {/* Stack Connection Details Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '10px',
-          marginBottom: '16px'
-        }}>
-          <div style={{ background: '#08090c', padding: '12px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-              MCP SERVER ENDPOINT
-            </span>
-            <span style={{ fontSize: '0.8rem', color: '#4ade80', fontFamily: 'var(--font-mono)', fontWeight: 600, wordBreak: 'break-all' }}>
-              {snapshot?.mcp_server_endpoint || 'https://mcp.grafana.com/mcp'}
-            </span>
-          </div>
-
-          <div style={{ background: '#08090c', padding: '12px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-              GRAFANA CLOUD STACK
-            </span>
-            <span style={{ fontSize: '0.8rem', color: '#fbbf24', fontFamily: 'var(--font-mono)', fontWeight: 600, wordBreak: 'break-all' }}>
-              {snapshot?.grafana_stack_url || 'Configured via .env'}
-            </span>
-          </div>
-
-          <div style={{ background: '#08090c', padding: '12px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-              TRANSPORT PROTOCOL
-            </span>
-            <span style={{ fontSize: '0.8rem', color: '#38bdf8', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-              JSON-RPC 2.0 (Streamable HTTP)
-            </span>
-          </div>
-
-          <div style={{ background: '#08090c', padding: '12px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-              ROUTING HEADER
-            </span>
-            <span style={{ fontSize: '0.8rem', color: '#a78bfa', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-              X-Grafana-URL
-            </span>
-          </div>
-        </div>
-
-        {/* Official Registered Tools List */}
-        <div>
-          <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'block', marginBottom: '8px' }}>
-            OFFICIAL RUNTIME MCP TOOLS (INVOKED DURING AUTONOMOUS SRE SWEEPS):
-          </span>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '8px' }}>
-            {[
-              {
-                name: "query_prometheus",
-                desc: "PromQL metrics query for retention scores, render latency, & token costs",
-                type: "Metric Query"
-              },
-              {
-                name: "query_loki",
-                desc: "LogQL log queries for video synthesis traces & director evaluations",
-                type: "Log Stream"
-              },
-              {
-                name: "search_dashboards",
-                desc: "Finds and links production pipeline dashboards (ashky-telemetry-01)",
-                type: "Dashboard Catalog"
-              },
-              {
-                name: "list_alerts",
-                desc: "Lists fired alerting rules and latency/hook drop SLO violations",
-                type: "Alert Management"
-              },
-              {
-                name: "grafana_diagnose_pipeline",
-                desc: "Autonomous multi-agent SRE sweep synthesizing findings and SLO actions",
-                type: "Agent Synthesis"
-              },
-              {
-                name: "grafana_optimize_retention_loop",
-                desc: "Closed-loop optimization rewriting Scene 1 if hook retention drops <90",
-                type: "Closed-Loop Action"
-              }
-            ].map((tool, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: '#08090c',
-                  borderRadius: '6px',
-                  padding: '10px 12px',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.78rem', color: '#38bdf8', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
-                    {tool.name}()
-                  </span>
-                  <span style={{ fontSize: '0.64rem', color: '#64748b', background: 'rgba(255,255,255,0.04)', padding: '1px 6px', borderRadius: '4px' }}>
-                    {tool.type}
-                  </span>
-                </div>
-                <p style={{ margin: 0, fontSize: '0.74rem', color: '#94a3b8', lineHeight: 1.4 }}>
-                  {tool.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 5. RELIABILITY TARGETS */}
-      <div className="matte-panel" style={{ padding: '22px', background: '#0d0f14' }}>
-        <div style={{ marginBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: '0 0 4px', color: '#ffffff' }}>
-              Reliability targets
-            </h3>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
-              Managed via Prometheus rules and Grafana alerts. Plain language failure allowance tracked weekly.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={handleDownloadDashboard} className="btn-matte-dark" style={{ padding: '6px 12px', fontSize: '0.78rem' }}>
-              <Download size={13} />
-              <span>Export Dashboard JSON</span>
-            </button>
-            <button onClick={fetchTelemetry} className="btn-matte-dark" style={{ padding: '6px 12px', fontSize: '0.78rem' }}>
-              <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
-              <span>Refresh</span>
-            </button>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {reliabilitySLOs.map((slo, idx) => (
-            <div
-              key={idx}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px 16px',
-                background: '#08090c',
-                borderRadius: '8px',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
-                fontSize: '0.82rem',
-                flexWrap: 'wrap',
-                gap: '8px'
+                gap: '6px',
+                border: '1px solid rgba(255, 255, 255, 0.1)'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CheckCircle2 size={14} color="#34d399" />
-                <span style={{ fontWeight: 600, color: '#f0f3f6' }}>{slo.title}</span>
-              </div>
+              <Film size={13} color="#f59e0b" />
+              <span>Jump to Video Studio Playback</span>
+              <ArrowRight size={12} />
+            </button>
+          )}
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontFamily: 'var(--font-mono)', fontSize: '0.78rem' }}>
-                <span style={{ color: '#64748b' }}>Target: {slo.target}</span>
-                <span style={{ color: '#34d399', fontWeight: 700 }}>Current: {slo.current}</span>
-                <span style={{ color: '#cbd5e1', background: 'rgba(255,255,255,0.06)', padding: '2px 8px', borderRadius: '4px' }}>
-                  {slo.errorBudgetUsed} budget used ({slo.burnRate})
-                </span>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 

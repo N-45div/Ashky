@@ -5,6 +5,7 @@ import AgentSidecar from '../components/AgentSidecar';
 import VideoStudio from './VideoStudio';
 import GeoOptimizer from './GeoOptimizer';
 import Observability from './Observability';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { Terminal, Sparkles, Activity, ShieldCheck, PanelLeft } from 'lucide-react';
 
 const DEFAULT_DEMO_CAMPAIGN = {
@@ -265,27 +266,29 @@ export default function AppWorkspace({ initialPreset = null }) {
           position: 'relative',
           overflow: activeTab === 'studio' ? 'hidden' : 'auto'
         }}>
-          {activeTab === 'studio' && (
-            <VideoStudio 
-              key={campaignKey} 
-              initialPreset={selectedPreset}
-              onStatusChange={setCampaignStatus}
-              onNavigateToGeo={() => handleSelectTab('geo')}
-            />
-          )}
-          {activeTab === 'geo' && (
-            <GeoOptimizer 
-              campaign={selectedPreset}
-              onNavigateToStudio={() => handleSelectTab('studio')}
-            />
-          )}
-          {activeTab === 'observability' && (
-            <Observability 
-              onOpenSidecar={() => setSidecarOpen(true)} 
-              onNavigateToStudio={() => handleSelectTab('studio')}
-              campaign={selectedPreset}
-            />
-          )}
+          <ErrorBoundary>
+            {activeTab === 'studio' && (
+              <VideoStudio 
+                key={campaignKey} 
+                initialPreset={selectedPreset}
+                onStatusChange={setCampaignStatus}
+                onNavigateToGeo={() => handleSelectTab('geo')}
+              />
+            )}
+            {activeTab === 'geo' && (
+              <GeoOptimizer 
+                campaign={selectedPreset}
+                onNavigateToStudio={() => handleSelectTab('studio')}
+              />
+            )}
+            {activeTab === 'observability' && (
+              <Observability 
+                onOpenSidecar={() => setSidecarOpen(true)} 
+                onNavigateToStudio={() => handleSelectTab('studio')}
+                campaign={selectedPreset}
+              />
+            )}
+          </ErrorBoundary>
         </main>
       </div>
 
