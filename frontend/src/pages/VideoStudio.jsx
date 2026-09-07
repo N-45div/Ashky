@@ -367,12 +367,13 @@ export default function VideoStudio({
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
+      maxHeight: '100%',
       width: '100%',
       background: '#07090e',
       color: '#e2e8f0',
       boxSizing: 'border-box',
-      padding: '8px 12px 6px',
-      gap: '8px',
+      padding: '6px 12px 6px',
+      gap: '6px',
       overflow: 'hidden',
       fontFamily: 'var(--font-sans)',
       userSelect: 'none'
@@ -384,39 +385,48 @@ export default function VideoStudio({
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'minmax(240px, 23%) minmax(480px, 54%) minmax(240px, 23%)',
-        gap: '10px',
-        flex: 1.55,
-        minHeight: 0
+        gap: '8px',
+        flex: '1.42 1 0',
+        minHeight: 0,
+        overflow: 'hidden'
       }}>
 
         {/* ------------------------------------------------------------ */}
         {/* COLUMN 1: CAMPAIGN BRIEF & LIVE SYNTHESIS STATUS */}
         {/* ------------------------------------------------------------ */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', height: '100%', minHeight: 0 }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px',
+          height: '100%',
+          minHeight: 0,
+          overflow: 'hidden',
+          justifyContent: 'space-between'
+        }}>
           
           {/* Card 1A: Campaign Brief (v3.1) */}
           <div style={{
             background: '#0c0f16',
             border: '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '10px',
-            padding: '12px 14px',
+            padding: '8px 12px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '8px',
+            gap: '4px',
             position: 'relative'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h3 style={{ fontSize: '0.86rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
                   Campaign Brief
                 </h3>
-                <span style={{ fontSize: '0.62rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontSize: '0.58rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
                   CAMPAIGN BRIEF v3.1
                 </span>
               </div>
               <div style={{ position: 'relative' }}>
                 <MoreVertical 
-                  size={14} 
+                  size={13} 
                   color="#64748b" 
                   style={{ cursor: 'pointer' }} 
                   onClick={() => setBriefMenuOpen(!briefMenuOpen)}
@@ -447,9 +457,9 @@ export default function VideoStudio({
             </div>
 
             {/* Inputs Group */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
               <div>
-                <label style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, display: 'block', marginBottom: '2px', fontFamily: 'var(--font-mono)' }}>
+                <label style={{ fontSize: '0.56rem', color: '#64748b', fontWeight: 700, display: 'block', marginBottom: '1px', fontFamily: 'var(--font-mono)' }}>
                   Project Name
                 </label>
                 <input
@@ -460,9 +470,9 @@ export default function VideoStudio({
                     width: '100%',
                     background: '#07090f',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '5px',
-                    padding: '6px 8px',
-                    fontSize: '0.74rem',
+                    borderRadius: '4px',
+                    padding: '3.5px 6px',
+                    fontSize: '0.70rem',
                     color: '#ffffff',
                     boxSizing: 'border-box',
                     outline: 'none'
@@ -471,7 +481,7 @@ export default function VideoStudio({
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, display: 'block', marginBottom: '2px', fontFamily: 'var(--font-mono)' }}>
+                <label style={{ fontSize: '0.56rem', color: '#64748b', fontWeight: 700, display: 'block', marginBottom: '1px', fontFamily: 'var(--font-mono)' }}>
                   Studio
                 </label>
                 <input
@@ -482,9 +492,9 @@ export default function VideoStudio({
                     width: '100%',
                     background: '#07090f',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '5px',
-                    padding: '6px 8px',
-                    fontSize: '0.74rem',
+                    borderRadius: '4px',
+                    padding: '3.5px 6px',
+                    fontSize: '0.70rem',
                     color: '#cbd5e1',
                     boxSizing: 'border-box',
                     outline: 'none'
@@ -493,7 +503,7 @@ export default function VideoStudio({
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, display: 'block', marginBottom: '2px', fontFamily: 'var(--font-mono)' }}>
+                <label style={{ fontSize: '0.56rem', color: '#64748b', fontWeight: 700, display: 'block', marginBottom: '1px', fontFamily: 'var(--font-mono)' }}>
                   Target Audience
                 </label>
                 <select
@@ -503,9 +513,9 @@ export default function VideoStudio({
                     width: '100%',
                     background: '#07090f',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '5px',
-                    padding: '6px 8px',
-                    fontSize: '0.74rem',
+                    borderRadius: '4px',
+                    padding: '3.5px 6px',
+                    fontSize: '0.70rem',
                     color: '#ffffff',
                     boxSizing: 'border-box',
                     outline: 'none',
@@ -520,7 +530,7 @@ export default function VideoStudio({
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, display: 'block', marginBottom: '2px', fontFamily: 'var(--font-mono)' }}>
+                <label style={{ fontSize: '0.56rem', color: '#64748b', fontWeight: 700, display: 'block', marginBottom: '1px', fontFamily: 'var(--font-mono)' }}>
                   Style
                 </label>
                 <select
@@ -530,9 +540,9 @@ export default function VideoStudio({
                     width: '100%',
                     background: '#07090f',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '5px',
-                    padding: '6px 8px',
-                    fontSize: '0.74rem',
+                    borderRadius: '4px',
+                    padding: '3.5px 6px',
+                    fontSize: '0.70rem',
                     color: '#ffffff',
                     boxSizing: 'border-box',
                     outline: 'none',
@@ -546,7 +556,7 @@ export default function VideoStudio({
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6rem', color: '#f59e0b', fontWeight: 700, display: 'block', marginBottom: '2px', fontFamily: 'var(--font-mono)' }}>
+                <label style={{ fontSize: '0.56rem', color: '#f59e0b', fontWeight: 700, display: 'block', marginBottom: '1px', fontFamily: 'var(--font-mono)' }}>
                   AI Video Engine
                 </label>
                 <select
@@ -556,9 +566,9 @@ export default function VideoStudio({
                     width: '100%',
                     background: '#07090f',
                     border: '1px solid rgba(245, 158, 11, 0.4)',
-                    borderRadius: '5px',
-                    padding: '6px 8px',
-                    fontSize: '0.74rem',
+                    borderRadius: '4px',
+                    padding: '3.5px 6px',
+                    fontSize: '0.70rem',
                     color: '#fbbf24',
                     boxSizing: 'border-box',
                     outline: 'none',
@@ -575,23 +585,23 @@ export default function VideoStudio({
                 onClick={handleSynthesizeVideo}
                 disabled={isSynthesizing}
                 style={{
-                  marginTop: '4px',
+                  marginTop: '2px',
                   width: '100%',
-                  padding: '8px 10px',
+                  padding: '5px 8px',
                   background: isSynthesizing 
                     ? 'linear-gradient(135deg, #78350f, #451a03)' 
                     : 'linear-gradient(135deg, #f59e0b, #d97706)',
                   border: '1px solid #fbbf24',
-                  borderRadius: '6px',
+                  borderRadius: '5px',
                   color: '#ffffff',
                   fontWeight: 800,
-                  fontSize: '0.74rem',
+                  fontSize: '0.70rem',
                   cursor: isSynthesizing ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '6px',
-                  boxShadow: isSynthesizing ? 'none' : '0 0 14px rgba(245, 158, 11, 0.35)',
+                  gap: '5px',
+                  boxShadow: isSynthesizing ? 'none' : '0 0 12px rgba(245, 158, 11, 0.3)',
                   transition: 'all 0.2s ease',
                   letterSpacing: '0.02em'
                 }}
@@ -615,46 +625,46 @@ export default function VideoStudio({
           <div style={{
             background: '#110e08',
             border: '1.5px solid #f59e0b',
-            boxShadow: '0 0 16px rgba(245, 158, 11, 0.18)',
+            boxShadow: '0 0 14px rgba(245, 158, 11, 0.15)',
             borderRadius: '10px',
-            padding: '12px 14px',
+            padding: '8px 12px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '6px',
+            gap: '4px',
             position: 'relative'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <span style={{
-                  width: '7px',
-                  height: '7px',
+                  width: '6px',
+                  height: '6px',
                   borderRadius: '50%',
                   background: '#f59e0b',
                   boxShadow: '0 0 8px #f59e0b',
                   display: 'inline-block'
                 }} />
-                <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>
                   Live Synthesis Status
                 </span>
               </div>
               <MoreVertical 
-                size={13} 
+                size={12} 
                 color="#92400e" 
                 style={{ cursor: 'pointer' }} 
                 onClick={() => setSynthesisMenuOpen(!synthesisMenuOpen)}
               />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
-              <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1px' }}>
+              <span style={{ fontSize: '0.68rem', color: '#cbd5e1' }}>
                 Processing Scene: <strong style={{ color: '#ffffff' }}>{synthesisScene} ({synthesisProgress}%)</strong>
               </span>
               <span style={{
-                fontSize: '0.58rem',
+                fontSize: '0.54rem',
                 background: isSynthesizing ? 'rgba(245, 158, 11, 0.25)' : (synthesisActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(100, 116, 139, 0.2)'),
                 color: isSynthesizing ? '#fbbf24' : (synthesisActive ? '#34d399' : '#94a3b8'),
                 border: `1px solid ${isSynthesizing ? 'rgba(245, 158, 11, 0.5)' : (synthesisActive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(100, 116, 139, 0.4)')}`,
-                padding: '1px 6px',
+                padding: '1px 5px',
                 borderRadius: '3px',
                 fontWeight: 700,
                 fontFamily: 'var(--font-mono)'
@@ -664,13 +674,13 @@ export default function VideoStudio({
             </div>
 
             {synthesisStep && (
-              <div style={{ fontSize: '0.64rem', color: '#f59e0b', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontSize: '0.60rem', color: '#f59e0b', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {synthesisStep}
               </div>
             )}
 
             {/* 16-Dot Pacing Indicator */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
               {[...Array(16)].map((_, i) => {
                 const activeCount = isSynthesizing 
                   ? Math.max(1, Math.round((synthesisProgress / 100) * 16))
@@ -680,11 +690,11 @@ export default function VideoStudio({
                   <span
                     key={i}
                     style={{
-                      width: '6px',
-                      height: '6px',
+                      width: '5px',
+                      height: '5px',
                       borderRadius: '50%',
                       background: isActive ? '#f59e0b' : 'rgba(255, 255, 255, 0.15)',
-                      boxShadow: isActive ? '0 0 6px #f59e0b' : 'none',
+                      boxShadow: isActive ? '0 0 5px #f59e0b' : 'none',
                       transition: 'all 0.3s ease'
                     }}
                   />
@@ -701,23 +711,25 @@ export default function VideoStudio({
         <div style={{
           background: '#090c12',
           border: '1.5px solid #f59e0b',
-          boxShadow: '0 0 22px rgba(245, 158, 11, 0.16)',
+          boxShadow: '0 0 18px rgba(245, 158, 11, 0.14)',
           borderRadius: '10px',
-          padding: '10px 14px 8px',
+          padding: '8px 14px 6px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
           height: '100%',
+          minHeight: 0,
+          overflow: 'hidden',
           boxSizing: 'border-box'
         }}>
           
           {/* Header Row: "Master Cinema Stage" */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
-            <h2 style={{ fontSize: '0.94rem', fontWeight: 800, margin: 0, color: '#ffffff', letterSpacing: '0.02em' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1px' }}>
+            <h2 style={{ fontSize: '0.88rem', fontWeight: 800, margin: 0, color: '#ffffff', letterSpacing: '0.02em' }}>
               Master Cinema Stage
             </h2>
             <MoreVertical 
-              size={14} 
+              size={13} 
               color="#64748b" 
               style={{ cursor: 'pointer' }} 
               onClick={() => setStageMenuOpen(!stageMenuOpen)}
@@ -729,19 +741,19 @@ export default function VideoStudio({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '24px',
+            gap: '18px',
             flex: 1,
             minHeight: 0
           }}>
             
             {/* Phone Monitor: Realistic Curved iPhone 15 Pro Bezel with Dynamic Island */}
             <div style={{
-              width: '235px',
-              height: '415px',
-              borderRadius: '32px',
+              width: 'clamp(175px, 15vw, 205px)',
+              height: 'clamp(280px, 32vh, 345px)',
+              borderRadius: '26px',
               background: '#000000',
-              border: '3px solid #283042',
-              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.08)',
+              border: '2.5px solid #283042',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.08)',
               position: 'relative',
               overflow: 'hidden',
               flexShrink: 0,
@@ -757,11 +769,11 @@ export default function VideoStudio({
               {/* Dynamic Island Notch */}
               <div style={{
                 position: 'absolute',
-                top: '7px',
-                width: '58px',
-                height: '14px',
+                top: '5px',
+                width: '46px',
+                height: '11px',
                 background: '#000000',
-                borderRadius: '10px',
+                borderRadius: '8px',
                 zIndex: 25,
                 boxShadow: '0 0 4px rgba(0,0,0,0.8)'
               }} />
@@ -796,27 +808,27 @@ export default function VideoStudio({
 
             {/* Right Side: Director Notes HUD Card (Matching Image 1 Master UI) */}
             <div style={{
-              width: '260px',
+              width: 'clamp(210px, 18vw, 250px)',
               background: '#0d1017',
-              borderRadius: '10px',
+              borderRadius: '9px',
               border: '1px solid rgba(255, 255, 255, 0.08)',
-              padding: '14px 16px',
+              padding: '10px 14px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '12px',
+              gap: '8px',
               boxSizing: 'border-box'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <h4 style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>
+                  <h4 style={{ fontSize: '0.78rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>
                     Director Notes HUD
                   </h4>
-                  <span style={{ fontSize: '0.58rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+                  <span style={{ fontSize: '0.56rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
                     NOTES & DATA
                   </span>
                 </div>
                 <Sliders 
-                  size={13} 
+                  size={12} 
                   color="#f59e0b" 
                   style={{ cursor: 'pointer' }} 
                   onClick={handleToggleVoice}
@@ -826,10 +838,10 @@ export default function VideoStudio({
 
               {/* Script Section */}
               <div>
-                <span style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
                   Script
                 </span>
-                <p style={{ fontSize: '0.76rem', color: '#e2e8f0', margin: '1px 0 0', fontWeight: 600 }}>
+                <p style={{ fontSize: '0.72rem', color: '#e2e8f0', margin: '1px 0 0', fontWeight: 600 }}>
                   {currentScene.script}
                 </p>
               </div>
@@ -840,21 +852,21 @@ export default function VideoStudio({
                 style={{ cursor: 'pointer' }}
                 title="Click to preview audio"
               >
-                <span style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)', marginBottom: '4px' }}>
+                <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)', marginBottom: '3px' }}>
                   Waveform Audio Preview
                 </span>
                 
                 {/* Centered Golden Acoustic Waveform graphic */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '26px', gap: '2px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '20px', gap: '2px' }}>
                   {[3, 4, 6, 8, 11, 14, 18, 22, 26, 22, 18, 14, 11, 8, 6, 4, 3].map((h, idx) => (
                     <span
                       key={idx}
                       style={{
-                        width: '2.5px',
-                        height: isPlayingVoice ? `${Math.max(4, (h * 1.25) % 26)}px` : `${h}px`,
+                        width: '2px',
+                        height: isPlayingVoice ? `${Math.max(3, (h * 0.9) % 20)}px` : `${Math.round(h * 0.75)}px`,
                         background: '#f59e0b',
-                        borderRadius: '1.5px',
-                        boxShadow: '0 0 5px rgba(245, 158, 11, 0.45)',
+                        borderRadius: '1px',
+                        boxShadow: '0 0 4px rgba(245, 158, 11, 0.45)',
                         transition: 'height 0.1s ease'
                       }}
                     />
@@ -864,20 +876,20 @@ export default function VideoStudio({
 
               {/* Camera Cues Section */}
               <div>
-                <span style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
                   Camera Cues
                 </span>
-                <p style={{ fontSize: '0.74rem', color: '#e2e8f0', margin: '1px 0 0', fontWeight: 500 }}>
+                <p style={{ fontSize: '0.70rem', color: '#e2e8f0', margin: '1px 0 0', fontWeight: 500 }}>
                   {currentScene.camera_cues}
                 </p>
               </div>
 
               {/* Telemetry Section */}
               <div>
-                <span style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
                   Telemetry
                 </span>
-                <p style={{ fontSize: '0.72rem', color: '#cbd5e1', margin: '1px 0 0', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
+                <p style={{ fontSize: '0.68rem', color: '#cbd5e1', margin: '1px 0 0', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
                   Frame: {Math.round(2400 + (currentTime / duration) * 2100)} | Time: {formatTimecode(currentTime).slice(3)}
                 </p>
               </div>
@@ -886,7 +898,7 @@ export default function VideoStudio({
           </div>
 
           {/* Bottom of Master Cinema Stage: Amber Transport Bar Controls (Matching Image 1) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '4px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingTop: '2px' }}>
             {/* Amber Range Slider with glowing thumb and dual color track */}
             <input
               type="range"
@@ -906,7 +918,7 @@ export default function VideoStudio({
 
             {/* Transport Bar Row: Left Timecode | Centered Controls | Right Timecode */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
-              <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: '#94a3b8', fontWeight: 600 }}>
+              <span style={{ fontSize: '0.68rem', fontFamily: 'var(--font-mono)', color: '#94a3b8', fontWeight: 600 }}>
                 {formatTimecode(currentTime)}
               </span>
 
@@ -918,7 +930,7 @@ export default function VideoStudio({
                   style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '2px' }}
                   title="Previous Scene"
                 >
-                  <SkipBack size={14} />
+                  <SkipBack size={13} />
                 </button>
 
                 {/* Glowing Amber Play/Stop Button */}
@@ -926,11 +938,11 @@ export default function VideoStudio({
                   type="button"
                   onClick={toggleTimelinePlayback}
                   style={{
-                    width: '26px',
-                    height: '26px',
+                    width: '24px',
+                    height: '24px',
                     borderRadius: '50%',
                     background: '#f59e0b',
-                    boxShadow: '0 0 12px rgba(245, 158, 11, 0.7)',
+                    boxShadow: '0 0 10px rgba(245, 158, 11, 0.7)',
                     border: 'none',
                     color: '#000000',
                     display: 'flex',
@@ -940,7 +952,7 @@ export default function VideoStudio({
                   }}
                   title={isPlaying ? 'Pause' : 'Play'}
                 >
-                  {isPlaying ? <Pause size={12} fill="#000000" /> : <Play size={12} fill="#000000" style={{ marginLeft: '1px' }} />}
+                  {isPlaying ? <Pause size={11} fill="#000000" /> : <Play size={11} fill="#000000" style={{ marginLeft: '1px' }} />}
                 </button>
 
                 <button
@@ -949,11 +961,11 @@ export default function VideoStudio({
                   style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '2px' }}
                   title="Next Scene"
                 >
-                  <SkipForward size={14} />
+                  <SkipForward size={13} />
                 </button>
               </div>
 
-              <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: '#94a3b8', fontWeight: 600 }}>
+              <span style={{ fontSize: '0.68rem', fontFamily: 'var(--font-mono)', color: '#94a3b8', fontWeight: 600 }}>
                 {formatTimecode(duration)}
               </span>
             </div>
@@ -968,27 +980,29 @@ export default function VideoStudio({
           background: '#0c0f16',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           borderRadius: '10px',
-          padding: '12px 14px',
+          padding: '8px 12px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          gap: '8px',
+          gap: '6px',
           height: '100%',
+          minHeight: 0,
+          overflow: 'hidden',
           boxSizing: 'border-box',
           position: 'relative'
         }}>
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h3 style={{ fontSize: '0.86rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
+              <h3 style={{ fontSize: '0.82rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
                 Gemini Vision Critic
               </h3>
-              <span style={{ fontSize: '0.62rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+              <span style={{ fontSize: '0.58rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
                 GEMINI CRITIC v2.4
               </span>
             </div>
             <MoreVertical 
-              size={14} 
+              size={13} 
               color="#64748b" 
               style={{ cursor: 'pointer' }} 
               onClick={() => setCriticMenuOpen(!criticMenuOpen)}
@@ -996,29 +1010,29 @@ export default function VideoStudio({
           </div>
 
           {/* Top 2 Sub-Cards: Retention Curve Left + Hook Strength Gauge Right */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
             {/* Retention Curve Card */}
             <div style={{
               background: '#07090f',
-              padding: '8px',
-              borderRadius: '7px',
+              padding: '6px 8px',
+              borderRadius: '6px',
               border: '1px solid rgba(255, 255, 255, 0.06)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between'
             }}>
               <div>
-                <span style={{ fontSize: '0.64rem', color: '#ffffff', fontWeight: 700, display: 'block' }}>
+                <span style={{ fontSize: '0.60rem', color: '#ffffff', fontWeight: 700, display: 'block' }}>
                   Retention Curve
                 </span>
-                <span style={{ fontSize: '0.54rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontSize: '0.52rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
                   Viewership: High 96%
                 </span>
               </div>
 
               {/* Downward Sloping Golden Curve SVG */}
-              <div style={{ height: '40px', width: '100%', margin: '4px 0' }}>
-                <svg width="100%" height="40" viewBox="0 0 120 40" preserveAspectRatio="none">
+              <div style={{ height: '32px', width: '100%', margin: '2px 0' }}>
+                <svg width="100%" height="32" viewBox="0 0 120 40" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="goldCurveGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.5" />
@@ -1030,7 +1044,7 @@ export default function VideoStudio({
                 </svg>
               </div>
 
-              <span style={{ fontSize: '0.54rem', color: '#f59e0b', fontWeight: 700, textAlign: 'center', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>
+              <span style={{ fontSize: '0.52rem', color: '#f59e0b', fontWeight: 700, textAlign: 'center', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>
                 VIEWERSHIP
               </span>
             </div>
@@ -1038,21 +1052,21 @@ export default function VideoStudio({
             {/* Hook Strength Gauge Card */}
             <div style={{
               background: '#07090f',
-              padding: '8px',
-              borderRadius: '7px',
+              padding: '6px 8px',
+              borderRadius: '6px',
               border: '1px solid rgba(255, 255, 255, 0.06)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'space-between'
             }}>
-              <span style={{ fontSize: '0.64rem', color: '#ffffff', fontWeight: 700 }}>
+              <span style={{ fontSize: '0.60rem', color: '#ffffff', fontWeight: 700 }}>
                 Hook Strength
               </span>
 
               {/* Circular Gauge */}
-              <div style={{ position: 'relative', width: '50px', height: '50px', margin: '2px 0' }}>
-                <svg width="50" height="50" viewBox="0 0 64 64">
+              <div style={{ position: 'relative', width: '42px', height: '42px', margin: '2px 0' }}>
+                <svg width="42" height="42" viewBox="0 0 64 64">
                   <circle cx="32" cy="32" r="25" fill="none" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="5" />
                   <circle
                     cx="32"
@@ -1065,18 +1079,18 @@ export default function VideoStudio({
                     strokeDashoffset={157.1 * (1 - 94 / 100)}
                     strokeLinecap="round"
                     transform="rotate(-90 32 32)"
-                    style={{ filter: 'drop-shadow(0 0 6px rgba(245, 158, 11, 0.7))' }}
+                    style={{ filter: 'drop-shadow(0 0 5px rgba(245, 158, 11, 0.7))' }}
                   />
                 </svg>
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
+                  <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
                     94
                   </span>
-                  <span style={{ fontSize: '0.46rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>100</span>
+                  <span style={{ fontSize: '0.44rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>100</span>
                 </div>
               </div>
 
-              <span style={{ fontSize: '0.54rem', color: '#f59e0b', fontWeight: 700, textAlign: 'center', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>
+              <span style={{ fontSize: '0.52rem', color: '#f59e0b', fontWeight: 700, textAlign: 'center', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>
                 ENGAGEMENT
               </span>
             </div>
@@ -1085,14 +1099,14 @@ export default function VideoStudio({
           {/* Quality Breakdown: 5 Bars (Visuals, Audio, Pacing, Narrative, Style) */}
           <div style={{
             background: '#07090f',
-            padding: '8px 10px',
-            borderRadius: '7px',
+            padding: '6px 8px',
+            borderRadius: '6px',
             border: '1px solid rgba(255, 255, 255, 0.06)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '6px'
+            gap: '4px'
           }}>
-            <span style={{ fontSize: '0.62rem', color: '#64748b', fontWeight: 700, fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
               Quality Breakdown
             </span>
 
@@ -1103,9 +1117,9 @@ export default function VideoStudio({
               { label: 'Narrative', pct: 80, color: '#34d399' },
               { label: 'Style', pct: 86, color: '#f59e0b' }
             ].map((bar) => (
-              <div key={bar.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.6rem' }}>
-                <span style={{ width: '45px', color: '#94a3b8' }}>{bar.label}</span>
-                <div style={{ flex: 1, height: '4px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+              <div key={bar.label} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.58rem' }}>
+                <span style={{ width: '42px', color: '#94a3b8' }}>{bar.label}</span>
+                <div style={{ flex: 1, height: '3.5px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '2px', overflow: 'hidden' }}>
                   <div style={{ width: `${bar.pct}%`, height: '100%', background: bar.color, borderRadius: '2px' }} />
                 </div>
               </div>
@@ -1115,12 +1129,12 @@ export default function VideoStudio({
           {/* Critique Card */}
           <div style={{
             background: '#07090f',
-            padding: '8px 10px',
+            padding: '6px 8px',
             borderRadius: '6px',
             border: '1px solid rgba(255, 255, 255, 0.06)',
-            fontSize: '0.68rem',
+            fontSize: '0.64rem',
             color: '#94a3b8',
-            lineHeight: 1.4
+            lineHeight: 1.35
           }}>
             <strong style={{ color: '#e2e8f0' }}>CRITIQUE:</strong> Strong visual hook; excellent pacing; dynamic audio sync.
           </div>
@@ -1136,13 +1150,13 @@ export default function VideoStudio({
         background: '#080a10',
         border: '1px solid rgba(255, 255, 255, 0.08)',
         borderRadius: '10px',
-        padding: '8px 14px 10px',
+        padding: '6px 14px 8px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        flex: 1,
-        minHeight: '260px',
-        maxHeight: '380px',
+        flex: '1 1 0',
+        minHeight: '160px',
+        maxHeight: '260px',
         boxSizing: 'border-box',
         overflow: 'hidden',
         position: 'relative'
