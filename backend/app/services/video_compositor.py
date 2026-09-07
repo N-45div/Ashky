@@ -160,10 +160,11 @@ class VideoCompositor:
         width: int = 1080,
         height: int = 1920,
         image_path: Optional[str] = None,
+        video_clip_path: Optional[str] = None,
     ) -> str:
         """
         Generate a single scene video clip with:
-        - Image background (AI-generated or procedural gradient) with solid fallback
+        - Video background (from Veo 3.1) or Image background with solid fallback
         - Smooth crossfade transitions (fade in/out)
         - Title text overlay (top area)
         - Subtitle text overlay (bottom area, simulating kinetic captions)
@@ -223,7 +224,19 @@ class VideoCompositor:
 
         fade_filter = f"fade=t=in:st=0:d=0.3,fade=t=out:st={max(0.1, duration - 0.3)}:d=0.3"
 
-        if image_path and os.path.exists(image_path):
+        if video_clip_path and os.path.exists(video_clip_path):
+            safe_vid = video_clip_path.replace("\\", "/")
+            video_inputs = [
+                "-stream_loop", "-1",
+                "-t", str(duration),
+                "-i", safe_vid,
+            ]
+            video_filters = (
+                f"scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},setsar=1,"
+                f"{fade_filter},"
+                f"{drawtext_filters}"
+            )
+        elif image_path and os.path.exists(image_path):
             safe_img = image_path.replace("\\", "/")
             video_inputs = [
                 "-loop", "1",
@@ -302,6 +315,7 @@ class VideoCompositor:
         audio_paths: List[str],
         aspect_ratio: str = "9:16",
         image_paths: Optional[Dict[int, str]] = None,
+        video_paths: Optional[Dict[int, str]] = None,
     ) -> str:
         """
         Full render pipeline: combine per-scene audio with visuals and
@@ -313,6 +327,7 @@ class VideoCompositor:
             audio_paths: List of audio file paths (one per scene)
             aspect_ratio: "9:16" or "16:9"
             image_paths: Optional mapping of scene_number -> local image file path
+            video_paths: Optional mapping of scene_number -> local video clip path (from Veo 3.1)
 
         Returns:
             Path to the final rendered MP4 file
@@ -327,6 +342,7 @@ class VideoCompositor:
         for i, (scene, audio_path) in enumerate(zip(scenes, audio_paths)):
             clip_output = str(campaign_video_dir / f"scene_{scene.scene_number}.mp4")
             img_path = image_paths.get(scene.scene_number) if image_paths else None
+            vid_path = video_paths.get(scene.scene_number) if video_paths else None
 
             clip_path = await asyncio.get_event_loop().run_in_executor(
                 None,
@@ -340,6 +356,7 @@ class VideoCompositor:
                 width,
                 height,
                 img_path,
+                vid_path,
             )
             clip_paths.append(clip_path)
 

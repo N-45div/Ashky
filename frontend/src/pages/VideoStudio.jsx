@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Play, Pause, Square, SkipBack, SkipForward,
   Sliders, MoreVertical, Scissors, Link, Search, Maximize2,
-  Bookmark, Eye, EyeOff, Lock, Unlock, Film, Music, Camera
+  Bookmark, Eye, EyeOff, Lock, Unlock, Film, Music, Camera,
+  Zap, Sparkles, RefreshCw, CheckCircle
 } from 'lucide-react';
 
 export default function VideoStudio({ 
@@ -24,6 +25,15 @@ export default function VideoStudio({
       if (initialPreset.style) setStyle(initialPreset.style);
     }
   }, [initialPreset]);
+
+  // Synthesis Engine State
+  const [videoEngine, setVideoEngine] = useState('veo'); // 'veo' (Google Veo 3.1) or 'turbo' (Fast FFmpeg)
+  const [isSynthesizing, setIsSynthesizing] = useState(false);
+  const [synthesisProgress, setSynthesisProgress] = useState(100);
+  const [synthesisActive, setSynthesisActive] = useState(false);
+  const [synthesisScene, setSynthesisScene] = useState('Neo-Racing Tokyo');
+  const [synthesisStep, setSynthesisStep] = useState('Video ready for playback & review');
+  const [activeCampaignId, setActiveCampaignId] = useState('camp_neon_circuit_01');
 
   // Video & Playback State - initialized to 16.875s matching 01:22:15 in reference
   const videoPlayerRef = useRef(null);
@@ -54,11 +64,6 @@ export default function VideoStudio({
   const [synthesisMenuOpen, setSynthesisMenuOpen] = useState(false);
   const [stageMenuOpen, setStageMenuOpen] = useState(false);
   const [criticMenuOpen, setCriticMenuOpen] = useState(false);
-
-  // Synthesis Status
-  const [synthesisProgress, setSynthesisProgress] = useState(78);
-  const [synthesisActive, setSynthesisActive] = useState(true);
-  const [synthesisScene, setSynthesisScene] = useState('Night Run');
 
   // Timecode formatter: matches reference 01:22:15 display format
   const formatTimecode = (sec) => {
@@ -137,8 +142,8 @@ export default function VideoStudio({
     };
   }, [isPlaying, duration, selectedSceneIndex]);
 
-  // Pre-configured scenes matching the reference video
-  const scenes = [
+  // Pre-configured default scenes matching reference video
+  const defaultScenes = [
     {
       scene_number: 14,
       title: 'Night Chase',
@@ -171,7 +176,99 @@ export default function VideoStudio({
     }
   ];
 
+  const [scenes, setScenes] = useState(defaultScenes);
   const currentScene = scenes[selectedSceneIndex] || scenes[0];
+
+  // 1-Click Video Synthesis Handler (Veo 3.1 & Turbo)
+  const handleSynthesizeVideo = async () => {
+    if (isSynthesizing) return;
+    setIsSynthesizing(true);
+    setSynthesisActive(true);
+    setSynthesisProgress(15);
+    setSynthesisScene(projectName);
+    setSynthesisStep(`Synthesizing 3-scene blueprint with Gemini 3.7 Flash...`);
+
+    try {
+      const resp = await fetch('/api/campaigns/quick-synthesize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_name: projectName,
+          studio: studio,
+          target_audience: targetAudience,
+          category: 'Gaming & Entertainment',
+          style: style,
+          aspect_ratio: '9:16',
+          engine: videoEngine,
+        }),
+      });
+
+      if (!resp.ok) {
+        throw new Error(`Synthesis API error: HTTP ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      const newCamp = data.campaign;
+      const campId = newCamp.campaign_id;
+      setActiveCampaignId(campId);
+
+      // Populate blueprint scenes into timeline
+      if (newCamp.scenes && newCamp.scenes.length > 0) {
+        const mapped = newCamp.scenes.map((s, idx) => ({
+          scene_number: s.scene_number || idx + 1,
+          title: s.title || `Scene ${idx + 1}`,
+          timeStart: idx * 10.0,
+          timeEnd: (idx + 1) * 10.0,
+          camera_cues: s.camera_cues || 'Cinematic Dolly',
+          telemetry: { frame: 2400 + idx * 700, time: `01:${String(idx * 10).padStart(2, '0')}` },
+          script: s.voiceover_script || s.title,
+          audio_url: `/media/audio/${campId}/scene_${s.scene_number || idx + 1}.mp3`,
+        }));
+        setScenes(mapped);
+      }
+
+      // Poll render status every 1.5s until completion
+      const pollTimer = setInterval(async () => {
+        try {
+          const sResp = await fetch(`/api/campaigns/${campId}/render-status`);
+          if (sResp.ok) {
+            const sData = await sResp.json();
+            setSynthesisProgress(sData.progress_pct || 20);
+            setSynthesisStep(sData.current_step || 'Rendering video...');
+
+            if (sData.status === 'completed') {
+              clearInterval(pollTimer);
+              setIsSynthesizing(false);
+              setSynthesisActive(false);
+              setSynthesisProgress(100);
+              setSynthesisStep('Render complete! Video ready.');
+
+              // Swap in new video URL and restart playback smoothly
+              if (sData.video_url && videoPlayerRef.current) {
+                videoPlayerRef.current.src = sData.video_url;
+                videoPlayerRef.current.currentTime = 0;
+                setCurrentTime(0);
+                videoPlayerRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+              }
+            } else if (sData.status === 'failed') {
+              clearInterval(pollTimer);
+              setIsSynthesizing(false);
+              setSynthesisActive(false);
+              setSynthesisStep(`Render failed: ${sData.error || 'Check logs'}`);
+            }
+          }
+        } catch (pollErr) {
+          console.warn('Status poll warning:', pollErr);
+        }
+      }, 1500);
+
+    } catch (err) {
+      console.error('Failed to start synthesis:', err);
+      setIsSynthesizing(false);
+      setSynthesisActive(false);
+      alert(`Could not start video synthesis: ${err.message}`);
+    }
+  };
 
   // Video Play / Pause Toggle
   const toggleTimelinePlayback = () => {
@@ -447,6 +544,70 @@ export default function VideoStudio({
                   <option value="Cyberpunk Matrix Minimal">Cyberpunk Matrix Minimal</option>
                 </select>
               </div>
+
+              <div>
+                <label style={{ fontSize: '0.6rem', color: '#f59e0b', fontWeight: 700, display: 'block', marginBottom: '2px', fontFamily: 'var(--font-mono)' }}>
+                  AI Video Engine
+                </label>
+                <select
+                  value={videoEngine}
+                  onChange={(e) => setVideoEngine(e.target.value)}
+                  style={{
+                    width: '100%',
+                    background: '#07090f',
+                    border: '1px solid rgba(245, 158, 11, 0.4)',
+                    borderRadius: '5px',
+                    padding: '6px 8px',
+                    fontSize: '0.74rem',
+                    color: '#fbbf24',
+                    boxSizing: 'border-box',
+                    outline: 'none',
+                    cursor: 'pointer',
+                    fontWeight: 600
+                  }}
+                >
+                  <option value="veo">⚡ Google Veo 3.1 Cinema (Official)</option>
+                  <option value="turbo">⚡ Turbo Kinetic Compositor (High-Speed)</option>
+                </select>
+              </div>
+
+              <button
+                onClick={handleSynthesizeVideo}
+                disabled={isSynthesizing}
+                style={{
+                  marginTop: '4px',
+                  width: '100%',
+                  padding: '8px 10px',
+                  background: isSynthesizing 
+                    ? 'linear-gradient(135deg, #78350f, #451a03)' 
+                    : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  border: '1px solid #fbbf24',
+                  borderRadius: '6px',
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  fontSize: '0.74rem',
+                  cursor: isSynthesizing ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  boxShadow: isSynthesizing ? 'none' : '0 0 14px rgba(245, 158, 11, 0.35)',
+                  transition: 'all 0.2s ease',
+                  letterSpacing: '0.02em'
+                }}
+              >
+                {isSynthesizing ? (
+                  <>
+                    <span style={{ display: 'inline-block' }}>⏳</span>
+                    Synthesizing Video ({synthesisProgress}%)...
+                  </>
+                ) : (
+                  <>
+                    <span>⚡</span>
+                    Synthesize Campaign Video
+                  </>
+                )}
+              </button>
             </div>
           </div>
 
@@ -490,32 +651,45 @@ export default function VideoStudio({
               </span>
               <span style={{
                 fontSize: '0.58rem',
-                background: synthesisActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(100, 116, 139, 0.2)',
-                color: synthesisActive ? '#34d399' : '#94a3b8',
-                border: `1px solid ${synthesisActive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(100, 116, 139, 0.4)'}`,
+                background: isSynthesizing ? 'rgba(245, 158, 11, 0.25)' : (synthesisActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(100, 116, 139, 0.2)'),
+                color: isSynthesizing ? '#fbbf24' : (synthesisActive ? '#34d399' : '#94a3b8'),
+                border: `1px solid ${isSynthesizing ? 'rgba(245, 158, 11, 0.5)' : (synthesisActive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(100, 116, 139, 0.4)')}`,
                 padding: '1px 6px',
                 borderRadius: '3px',
                 fontWeight: 700,
                 fontFamily: 'var(--font-mono)'
               }}>
-                {synthesisActive ? 'ACTIVE' : 'IDLE'}
+                {isSynthesizing ? 'SYNTHESIZING' : (synthesisActive ? 'ACTIVE' : 'IDLE')}
               </span>
             </div>
 
-            {/* 16-Dot Pacing Indicator (12 active glowing amber, 4 dimmed) */}
+            {synthesisStep && (
+              <div style={{ fontSize: '0.64rem', color: '#f59e0b', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {synthesisStep}
+              </div>
+            )}
+
+            {/* 16-Dot Pacing Indicator */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '4px' }}>
-              {[...Array(16)].map((_, i) => (
-                <span
-                  key={i}
-                  style={{
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    background: i < 12 ? '#f59e0b' : 'rgba(255, 255, 255, 0.15)',
-                    boxShadow: i < 12 ? '0 0 6px #f59e0b' : 'none'
-                  }}
-                />
-              ))}
+              {[...Array(16)].map((_, i) => {
+                const activeCount = isSynthesizing 
+                  ? Math.max(1, Math.round((synthesisProgress / 100) * 16))
+                  : (synthesisActive ? 12 : 0);
+                const isActive = i < activeCount;
+                return (
+                  <span
+                    key={i}
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      background: isActive ? '#f59e0b' : 'rgba(255, 255, 255, 0.15)',
+                      boxShadow: isActive ? '0 0 6px #f59e0b' : 'none',
+                      transition: 'all 0.3s ease'
+                    }}
+                  />
+                );
+              })}
             </div>
           </div>
 

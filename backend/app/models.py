@@ -52,6 +52,18 @@ class RenderRequest(BaseModel):
     voice: Optional[str] = None
     aspect_ratio: Optional[str] = "9:16"
     include_subtitles: bool = True
+    engine: Optional[str] = "veo"  # "veo" for Google Veo 3.1 or "turbo" for instant kinetic compositor
+
+class QuickSynthesizeRequest(BaseModel):
+    product_name: str = Field(..., json_schema_extra={"example": "Neo-Racing Tokyo"})
+    studio: Optional[str] = Field("Ashky", json_schema_extra={"example": "Ashky"})
+    product_pitch: Optional[str] = Field(None, json_schema_extra={"example": "Autonomous AI cinema & marketing reel engine"})
+    target_audience: Optional[str] = Field("Gen Z/Alpha", json_schema_extra={"example": "Gen Z/Alpha"})
+    category: Optional[str] = Field("Gaming & Entertainment", json_schema_extra={"example": "Gaming & Entertainment"})
+    style: Optional[str] = Field("Cinematic Neon-Noir", json_schema_extra={"example": "Cinematic Neon-Noir"})
+    aspect_ratio: Optional[str] = Field("9:16", json_schema_extra={"example": "9:16"})
+    engine: Optional[str] = Field("veo", json_schema_extra={"example": "veo"})  # "veo" or "turbo"
+    voice: Optional[str] = None
 
 class RenderStatus(BaseModel):
     campaign_id: str

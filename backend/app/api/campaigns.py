@@ -15,6 +15,7 @@ from app.models import (
     GeminiAgenticInspectionRequest,
     GeminiAgenticVideoAnalysis,
     RenderRequest,
+    QuickSynthesizeRequest,
     RenderStatus,
 )
 from app.services.telemetry import (
@@ -27,6 +28,7 @@ from app.services.gemini_agent import gemini_agentic_engine
 from app.services.tts_engine import tts_engine, VIDEO_DIR
 from app.services.video_compositor import video_compositor, get_audio_duration
 from app.services.image_generator import image_generator
+from app.services.veo_engine import veo_engine
 from app.config import settings
 
 logger = logging.getLogger(__name__)
@@ -333,8 +335,9 @@ async def _execute_render(
     blueprint: CampaignBlueprint,
     voice: Optional[str] = None,
     aspect_ratio: str = "9:16",
+    engine: str = "veo",
 ):
-    """Background task: synthesizes voiceovers per scene and renders full video."""
+    """Background task: synthesizes voiceovers per scene, generates visuals via Veo 3.1/Gemini, and renders full video."""
     try:
         chosen_voice = voice or settings.EDGE_TTS_VOICE
 
@@ -356,11 +359,39 @@ async def _execute_render(
             voice=chosen_voice,
         )
 
+        video_paths = None
+        if engine == "veo":
+            RENDER_STATUS_STORE[campaign_id] = RenderStatus(
+                campaign_id=campaign_id,
+                status="rendering_scenes",
+                progress_pct=45,
+                current_step="Synthesizing cinematic scene shots with Google Veo 3.1...",
+            )
+            log_collector.record_log(
+                "INFO",
+                "veo_engine",
+                f"Generating {len(blueprint.scenes)} cinematic shots with Google Veo 3.1 for {campaign_id}"
+            )
+            try:
+                video_paths = await veo_engine.generate_campaign_videos(
+                    campaign_id=campaign_id,
+                    scenes=blueprint.scenes,
+                    aspect_ratio=aspect_ratio,
+                )
+                if video_paths:
+                    log_collector.record_log(
+                        "INFO",
+                        "veo_engine",
+                        f"Successfully generated {len(video_paths)} shots via Veo 3.1 for {campaign_id}"
+                    )
+            except Exception as veo_err:
+                logger.warning(f"Veo generation exception: {veo_err}. Falling back to image engine.")
+
         RENDER_STATUS_STORE[campaign_id] = RenderStatus(
             campaign_id=campaign_id,
             status="rendering_scenes",
-            progress_pct=45,
-            current_step="Generating high-contrast visual backgrounds via Gemini AI & cinema gradients...",
+            progress_pct=65,
+            current_step="Compositing visual backgrounds & high-contrast gradients...",
         )
         log_collector.record_log(
             "INFO",
@@ -377,7 +408,7 @@ async def _execute_render(
         RENDER_STATUS_STORE[campaign_id] = RenderStatus(
             campaign_id=campaign_id,
             status="assembling_video",
-            progress_pct=70,
+            progress_pct=85,
             current_step="Compositing visuals, kinetic captions, and audio via FFmpeg...",
         )
         log_collector.record_log(
@@ -392,6 +423,7 @@ async def _execute_render(
             audio_paths=audio_paths,
             aspect_ratio=aspect_ratio,
             image_paths=image_paths,
+            video_paths=video_paths,
         )
 
         file_size = os.path.getsize(final_output) if os.path.exists(final_output) else 0
@@ -428,6 +460,80 @@ async def _execute_render(
         )
 
 
+@router.post("/quick-synthesize")
+async def quick_synthesize_campaign(
+    request: QuickSynthesizeRequest,
+    background_tasks: BackgroundTasks,
+):
+    """
+    1-Click Video Synthesis:
+    Generates 3-scene director blueprint with Gemini 3.7 Flash and immediately
+    triggers background video rendering (Google Veo 3.1 or Turbo kinetic) and FFmpeg assembly.
+    """
+    campaign_id = f"camp_{uuid.uuid4().hex[:8]}"
+    created_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+    engine_mode = request.engine or "veo"
+    log_collector.record_log(
+        "INFO",
+        "director_agent",
+        f"Quick-synthesizing campaign for '{request.product_name}' ({request.category}, {request.aspect_ratio}) using {engine_mode.upper()} engine"
+    )
+
+    camp_req = CampaignRequest(
+        product_name=request.product_name,
+        product_pitch=request.product_pitch or f"High-impact marketing reel for {request.product_name} by {request.studio}",
+        target_audience=request.target_audience or "Gen Z/Alpha",
+        category=request.category or "Gaming & Entertainment",
+        aspect_ratio=request.aspect_ratio or "9:16",
+        style=request.style or "Cinematic Neon-Noir",
+    )
+
+    scenes, vision_scores, tokens_consumed = await gemini_agentic_engine.generate_campaign_blueprint(camp_req)
+
+    token_cost = round((tokens_consumed / 1_000_000.0) * 0.25, 4)
+    if token_cost <= 0.0001:
+        token_cost = 0.0008
+
+    total_duration = sum(s.duration_seconds for s in scenes)
+    if total_duration <= 0:
+        total_duration = 30.0
+
+    blueprint = CampaignBlueprint(
+        campaign_id=campaign_id,
+        product_name=request.product_name,
+        aspect_ratio=request.aspect_ratio or "9:16",
+        total_duration_seconds=round(total_duration, 1),
+        estimated_token_cost=token_cost,
+        scenes=scenes,
+        vision_qa=vision_scores,
+        created_at=created_at
+    )
+    CAMPAIGN_STORE[campaign_id] = blueprint
+
+    initial_status = RenderStatus(
+        campaign_id=campaign_id,
+        status="synthesizing_audio",
+        progress_pct=15,
+        current_step=f"Script synthesized! Starting voiceovers & {engine_mode.upper()} shots...",
+    )
+    RENDER_STATUS_STORE[campaign_id] = initial_status
+
+    background_tasks.add_task(
+        _execute_render,
+        campaign_id=campaign_id,
+        blueprint=blueprint,
+        voice=request.voice,
+        aspect_ratio=request.aspect_ratio or "9:16",
+        engine=engine_mode,
+    )
+
+    return {
+        "campaign": blueprint,
+        "render_status": initial_status
+    }
+
+
 @router.post("/{campaign_id}/render", response_model=RenderStatus)
 async def render_campaign_video(
     campaign_id: str,
@@ -454,6 +560,7 @@ async def render_campaign_video(
 
     aspect_ratio = render_request.aspect_ratio if render_request and render_request.aspect_ratio else blueprint.aspect_ratio
     voice = render_request.voice if render_request else None
+    engine = render_request.engine if render_request and render_request.engine else "veo"
 
     initial_status = RenderStatus(
         campaign_id=campaign_id,
@@ -469,6 +576,7 @@ async def render_campaign_video(
         blueprint=blueprint,
         voice=voice,
         aspect_ratio=aspect_ratio,
+        engine=engine,
     )
 
     return initial_status

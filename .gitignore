@@ -65,4 +65,5 @@ backend/media/*
 # Internal Agent Instructions & Local Docs
 GEMINI_3_8_FRONTEND_AGENT_INSTRUCTIONS.md
 *AGENT_INSTRUCTIONS*.md
+scratch/
 
