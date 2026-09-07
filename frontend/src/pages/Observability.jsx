@@ -18,13 +18,6 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
   const [ttftVal, setTtftVal] = useState(213);
   const [audioVal, setAudioVal] = useState(143);
   
-  // Live Animation Phase (Smooth rippling waves)
-  const [wavePhase, setWavePhase] = useState(0);
-
-  // Interactive Chart Tooltip & Metric Inspector
-  const [hoverChart, setHoverChart] = useState(null); // { type: 'gpu'|'ttft'|'audio', x: number, val: number, label: string }
-  const [inspectedMetric, setInspectedMetric] = useState(null); // 'gpu' | 'ttft' | 'audio' | null
-  const [timeRange, setTimeRange] = useState('Live'); // '5m' | '15m' | '1h' | 'Live'
 
   // DAG Interactive State
   const [selectedNode, setSelectedNode] = useState(null);
@@ -171,16 +164,6 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
     return () => clearInterval(interval);
   }, []);
 
-  // Smooth Live Wave Animation (Rippling fluid curves)
-  useEffect(() => {
-    let animFrame;
-    const animate = () => {
-      setWavePhase((prev) => (prev + 0.035) % (Math.PI * 2));
-      animFrame = requestAnimationFrame(animate);
-    };
-    animFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animFrame);
-  }, []);
 
   // Live Pulse Updates for Numbers
   useEffect(() => {
@@ -316,23 +299,6 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
     ]);
   };
 
-  // Dynamic Fluid SVG Wave Calculations (Matching Image 1 Visual Perfection)
-  // GPU Chart: Dual soaring wave curves with animated subtle breathing
-  const gpuSway = Math.sin(wavePhase) * 2;
-  const gpuPathOuter = `M 0,${46 + gpuSway} Q 35,${24 - gpuSway} 65,${54 + gpuSway} T 125,${4 + gpuSway * 0.5} Q 155,${38 - gpuSway} 175,${66 + gpuSway} T 220,${2 - gpuSway * 0.5} Q 245,${36 + gpuSway} 265,${66 - gpuSway} T 300,${30 + gpuSway}`;
-  const gpuPathInner = `M 0,${56 + gpuSway} Q 40,${34 - gpuSway} 75,${58 + gpuSway} T 135,${12 + gpuSway * 0.5} Q 165,${42 - gpuSway} 185,${64 + gpuSway} T 230,${8 - gpuSway * 0.5} Q 255,${38 + gpuSway} 275,${62 - gpuSway} T 300,${36 + gpuSway}`;
-  const gpuArea = `${gpuPathInner} L 300,70 L 0,70 Z`;
-
-  // TTFT Chart: Dual smooth violet curves
-  const ttftSway = Math.cos(wavePhase * 0.8) * 1.8;
-  const ttftPathOuter = `M 0,${44 + ttftSway} Q 45,${48 - ttftSway} 80,${56 + ttftSway} Q 150,${42 - ttftSway} 220,${16 + ttftSway * 0.5} Q 260,${32 - ttftSway} 300,${52 + ttftSway}`;
-  const ttftPathInner = `M 0,${52 + ttftSway} Q 45,${54 - ttftSway} 80,${58 + ttftSway} Q 140,${46 - ttftSway} 195,${26 + ttftSway * 0.5} Q 250,${44 - ttftSway} 300,${60 + ttftSway}`;
-  const ttftArea = `${ttftPathInner} L 300,70 L 0,70 Z`;
-
-  // Audio Bitrate Chart: Elegant emerald hill curve
-  const audioSway = Math.sin(wavePhase * 0.7) * 1.5;
-  const audioPath = `M 0,${58 + audioSway} Q 40,${57 - audioSway} 70,${54 + audioSway} Q 140,${42 - audioSway} 210,${16 + audioSway * 0.5} Q 255,${44 - audioSway} 300,${56 + audioSway}`;
-  const audioArea = `${audioPath} L 300,70 L 0,70 Z`;
 
   return (
     <div style={{
@@ -846,14 +812,14 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
         </div>
 
         {/* ------------------------------------------------------------ */}
-        {/* COLUMN 2: GRAFANA CLOUD TELEMETRY CHARTS (REAL-TIME & CLICKABLE) */}
+        {/* COLUMN 2: GRAFANA CLOUD TELEMETRY CHARTS (REAL-TIME) */}
         {/* ------------------------------------------------------------ */}
         <div style={{
           background: '#090c12',
           border: '1.5px solid #f59e0b',
           boxShadow: '0 0 16px rgba(245, 158, 11, 0.12)',
           borderRadius: '10px',
-          padding: '8px 12px 6px',
+          padding: '10px 12px 8px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -861,85 +827,76 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
           minHeight: 0,
           boxSizing: 'border-box',
           overflow: 'hidden',
-          gap: '5px',
-          position: 'relative'
+          gap: '6px'
         }}>
           {/* Header Row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ fontSize: '0.78rem', fontWeight: 800, margin: 0, color: '#ffffff', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
-              GRAFANA CLOUD TELEMETRY CHARTS (REAL-TIME)
+              Grafana Cloud Telemetry Charts (Real-Time)
             </h2>
             <MoreVertical size={13} color="#64748b" style={{ cursor: 'pointer' }} />
           </div>
 
           {/* Chart 1: GPU UTILIZATION (%) */}
-          <div 
-            onClick={() => setInspectedMetric(inspectedMetric === 'gpu' ? null : 'gpu')}
-            style={{
-              background: inspectedMetric === 'gpu' ? '#0d111a' : '#07090f',
-              border: `1px solid ${inspectedMetric === 'gpu' ? '#f59e0b' : 'rgba(255, 255, 255, 0.06)'}`,
-              borderRadius: '6px',
-              padding: '5px 8px',
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              minHeight: 0,
-              cursor: 'pointer',
-              position: 'relative'
-            }}
-            title="Click to inspect live PromQL GPU metrics"
-          >
+          <div style={{
+            background: '#07090f',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            borderRadius: '6px',
+            padding: '6px 8px',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: 0
+          }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.62rem', color: '#cbd5e1', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
-                GPU UTILIZATION (%) {inspectedMetric === 'gpu' && <span style={{ color: '#38bdf8', fontSize: '0.52rem' }}>(PromQL Active)</span>}
+              <span style={{ fontSize: '0.64rem', color: '#cbd5e1', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                GPU UTILIZATION (%)
               </span>
               <span style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
                 {gpuVal}%
               </span>
             </div>
 
-            {/* Dual Orange Curves SVG with Dynamic Waves */}
-            <div 
-              style={{ flex: 1, width: '100%', minHeight: '44px', position: 'relative' }}
-              onMouseMove={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const ratio = Math.max(0, Math.min(1, x / rect.width));
-                const val = Math.round(55 + ratio * 35);
-                setHoverChart({ type: 'gpu', x, val, label: `GPU: ${val}% · 16:42:15` });
-              }}
-              onMouseLeave={() => setHoverChart(null)}
-            >
-              <svg width="100%" height="100%" viewBox="0 0 300 70" preserveAspectRatio="none">
+            {/* Dual Orange Curves SVG */}
+            <div style={{ flex: 1, width: '100%', minHeight: '44px' }}>
+              <svg width="100%" height="100%" viewBox="0 0 300 60" preserveAspectRatio="none">
                 <defs>
-                  <linearGradient id="gpuWaveGrad" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="gpuGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.45" />
                     <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
-                <line x1="0" y1="15" x2="300" y2="15" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
-                <line x1="0" y1="35" x2="300" y2="35" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
-                <line x1="0" y1="55" x2="300" y2="55" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+                {/* Horizontal Gridlines */}
+                <line x1="0" y1="12" x2="300" y2="12" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+                <line x1="0" y1="28" x2="300" y2="28" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+                <line x1="0" y1="44" x2="300" y2="44" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
 
-                <path d={gpuArea} fill="url(#gpuWaveGrad)" />
-                <path d={gpuPathInner} fill="none" stroke="#d97706" strokeWidth="1.4" opacity="0.8" />
-                <path d={gpuPathOuter} fill="none" stroke="#f59e0b" strokeWidth="2.2" />
-
-                {hoverChart?.type === 'gpu' && (
-                  <line x1={hoverChart.x} y1="0" x2={hoverChart.x} y2="70" stroke="#38bdf8" strokeWidth="1" strokeDasharray="2 2" />
-                )}
+                {/* Main Curve 1 */}
+                <path
+                  d="M 0 45 Q 20 20 40 38 T 80 18 T 120 35 T 160 22 T 200 48 T 240 16 T 280 34 L 300 24 L 300 60 L 0 60 Z"
+                  fill="url(#gpuGrad)"
+                />
+                <path
+                  d="M 0 45 Q 20 20 40 38 T 80 18 T 120 35 T 160 22 T 200 48 T 240 16 T 280 34 L 300 24"
+                  fill="none"
+                  stroke="#f59e0b"
+                  strokeWidth="1.8"
+                />
+                {/* Second Accent Curve */}
+                <path
+                  d="M 0 48 Q 20 30 50 42 T 90 26 T 130 40 T 170 18 T 210 38 T 250 28 T 300 20"
+                  fill="none"
+                  stroke="#ea580c"
+                  strokeWidth="1.2"
+                  opacity="0.8"
+                />
               </svg>
-
-              {hoverChart?.type === 'gpu' && (
-                <div style={{ position: 'absolute', top: 2, left: Math.min(220, hoverChart.x), background: '#000000', border: '1px solid #f59e0b', padding: '2px 5px', borderRadius: '3px', fontSize: '0.52rem', color: '#ffffff', pointerEvents: 'none', zIndex: 10 }}>
-                  {hoverChart.label}
-                </div>
-              )}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.52rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
-              <div style={{ display: 'flex', gap: '12px' }}>
+            {/* X-Axis & Legend */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.54rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ display: 'flex', gap: '14px' }}>
                 <span>10:00</span>
                 <span>12:30</span>
                 <span>14:00</span>
@@ -954,25 +911,19 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
           </div>
 
           {/* Chart 2: TTFT (Time to First Token) */}
-          <div 
-            onClick={() => setInspectedMetric(inspectedMetric === 'ttft' ? null : 'ttft')}
-            style={{
-              background: inspectedMetric === 'ttft' ? '#0d111a' : '#07090f',
-              border: `1px solid ${inspectedMetric === 'ttft' ? '#c084fc' : 'rgba(255, 255, 255, 0.06)'}`,
-              borderRadius: '6px',
-              padding: '5px 8px',
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              minHeight: 0,
-              cursor: 'pointer',
-              position: 'relative'
-            }}
-            title="Click to inspect TTFT metrics"
-          >
+          <div style={{
+            background: '#07090f',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            borderRadius: '6px',
+            padding: '6px 8px',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: 0
+          }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.62rem', color: '#cbd5e1', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+              <span style={{ fontSize: '0.64rem', color: '#cbd5e1', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
                 TTFT (Time to First Token)
               </span>
               <span style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
@@ -980,46 +931,42 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
               </span>
             </div>
 
-            <div 
-              style={{ flex: 1, width: '100%', minHeight: '44px', position: 'relative' }}
-              onMouseMove={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const ratio = Math.max(0, Math.min(1, x / rect.width));
-                const val = Math.round(195 + ratio * 35);
-                setHoverChart({ type: 'ttft', x, val, label: `TTFT: ${val}ms · P95: 228ms` });
-              }}
-              onMouseLeave={() => setHoverChart(null)}
-            >
-              <svg width="100%" height="100%" viewBox="0 0 300 70" preserveAspectRatio="none">
+            {/* Dual Purple/Violet Curves SVG */}
+            <div style={{ flex: 1, width: '100%', minHeight: '44px' }}>
+              <svg width="100%" height="100%" viewBox="0 0 300 60" preserveAspectRatio="none">
                 <defs>
-                  <linearGradient id="ttftWaveGrad" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="ttftGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#a855f7" stopOpacity="0.4" />
                     <stop offset="100%" stopColor="#a855f7" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
-                <line x1="0" y1="15" x2="300" y2="15" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
-                <line x1="0" y1="35" x2="300" y2="35" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
-                <line x1="0" y1="55" x2="300" y2="55" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+                <line x1="0" y1="12" x2="300" y2="12" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+                <line x1="0" y1="28" x2="300" y2="28" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+                <line x1="0" y1="44" x2="300" y2="44" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
 
-                <path d={ttftArea} fill="url(#ttftWaveGrad)" />
-                <path d={ttftPathInner} fill="none" stroke="#9333ea" strokeWidth="1.4" opacity="0.85" />
-                <path d={ttftPathOuter} fill="none" stroke="#c084fc" strokeWidth="2.2" />
-
-                {hoverChart?.type === 'ttft' && (
-                  <line x1={hoverChart.x} y1="0" x2={hoverChart.x} y2="70" stroke="#38bdf8" strokeWidth="1" strokeDasharray="2 2" />
-                )}
+                <path
+                  d="M 0 32 Q 30 30 60 38 T 120 44 T 180 34 T 240 18 T 280 35 L 300 42 L 300 60 L 0 60 Z"
+                  fill="url(#ttftGrad)"
+                />
+                <path
+                  d="M 0 32 Q 30 30 60 38 T 120 44 T 180 34 T 240 18 T 280 35 L 300 42"
+                  fill="none"
+                  stroke="#c084fc"
+                  strokeWidth="1.8"
+                />
+                <path
+                  d="M 0 38 Q 40 36 80 46 T 160 38 T 240 28 T 300 48"
+                  fill="none"
+                  stroke="#9333ea"
+                  strokeWidth="1.2"
+                  opacity="0.8"
+                />
               </svg>
-
-              {hoverChart?.type === 'ttft' && (
-                <div style={{ position: 'absolute', top: 2, left: Math.min(220, hoverChart.x), background: '#000000', border: '1px solid #c084fc', padding: '2px 5px', borderRadius: '3px', fontSize: '0.52rem', color: '#ffffff', pointerEvents: 'none', zIndex: 10 }}>
-                  {hoverChart.label}
-                </div>
-              )}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.52rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
-              <div style={{ display: 'flex', gap: '12px' }}>
+            {/* X-Axis & Legend */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.54rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ display: 'flex', gap: '14px' }}>
                 <span>10:00</span>
                 <span>10:30</span>
                 <span>13:00</span>
@@ -1034,25 +981,19 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
           </div>
 
           {/* Chart 3: AUDIO SYNTHESIS BITRATE */}
-          <div 
-            onClick={() => setInspectedMetric(inspectedMetric === 'audio' ? null : 'audio')}
-            style={{
-              background: inspectedMetric === 'audio' ? '#0d111a' : '#07090f',
-              border: `1px solid ${inspectedMetric === 'audio' ? '#34d399' : 'rgba(255, 255, 255, 0.06)'}`,
-              borderRadius: '6px',
-              padding: '5px 8px',
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              minHeight: 0,
-              cursor: 'pointer',
-              position: 'relative'
-            }}
-            title="Click to inspect Audio Bitrate metrics"
-          >
+          <div style={{
+            background: '#07090f',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            borderRadius: '6px',
+            padding: '6px 8px',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: 0
+          }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.62rem', color: '#cbd5e1', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+              <span style={{ fontSize: '0.64rem', color: '#cbd5e1', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
                 AUDIO SYNTHESIS BITRATE
               </span>
               <span style={{ fontSize: '0.78rem', color: '#34d399', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
@@ -1060,45 +1001,35 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
               </span>
             </div>
 
-            <div 
-              style={{ flex: 1, width: '100%', minHeight: '44px', position: 'relative' }}
-              onMouseMove={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const ratio = Math.max(0, Math.min(1, x / rect.width));
-                const val = Math.round(138 + ratio * 10);
-                setHoverChart({ type: 'audio', x, val, label: `Bitrate: ${val} kbps · 48kHz` });
-              }}
-              onMouseLeave={() => setHoverChart(null)}
-            >
-              <svg width="100%" height="100%" viewBox="0 0 300 70" preserveAspectRatio="none">
+            {/* Green Waveform Curve SVG */}
+            <div style={{ flex: 1, width: '100%', minHeight: '44px' }}>
+              <svg width="100%" height="100%" viewBox="0 0 300 60" preserveAspectRatio="none">
                 <defs>
-                  <linearGradient id="audioWaveGrad" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="audioGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
                     <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
-                <line x1="0" y1="15" x2="300" y2="15" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
-                <line x1="0" y1="35" x2="300" y2="35" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
-                <line x1="0" y1="55" x2="300" y2="55" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+                <line x1="0" y1="12" x2="300" y2="12" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+                <line x1="0" y1="28" x2="300" y2="28" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+                <line x1="0" y1="44" x2="300" y2="44" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
 
-                <path d={audioArea} fill="url(#audioWaveGrad)" />
-                <path d={audioPath} fill="none" stroke="#34d399" strokeWidth="2.2" />
-
-                {hoverChart?.type === 'audio' && (
-                  <line x1={hoverChart.x} y1="0" x2={hoverChart.x} y2="70" stroke="#38bdf8" strokeWidth="1" strokeDasharray="2 2" />
-                )}
+                <path
+                  d="M 0 45 Q 30 46 60 44 T 120 34 T 180 24 T 240 38 L 300 46 L 300 60 L 0 60 Z"
+                  fill="url(#audioGrad)"
+                />
+                <path
+                  d="M 0 45 Q 30 46 60 44 T 120 34 T 180 24 T 240 38 L 300 46"
+                  fill="none"
+                  stroke="#34d399"
+                  strokeWidth="1.8"
+                />
               </svg>
-
-              {hoverChart?.type === 'audio' && (
-                <div style={{ position: 'absolute', top: 2, left: Math.min(220, hoverChart.x), background: '#000000', border: '1px solid #34d399', padding: '2px 5px', borderRadius: '3px', fontSize: '0.52rem', color: '#ffffff', pointerEvents: 'none', zIndex: 10 }}>
-                  {hoverChart.label}
-                </div>
-              )}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.52rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
-              <div style={{ display: 'flex', gap: '12px' }}>
+            {/* X-Axis & Legend */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.54rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ display: 'flex', gap: '14px' }}>
                 <span>10:00</span>
                 <span>18:30</span>
                 <span>18:00</span>
@@ -1111,40 +1042,6 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
               </div>
             </div>
           </div>
-
-          {/* PromQL Detail Drawer when a chart is clicked */}
-          {inspectedMetric && (
-            <div style={{
-              position: 'absolute',
-              top: '32px',
-              left: '10px',
-              right: '10px',
-              background: '#07090f',
-              border: '1.5px solid #f59e0b',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.95)',
-              borderRadius: '6px',
-              padding: '7px 9px',
-              fontSize: '0.62rem',
-              zIndex: 30
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                <span style={{ fontWeight: 800, color: '#f59e0b', fontFamily: 'var(--font-mono)' }}>
-                  {inspectedMetric.toUpperCase()} METRIC TELEMETRY INSPECTOR
-                </span>
-                <X size={13} style={{ cursor: 'pointer', color: '#94a3b8' }} onClick={() => setInspectedMetric(null)} />
-              </div>
-              <div style={{ background: '#0a0d14', padding: '4px 6px', borderRadius: '3px', fontFamily: 'var(--font-mono)', color: '#38bdf8', fontSize: '0.56rem', marginBottom: '4px' }}>
-                {inspectedMetric === 'gpu' && 'ashky_pipeline_gpu_utilization{instance="veo-worker-01"}'}
-                {inspectedMetric === 'ttft' && 'histogram_quantile(0.95, rate(ashky_ttft_seconds_bucket[5m]))'}
-                {inspectedMetric === 'audio' && 'rate(ashky_audio_synthesis_bitrate_kbps[1m])'}
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#cbd5e1', fontSize: '0.58rem' }}>
-                <span>P50: <strong>{inspectedMetric === 'gpu' ? '64%' : (inspectedMetric === 'ttft' ? '208ms' : '142 kbps')}</strong></span>
-                <span>P95: <strong>{inspectedMetric === 'gpu' ? '74%' : (inspectedMetric === 'ttft' ? '228ms' : '146 kbps')}</strong></span>
-                <span>P99: <strong>{inspectedMetric === 'gpu' ? '88%' : (inspectedMetric === 'ttft' ? '242ms' : '148 kbps')}</strong></span>
-              </div>
-            </div>
-          )}
 
         </div>
 
