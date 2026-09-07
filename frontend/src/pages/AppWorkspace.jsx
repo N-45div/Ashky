@@ -164,7 +164,9 @@ export default function AppWorkspace({ initialPreset = null }) {
             letterSpacing: '0.01em',
             fontFamily: 'var(--font-sans)'
           }}>
-            Ashky Video Studio
+            {activeTab === 'studio' && 'Ashky Video Studio'}
+            {activeTab === 'observability' && 'Ashky Observability & Pipeline Ops'}
+            {activeTab === 'geo' && 'Ashky AI Search & GEO Engine'}
           </span>
         </div>
 
