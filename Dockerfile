@@ -38,11 +38,11 @@ COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
 # Ensure media storage directories exist
 RUN mkdir -p /app/backend/media/audio /app/backend/media/video /app/backend/media/images
 
-ENV PORT=8000
+ENV PORT=8080
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app/backend
 
-EXPOSE 8000
+EXPOSE 8080 8000
 
 # Start FastAPI application via Uvicorn
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]

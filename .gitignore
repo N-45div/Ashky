@@ -41,6 +41,8 @@ coverage/
 .env.*.local
 *.pem
 *.key
+env.yaml
+*.env.yaml
 
 # IDE & OS
 .vscode/
