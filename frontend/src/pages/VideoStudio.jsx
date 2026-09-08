@@ -83,6 +83,62 @@ export default function VideoStudio({
   const [criticData, setCriticData] = useState(null);
   const [isCriticLoading, setIsCriticLoading] = useState(false);
 
+  // Agentic Self-Improving Video Harness State
+  const [evolutionLineage, setEvolutionLineage] = useState([]);
+  const [isEvolving, setIsEvolving] = useState(false);
+  const [showEvolutionModal, setShowEvolutionModal] = useState(false);
+
+  const fetchEvolutionLineage = async (campId) => {
+    const targetId = campId || activeCampaignId || 'camp_neon_circuit_01';
+    try {
+      const res = await fetch(`/api/campaigns/${targetId}/evolution-lineage`);
+      if (res.ok) {
+        const data = await res.json();
+        setEvolutionLineage(data.lineage || []);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch evolution lineage:', err);
+    }
+  };
+
+  const runSelfImprovingEvolution = async () => {
+    const targetId = activeCampaignId || 'camp_neon_circuit_01';
+    setIsEvolving(true);
+    showToast('🧬 Self-Improving Harness: Mutating Veo 3.1 prompts & safe zones...');
+    try {
+      const res = await fetch(`/api/campaigns/${targetId}/evolve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          campaign_id: targetId,
+          engine: videoEngine,
+          target_focus: '0-3s_hook'
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const record = data.evolution_record;
+        if (data.evolved_blueprint?.scenes) {
+          setScenes(data.evolved_blueprint.scenes);
+        }
+        await fetchEvolutionLineage(targetId);
+        await runAgenticVisionCritic(targetId);
+        showToast(`🧬 Video Evolved to v${record.iteration}: Hook Score ${record.hook_score_before} ➔ ${record.hook_score_after} (+${record.hook_score_after - record.hook_score_before})`);
+
+        setIsSynthesizing(true);
+        setSynthesisActive(true);
+        pollRenderStatus(targetId);
+      } else {
+        showToast('Evolution step failed. Check backend logs.');
+      }
+    } catch (err) {
+      console.error('Failed to run self-improving evolution:', err);
+      showToast('Evolution error: ' + err.message);
+    } finally {
+      setIsEvolving(false);
+    }
+  };
+
   const runAgenticVisionCritic = async (campId) => {
     const targetId = campId || activeCampaignId || 'camp_neon_circuit_01';
     setIsCriticLoading(true);
@@ -131,8 +187,9 @@ export default function VideoStudio({
           // If autoplay is blocked by browser policy without user gesture, user can click play
         });
     }
-    // Automatically trigger Gemini 3.8 Flash Vision Critic on load
+    // Automatically trigger Gemini 3.8 Flash Vision Critic and fetch evolution lineage on load
     runAgenticVisionCritic('camp_neon_circuit_01');
+    fetchEvolutionLineage('camp_neon_circuit_01');
   }, []);
 
   // Smooth 60 FPS Video & Playhead Runner Loop
@@ -1263,7 +1320,30 @@ export default function VideoStudio({
                 {isCriticLoading ? 'AUDITING FRAMES...' : 'GEMINI 3.8 FLASH CRITIC'}
               </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <button
+                onClick={runSelfImprovingEvolution}
+                disabled={isEvolving || isCriticLoading}
+                title="Feed Vision Critic defects into Self-Improving Harness to mutate prompts and evolve next video"
+                style={{
+                  background: isEvolving ? 'rgba(245, 158, 11, 0.25)' : 'rgba(245, 158, 11, 0.12)',
+                  border: '1px solid rgba(245, 158, 11, 0.45)',
+                  borderRadius: '4px',
+                  color: isEvolving ? '#fbbf24' : '#f59e0b',
+                  fontSize: '0.55rem',
+                  fontWeight: 700,
+                  padding: '3px 6px',
+                  cursor: (isEvolving || isCriticLoading) ? 'default' : 'pointer',
+                  fontFamily: 'var(--font-mono)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  boxShadow: isEvolving ? '0 0 10px rgba(245, 158, 11, 0.4)' : 'none',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                {isEvolving ? '🧬 EVOLVING...' : '🧬 AUTO-EVOLVE'}
+              </button>
               <button
                 onClick={() => runAgenticVisionCritic(activeCampaignId)}
                 disabled={isCriticLoading}
@@ -1470,6 +1550,65 @@ export default function VideoStudio({
               </div>
             );
           })()}
+
+          {/* Agentic Self-Improving Harness Reflexion Card */}
+          <div style={{
+            background: 'linear-gradient(145deg, rgba(245, 158, 11, 0.09) 0%, rgba(13, 16, 23, 0.95) 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.35)',
+            borderRadius: '6px',
+            padding: '7px 9px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            boxSizing: 'border-box'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ fontSize: '0.62rem', fontWeight: 800, color: '#f59e0b', fontFamily: 'var(--font-mono)' }}>
+                  🧬 SELF-IMPROVING HARNESS
+                </span>
+                <span style={{
+                  background: 'rgba(245, 158, 11, 0.25)',
+                  color: '#fbbf24',
+                  fontSize: '0.52rem',
+                  fontFamily: 'var(--font-mono)',
+                  padding: '1px 5px',
+                  borderRadius: '3px',
+                  fontWeight: 700
+                }}>
+                  v{evolutionLineage.length > 0 ? evolutionLineage.length + 1 : 1} {evolutionLineage.length > 0 ? 'EVOLVED' : 'INITIAL'}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEvolutionModal(true)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#38bdf8',
+                  fontSize: '0.55rem',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-mono)',
+                  textDecoration: 'underline'
+                }}
+              >
+                Lineage ({evolutionLineage.length})
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.60rem', color: '#cbd5e1', margin: 0, lineHeight: 1.35 }}>
+              {evolutionLineage.length > 0
+                ? evolutionLineage[evolutionLineage.length - 1]?.critic_summary
+                : "Harness listening to visual keyframe defects. Click '🧬 AUTO-EVOLVE' to mutate Veo 3.1 prompts, camera pacing & safe margins."}
+            </p>
+
+            {evolutionLineage.length > 0 && (
+              <div style={{ display: 'flex', gap: '8px', fontSize: '0.54rem', fontFamily: 'var(--font-mono)', color: '#10b981' }}>
+                <span>Delta: +{evolutionLineage[evolutionLineage.length - 1]?.hook_score_after - evolutionLineage[evolutionLineage.length - 1]?.hook_score_before} Hook Score</span>
+                <span>Drop-off: {evolutionLineage[evolutionLineage.length - 1]?.dropoff_pct_before}% ➔ {evolutionLineage[evolutionLineage.length - 1]?.dropoff_pct_after}%</span>
+              </div>
+            )}
+          </div>
 
         </div>
 
@@ -2073,6 +2212,171 @@ export default function VideoStudio({
         </div>
 
       </div>
+
+      {/* Evolution Lineage & Mutations Modal */}
+      {showEvolutionModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.82)',
+          backdropFilter: 'blur(10px)',
+          zIndex: 10000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            width: 'min(820px, 94vw)',
+            maxHeight: '86vh',
+            background: '#0a0d14',
+            border: '1px solid rgba(245, 158, 11, 0.45)',
+            borderRadius: '12px',
+            boxShadow: '0 24px 64px rgba(0, 0, 0, 0.9), 0 0 24px rgba(245, 158, 11, 0.2)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
+          }}>
+            {/* Modal Header */}
+            <div style={{
+              padding: '16px 20px',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(10, 13, 20, 0.8) 100%)'
+            }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '0.96rem', fontWeight: 800, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ color: '#f59e0b' }}>🧬</span> Self-Improving Harness: Evolution Lineage
+                </h3>
+                <span style={{ fontSize: '0.64rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
+                  Closed-loop reinforcement from Gemini 3.8 Flash Multimodal Vision Critic
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEvolutionModal(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '6px',
+                  color: '#cbd5e1',
+                  fontSize: '0.75rem',
+                  padding: '4px 10px',
+                  cursor: 'pointer'
+                }}
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {evolutionLineage.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '36px 20px', color: '#64748b' }}>
+                  <p style={{ fontSize: '0.84rem', margin: '0 0 8px', color: '#94a3b8' }}>
+                    No automated evolutions recorded yet for this campaign.
+                  </p>
+                  <p style={{ fontSize: '0.70rem', margin: 0, fontFamily: 'var(--font-mono)' }}>
+                    Click <strong>'🧬 AUTO-EVOLVE'</strong> in Column 3 to feed Gemini Vision Critic defects into the harness and mutate the prompts.
+                  </p>
+                </div>
+              ) : (
+                evolutionLineage.map((rec, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      background: '#0e121b',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '8px',
+                      padding: '14px 16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px'
+                    }}
+                  >
+                    {/* Iteration Header */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{
+                          background: 'rgba(245, 158, 11, 0.2)',
+                          color: '#fbbf24',
+                          border: '1px solid rgba(245, 158, 11, 0.4)',
+                          borderRadius: '4px',
+                          padding: '2px 8px',
+                          fontSize: '0.66rem',
+                          fontWeight: 800,
+                          fontFamily: 'var(--font-mono)'
+                        }}>
+                          ITERATION {rec.iteration}
+                        </span>
+                        <span style={{ fontSize: '0.62rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+                          {new Date(rec.timestamp).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '12px', fontSize: '0.66rem', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ color: '#10b981' }}>
+                          Hook Score: {rec.hook_score_before} ➔ <strong>{rec.hook_score_after}</strong> (+{rec.hook_score_after - rec.hook_score_before})
+                        </span>
+                        <span style={{ color: '#38bdf8' }}>
+                          3s Drop-off: {rec.dropoff_pct_before}% ➔ <strong>{rec.dropoff_pct_after}%</strong>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Summary */}
+                    <p style={{ margin: 0, fontSize: '0.72rem', color: '#e2e8f0', lineHeight: 1.4 }}>
+                      {rec.critic_summary}
+                    </p>
+
+                    {/* Applied Mutations */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <span style={{ fontSize: '0.58rem', fontWeight: 800, color: '#f59e0b', fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
+                        Autonomous Mutations Applied ({rec.mutations_applied?.length || 0}):
+                      </span>
+                      {rec.mutations_applied?.map((m, mIdx) => (
+                        <div
+                          key={mIdx}
+                          style={{
+                            background: '#07090f',
+                            border: '1px solid rgba(255, 255, 255, 0.05)',
+                            borderRadius: '6px',
+                            padding: '8px 10px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '4px',
+                            fontSize: '0.66rem'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ color: '#38bdf8', fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: '0.60rem' }}>
+                              Scene {m.target_scene} • {m.mutation_type}
+                            </span>
+                            <span style={{ color: '#94a3b8', fontSize: '0.58rem', fontStyle: 'italic' }}>
+                              {m.critic_rationale}
+                            </span>
+                          </div>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '2px' }}>
+                            <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '5px 8px', borderRadius: '4px' }}>
+                              <span style={{ fontSize: '0.54rem', color: '#f87171', display: 'block', fontWeight: 700 }}>ORIGINAL</span>
+                              <span style={{ color: '#cbd5e1', fontSize: '0.62rem' }}>{m.original_value}</span>
+                            </div>
+                            <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '5px 8px', borderRadius: '4px' }}>
+                              <span style={{ fontSize: '0.54rem', color: '#34d399', display: 'block', fontWeight: 700 }}>MUTATED & EVOLVED</span>
+                              <span style={{ color: '#ffffff', fontSize: '0.62rem', fontWeight: 600 }}>{m.mutated_value}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating In-App Toast Notification */}
       {toastMsg && (

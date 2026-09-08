@@ -210,6 +210,39 @@ flowchart LR
 
 ---
 
+## 5.1. Agentic Closed-Loop Self-Improving Video Harness (Reflexion Loop)
+
+The **Agentic Self-Improving Video Harness** transforms passive computer vision critique into an active, autonomous reinforcement cycle:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Founder as Creator / Video Studio
+    participant Critic as Gemini 3.8 Flash Vision Critic
+    participant Harness as Self-Improving Harness Agent
+    participant Veo as Google Veo 3.1 Engine
+    participant Compositor as FFmpeg Video Compositor
+
+    Founder->>Critic: POST /api/campaigns/{id}/agentic-inspect (Keyframes 0.8s, 2.2s, 8.5s)
+    Critic-->>Harness: Defect Report (Pacing stall at 2.2s, caption safe-margin clip, dropoff 47%)
+    Founder->>Harness: POST /api/campaigns/{id}/evolve
+    activate Harness
+    Harness->>Harness: Reflexion Prompting: Mutate visual prompts & kinetic camera cues
+    Harness->>Harness: Record Lineage: v1 ➔ v2 (+24 Hook Score, -29% Drop-off)
+    Harness->>Veo: Regenerate Scene 1 & 2 with volumetric lighting & 1.8s whip-zoom
+    Harness->>Compositor: Re-composite 9:16 vertical canvas with +40px safe-zone padding
+    deactivate Harness
+    Compositor-->>Founder: Evolved Video Ready (Iteration 2) with Lineage Diffs
+```
+
+### Evolutionary Mutations Applied by the Harness:
+1. **Pacing Stall Elimination (`CAMERA_KINETIC_BOOST`)**: Automatically injects a 0.3s whip-zoom or rotational cutaway before 2.0s when a visual freeze is detected between 0.8s and 2.2s.
+2. **Safe-Zone Text Clearance (`SAFE_ZONE_ADJUSTMENT`)**: Dynamically shifts caption overlays and CTA buttons inward by +40px when horizontal border clipping is observed.
+3. **Visual Prompt Elevation (`PROMPT_EVOLUTION`)**: Infuses volumetric haze, directional neon lighting, and high-velocity camera tracking into Veo 3.1 generation prompts.
+4. **Lineage Ledger**: Tracks every generational iteration (`v1 ➔ v2 ➔ v3`) with before/after retention scores and exact prompt diffs.
+
+---
+
 ## 6. Generative Engine Optimization (GEO) & Schema Grounding
 
 Modern software discovery is shifting from traditional keyword search to LLM-grounded answers. Ashky measures and influences how AI answer engines cite products.

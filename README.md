@@ -30,6 +30,7 @@
 3. **Google Veo 3.1 AI Generation Engine**: Deep integration with Google DeepMind's `veo-3.1-fast-generate-preview` and `veo-3.1-generate-preview` for cinematic photorealistic b-roll generation.
 4. **Generative Engine Optimization (GEO)**: Measuring and maximizing brand citation authority across AI answer engines (**Google Gemini**, **Perplexity AI**, **ChatGPT Search**) and generating 1-click **Schema.org VideoObject JSON-LD** to ground AI search citations.
 5. **Grafana Cloud Observability & Official Hosted MCP Server**: Built-in Prometheus telemetry (`/metrics`), Loki error traces, and full **Model Context Protocol (MCP)** JSON-RPC 2.0 dispatch (`https://mcp.grafana.com/mcp`) for autonomous SRE self-healing and closed-loop retention re-writing.
+6. **Agentic Self-Improving Video Harness**: Closed-loop reinforcement from visual AI feedback (Reflexion loop). Multimodal keyframe defects (safe margin clipping, pacing stalls, contrast flaws) feed directly into Gemini 3.8 Flash to iteratively mutate Veo 3.1 prompts, camera kinetic cues, and safe-zone typography across versioned lineages (v1 ➔ v2 ➔ v3).
 
 For full architectural blueprints, see **[ARCHITECTURE.md](ARCHITECTURE.md)**.  
 For test verification logs and cURL recipes, see **[TESTING.md](TESTING.md)**.

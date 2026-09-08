@@ -17,6 +17,10 @@ from app.models import (
     RenderRequest,
     QuickSynthesizeRequest,
     RenderStatus,
+    HarnessMutation,
+    HarnessEvolutionRecord,
+    EvolutionRequest,
+    AutoImproveLoopRequest,
 )
 from app.services.telemetry import (
     record_campaign_metrics,
@@ -25,6 +29,7 @@ from app.services.telemetry import (
     log_collector
 )
 from app.services.gemini_agent import gemini_agentic_engine
+from app.services.feedback_harness import feedback_harness
 from app.services.tts_engine import tts_engine, VIDEO_DIR
 from app.services.video_compositor import video_compositor, get_audio_duration
 from app.services.image_generator import image_generator
@@ -630,4 +635,151 @@ async def download_campaign_video(campaign_id: str):
         media_type="video/mp4",
         filename=f"ashky_{campaign_id}.mp4",
     )
+
+
+# ==============================================================================
+# Agentic Self-Improving Video Harness Endpoints
+# ==============================================================================
+
+@router.post("/{campaign_id}/evolve")
+async def evolve_campaign_pipeline(
+    campaign_id: str,
+    background_tasks: BackgroundTasks,
+    request: Optional[EvolutionRequest] = None,
+):
+    """
+    Closed-Loop Feedback Step:
+    Runs Gemini 3.8 Flash Vision Critic on current video frames, feeds detected
+    visual defects and drop-off bottlenecks into the Self-Improving Harness,
+    mutates the blueprint prompts and safe margins, and starts background resynthesis.
+    """
+    if campaign_id not in CAMPAIGN_STORE:
+        if campaign_id == "camp_neon_circuit_01":
+            _seed_neon_campaign()
+        else:
+            raise HTTPException(status_code=404, detail="Campaign not found")
+
+    blueprint = CAMPAIGN_STORE[campaign_id]
+    engine_mode = (request.engine if request else None) or "veo"
+    target_focus = (request.target_focus if request else None) or "0-3s_hook"
+
+    log_collector.record_log(
+        "INFO",
+        "self_improving_harness",
+        f"Triggering closed-loop evolution for campaign {campaign_id} ({engine_mode.upper()} engine)"
+    )
+
+    # 1. Obtain current multimodal vision critique
+    critic_analysis = await gemini_agentic_engine.inspect_campaign_video(
+        blueprint, focus_area=target_focus
+    )
+
+    # 2. Mutate blueprint through the Self-Improving Harness
+    evolved_blueprint, evolution_record = await feedback_harness.evolve_campaign(
+        blueprint=blueprint,
+        critic_analysis=critic_analysis,
+    )
+
+    # 3. Update campaign store with evolved blueprint
+    CAMPAIGN_STORE[campaign_id] = evolved_blueprint
+
+    # 4. Trigger progressive video resynthesis in background
+    background_tasks.add_task(
+        _execute_render,
+        campaign_id=campaign_id,
+        blueprint=evolved_blueprint,
+        aspect_ratio=evolved_blueprint.aspect_ratio,
+        engine=engine_mode,
+    )
+
+    return {
+        "status": "evolved",
+        "iteration": evolution_record.iteration,
+        "evolution_record": evolution_record,
+        "evolved_blueprint": evolved_blueprint,
+        "critic_baseline": critic_analysis,
+    }
+
+
+@router.post("/evolve")
+async def evolve_direct(
+    request: EvolutionRequest,
+    background_tasks: BackgroundTasks,
+):
+    """Direct evolution endpoint taking JSON payload."""
+    return await evolve_campaign_pipeline(
+        campaign_id=request.campaign_id,
+        background_tasks=background_tasks,
+        request=request,
+    )
+
+
+@router.get("/{campaign_id}/evolution-lineage")
+async def get_campaign_evolution_lineage(campaign_id: str):
+    """Retrieves chronological evolution history and score deltas for a campaign."""
+    lineage = feedback_harness.get_lineage(campaign_id)
+    return {
+        "campaign_id": campaign_id,
+        "total_iterations": len(lineage),
+        "lineage": lineage,
+    }
+
+
+@router.post("/{campaign_id}/auto-improve")
+async def auto_improve_campaign_loop(
+    campaign_id: str,
+    background_tasks: BackgroundTasks,
+    request: Optional[AutoImproveLoopRequest] = None,
+):
+    """
+    Multi-Pass Autonomous Self-Improving Loop:
+    Executes iterative refinement until target retention score is achieved or max iterations reached.
+    """
+    if campaign_id not in CAMPAIGN_STORE:
+        if campaign_id == "camp_neon_circuit_01":
+            _seed_neon_campaign()
+        else:
+            raise HTTPException(status_code=404, detail="Campaign not found")
+
+    target_score = request.target_min_score if request else 80
+    max_iters = request.max_iterations if request else 3
+    engine_mode = (request.engine if request else None) or "veo"
+
+    blueprint = CAMPAIGN_STORE[campaign_id]
+    current_blueprint = blueprint
+    records: List[HarnessEvolutionRecord] = []
+
+    for _ in range(max_iters):
+        critic_analysis = await gemini_agentic_engine.inspect_campaign_video(
+            current_blueprint, focus_area="0-3s_hook"
+        )
+        if critic_analysis.overall_hook_retention_score >= target_score and len(records) > 0:
+            break
+
+        current_blueprint, record = await feedback_harness.evolve_campaign(
+            blueprint=current_blueprint,
+            critic_analysis=critic_analysis,
+        )
+        records.append(record)
+
+    CAMPAIGN_STORE[campaign_id] = current_blueprint
+
+    # Trigger final render
+    background_tasks.add_task(
+        _execute_render,
+        campaign_id=campaign_id,
+        blueprint=current_blueprint,
+        aspect_ratio=current_blueprint.aspect_ratio,
+        engine=engine_mode,
+    )
+
+    return {
+        "status": "auto_improved",
+        "target_score": target_score,
+        "final_predicted_score": records[-1].hook_score_after if records else 90,
+        "iterations_executed": len(records),
+        "records": records,
+        "evolved_blueprint": current_blueprint,
+    }
+
 
