@@ -151,17 +151,20 @@ async def test_api_evolution_endpoints(mock_blueprint, mock_critic_analysis):
         evolved_blueprint=mock_blueprint
     )
 
+    from app.api.campaigns import CAMPAIGN_STORE, _seed_neon_campaign
+    CAMPAIGN_STORE["camp_test_evolution_01"] = mock_blueprint
+
     with patch("app.api.campaigns._execute_render", new_callable=AsyncMock), \
          patch("app.api.campaigns.gemini_agentic_engine.inspect_campaign_video", return_value=mock_critic_analysis), \
          patch("app.api.campaigns.feedback_harness.evolve_campaign", return_value=(mock_blueprint, mock_record)):
         
-        feedback_harness.evolution_ledger["camp_neon_circuit_01"] = [mock_record]
+        feedback_harness.evolution_ledger["camp_test_evolution_01"] = [mock_record]
 
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
             # 1. Evolve campaign
-            res = await client.post("/api/campaigns/camp_neon_circuit_01/evolve", json={
-                "campaign_id": "camp_neon_circuit_01",
+            res = await client.post("/api/campaigns/camp_test_evolution_01/evolve", json={
+                "campaign_id": "camp_test_evolution_01",
                 "engine": "turbo"
             })
             assert res.status_code == 200
@@ -172,15 +175,15 @@ async def test_api_evolution_endpoints(mock_blueprint, mock_critic_analysis):
             assert data["evolution_record"]["hook_score_after"] >= data["evolution_record"]["hook_score_before"]
 
             # 2. Check Lineage
-            res_lineage = await client.get("/api/campaigns/camp_neon_circuit_01/evolution-lineage")
+            res_lineage = await client.get("/api/campaigns/camp_test_evolution_01/evolution-lineage")
             assert res_lineage.status_code == 200
             lineage_data = res_lineage.json()
             assert lineage_data["total_iterations"] >= 1
             assert len(lineage_data["lineage"]) >= 1
 
             # 3. Test Auto-Improve Loop
-            res_loop = await client.post("/api/campaigns/camp_neon_circuit_01/auto-improve", json={
-                "campaign_id": "camp_neon_circuit_01",
+            res_loop = await client.post("/api/campaigns/camp_test_evolution_01/auto-improve", json={
+                "campaign_id": "camp_test_evolution_01",
                 "target_min_score": 75,
                 "max_iterations": 1,
                 "engine": "turbo"
@@ -188,5 +191,9 @@ async def test_api_evolution_endpoints(mock_blueprint, mock_critic_analysis):
             assert res_loop.status_code == 200
             loop_data = res_loop.json()
             assert loop_data["status"] == "auto_improved"
+
+    # Always restore default demo campaign state
+    _seed_neon_campaign(force=True)
+
 
 

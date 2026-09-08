@@ -141,7 +141,7 @@ export default function LandingPage({ onNavigate, onSelectPreset }) {
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399' }} />
             <span style={{ fontWeight: 600, color: '#f8fafc' }}>Autonomous Video Growth Studio</span>
             <span style={{ color: '#64748b' }}>•</span>
-            <span>Gemini 3.8 Flash & Grafana Cloud</span>
+            <span>Gemini 3.8 Flash · Google Veo 3.1 · Self-Improving Harness · Grafana Cloud</span>
           </div>
 
           <h1 style={{
@@ -216,7 +216,7 @@ export default function LandingPage({ onNavigate, onSelectPreset }) {
             fontFamily: 'var(--font-mono)',
             letterSpacing: '0.02em'
           }}>
-            Gemini 3.8 Flash · Veo on Google Cloud · Grafana Cloud MCP
+            Gemini 3.8 Flash Multimodal Video Understanding · Google Veo 3.1 · Self-Improving Reflexion Harness · Grafana Cloud MCP
           </div>
         </div>
 
@@ -400,25 +400,33 @@ export default function LandingPage({ onNavigate, onSelectPreset }) {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.86rem', padding: '6px 8px', borderRadius: '6px', background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <RefreshCw size={14} color="#60a5fa" className="animate-spin" />
-                      <span style={{ fontWeight: 600, color: '#ffffff' }}>Render</span>
+                      <span style={{ fontWeight: 600, color: '#ffffff' }}>Render (Veo 3.1)</span>
                     </div>
-                    <span style={{ fontSize: '0.74rem', color: '#60a5fa', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>In progress · 2/3 scenes</span>
+                    <span style={{ fontSize: '0.74rem', color: '#60a5fa', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>Active · 2/3 scenes</span>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.86rem', padding: '6px 8px', borderRadius: '6px', background: 'rgba(255, 255, 255, 0.02)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Clock size={15} color="#94a3b8" />
-                      <span style={{ fontWeight: 500, color: '#94a3b8' }}>Hook review</span>
+                      <Eye size={15} color="#34d399" />
+                      <span style={{ fontWeight: 500, color: '#f0f3f6' }}>Vision Critic (Gemini 3.8)</span>
                     </div>
-                    <span style={{ fontSize: '0.74rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>Queued</span>
+                    <span style={{ fontSize: '0.74rem', color: '#34d399', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>Ready · 89/100</span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.86rem', padding: '6px 8px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <TrendingUp size={15} color="#fbbf24" />
+                      <span style={{ fontWeight: 600, color: '#fef3c7' }}>Self-Improving Harness</span>
+                    </div>
+                    <span style={{ fontSize: '0.74rem', color: '#fbbf24', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>Reflexion v1 ➔ v2 (+31)</span>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.86rem', padding: '6px 8px', borderRadius: '6px', background: 'rgba(255, 255, 255, 0.02)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Search size={15} color="#94a3b8" />
-                      <span style={{ fontWeight: 500, color: '#94a3b8' }}>AI discovery</span>
+                      <span style={{ fontWeight: 500, color: '#94a3b8' }}>AI GEO Discovery</span>
                     </div>
-                    <span style={{ fontSize: '0.74rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>Queued</span>
+                    <span style={{ fontSize: '0.74rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>Schema Ready</span>
                   </div>
                 </div>
               </div>
@@ -534,17 +542,17 @@ export default function LandingPage({ onNavigate, onSelectPreset }) {
               </p>
             </div>
 
-            {/* Stage 4: Improve */}
+            {/* Stage 4: Self-Improving Reflexion Harness */}
             <div className="matte-panel" style={{ padding: '22px', background: '#0d0f14', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>04 / IMPROVE</span>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>04 / REFLEXION HARNESS</span>
                 <TrendingUp size={18} color="#fbbf24" />
               </div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
-                Closed-Loop Variations
+                Self-Improving Video Harness
               </h3>
               <p style={{ fontSize: '0.86rem', color: '#9aa4b2', lineHeight: 1.5, margin: 0 }}>
-                Turns discovery gaps and low-retention scenes into targeted video briefs, continuously refining performance and conversion.
+                Gemini 3.8 Flash Vision Critic defects (0-2s kinetic stalls, safe-margin cropping) autonomously trigger Veo 3.1 prompt mutations and kinetic boosts across lineages (v1 ➔ v2 ➔ v3) until target retention is reached.
               </p>
             </div>
           </div>
@@ -823,15 +831,19 @@ export default function LandingPage({ onNavigate, onSelectPreset }) {
         }}>
           <div>
             <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700, fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
-              Google Cloud
+              Google Cloud & Veo 3.1
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#cbd5e1' }}>
-                <span>Gemini 3.8 Flash Director & Critic</span>
+                <span>Gemini 3.8 Flash Multimodal Critic</span>
                 <span style={{ color: '#34d399', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>Active</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#cbd5e1' }}>
-                <span>Veo on Google Cloud Video Synthesis</span>
+                <span>Google Veo 3.1 Synthesis Engine</span>
+                <span style={{ color: '#34d399', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>Active</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#cbd5e1' }}>
+                <span>Self-Improving Reflexion Harness</span>
                 <span style={{ color: '#34d399', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>Active</span>
               </div>
             </div>

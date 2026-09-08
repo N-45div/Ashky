@@ -4,7 +4,7 @@ import json
 import uuid
 import datetime
 import logging
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import StreamingResponse, FileResponse
 from app.models import (
@@ -44,9 +44,9 @@ router = APIRouter(prefix="/api/campaigns", tags=["campaigns"])
 CAMPAIGN_STORE: dict[str, CampaignBlueprint] = {}
 RENDER_STATUS_STORE: dict[str, RenderStatus] = {}
 
-def _seed_neon_campaign():
+def _seed_neon_campaign(force: bool = False):
     """Pre-seed default campaign so real TTS & video rendering works out-of-the-box."""
-    if "camp_neon_circuit_01" not in CAMPAIGN_STORE:
+    if force or "camp_neon_circuit_01" not in CAMPAIGN_STORE:
         CAMPAIGN_STORE["camp_neon_circuit_01"] = CampaignBlueprint(
             campaign_id="camp_neon_circuit_01",
             product_name="Neon Circuit",
@@ -747,7 +747,7 @@ async def auto_improve_campaign_loop(
 
     blueprint = CAMPAIGN_STORE[campaign_id]
     current_blueprint = blueprint
-    records: List[HarnessEvolutionRecord] = []
+    records: list[HarnessEvolutionRecord] = []
 
     for _ in range(max_iters):
         critic_analysis = await gemini_agentic_engine.inspect_campaign_video(

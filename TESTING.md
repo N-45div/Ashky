@@ -2,7 +2,7 @@
 
 > **Production Testing & Verification Standard**  
 > Validated on Python 3.12.10 | FastAPI 0.115+ | pytest 8.4.2 | Node.js 18+ | Vite 6.2+  
-> **100% Verified Pass: 21 of 21 Automated Tests Passing**  
+> **100% Verified Pass: 23 of 23 Automated Tests Passing**  
 > 🌐 **Live Cloud Run Deployment**: `https://ashky-949122795167.us-central1.run.app` (Verified Live)
 
 ---
@@ -21,8 +21,9 @@ Ashky adheres to a multi-tiered verification standard designed to guarantee zero
    - Strict Prometheus 0.0.4 text format validation for all scrape targets.
 
 3. **Multi-Agent Simulation & Live Inspection**:
-   - Gemini 3.5 Flash Agentic Video Understanding (*Think → Act → Observe*) tested under both deterministic simulation fixtures and live Gemini API execution.
+   - Gemini 3.8 Flash Agentic Video Understanding (*Think → Act → Observe*) tested under both deterministic simulation fixtures and live Gemini API execution.
    - Closed-loop retention optimization verified end-to-end: detecting retention drops and triggering Director re-writes.
+   - Agentic Self-Improving Video Harness verified with Reflexion memory ledger and lineage retention.
 
 ---
 
@@ -30,10 +31,11 @@ Ashky adheres to a multi-tiered verification standard designed to guarantee zero
 
 ```mermaid
 graph TD
-    A[Pytest Runner: 21 Items] --> B[test_foundation.py: 8 Tests]
+    A[Pytest Runner: 23 Items] --> B[test_foundation.py: 8 Tests]
     A --> C[test_gemini_agentic.py: 3 Tests]
     A --> D[test_grafana_cloud.py: 5 Tests]
     A --> E[test_video_pipeline.py: 5 Tests]
+    A --> F[test_feedback_harness.py: 2 Tests]
     
     B --> B1[Health & Readiness]
     B --> B2[Prometheus Text Metrics]
