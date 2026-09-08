@@ -2,7 +2,8 @@
 
 > **Production Testing & Verification Standard**  
 > Validated on Python 3.12.10 | FastAPI 0.115+ | pytest 8.4.2 | Node.js 18+ | Vite 6.2+  
-> **100% Verified Pass: 21 of 21 Automated Tests Passing**
+> **100% Verified Pass: 21 of 21 Automated Tests Passing**  
+> 🌐 **Live Cloud Run Deployment**: `https://ashky-949122795167.us-central1.run.app` (Verified Live)
 
 ---
 

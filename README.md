@@ -11,6 +11,12 @@
 [![Grafana Cloud MCP](https://img.shields.io/badge/Grafana%20Cloud-MCP%20Enabled-F46800.svg)](https://mcp.grafana.com)
 [![Gemini 3.5 Flash](https://img.shields.io/badge/Google%20Gemini-Agentic%20Video-4285F4.svg)](https://ai.google.dev)
 [![Tests Passing](https://img.shields.io/badge/Tests-21%2F21%20Passed-brightgreen.svg)](TESTING.md)
+[![Google Cloud Run](https://img.shields.io/badge/Google%20Cloud%20Run-Live%20Demo-4285F4?logo=googlecloud&logoColor=white)](https://ashky-949122795167.us-central1.run.app)
+
+> 🚀 **Live Production Deployment**: [https://ashky-949122795167.us-central1.run.app](https://ashky-949122795167.us-central1.run.app)  
+> 📊 **Prometheus Metrics**: [https://ashky-949122795167.us-central1.run.app/metrics](https://ashky-949122795167.us-central1.run.app/metrics)  
+> 🩺 **System Health**: [https://ashky-949122795167.us-central1.run.app/health](https://ashky-949122795167.us-central1.run.app/health)  
+> 🤖 **MCP JSON-RPC 2.0**: `https://ashky-949122795167.us-central1.run.app/mcp`
 
 ---
 
