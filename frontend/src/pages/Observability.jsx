@@ -40,6 +40,13 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
   const [cliInput, setCliInput] = useState('');
   const [activeTabTerm, setActiveTabTerm] = useState('logs'); // 'logs' | 'mcp_tools'
 
+  // Non-blocking in-app toast notification state
+  const [toastMsg, setToastMsg] = useState(null);
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 2800);
+  };
+
   const [logs, setLogs] = useState([
     { id: 1, ts: '10:45:12', msg: "executing 'tool_call_1' (generate_3scene_script), latency =25ms, output: {scenes: 3}", type: 'tool', span: 'tool_call_1' },
     { id: 2, ts: '10:45:13', msg: "executing 'tool_call_2' (veo_stream_firstframe), latency =25ms, output: {status: 'ok'}", type: 'tool', span: 'tool_call_2' },
@@ -623,7 +630,7 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
               </button>
               <button 
                 type="button" 
-                onClick={() => alert(`Active Trace Sample: 100% · Engine: Google Veo 3.1 & Gemini 3.7 Flash · Status: Live`)}
+                onClick={() => showToast('Active Trace Sample: 100% · Engine: Google Veo 3.1 & Gemini 3.7 Flash · Status: Live')}
                 title="DAG Settings"
                 style={{ background: '#07090f', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '3px', padding: '2px 4px', color: '#94a3b8', cursor: 'pointer', display: 'flex' }}
               >
@@ -1223,7 +1230,7 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
                   clear
                 </span>
                 <Minus size={9} style={{ cursor: 'pointer' }} />
-                <Settings size={9} style={{ cursor: 'pointer' }} onClick={() => alert("Terminal Config: Buffer size 1000 lines, Log level INFO, Auto-scroll enabled")} />
+                <Settings size={9} style={{ cursor: 'pointer' }} onClick={() => showToast('Terminal Config: Buffer 1000 lines, Log level INFO, Auto-scroll enabled')} />
               </div>
             </div>
 
@@ -1408,6 +1415,32 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
         </div>
 
       </div>
+
+      {/* Floating In-App Toast Notification */}
+      {toastMsg && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '24px',
+          background: '#0d1017',
+          color: '#fbbf24',
+          border: '1px solid #f59e0b',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.85), 0 0 12px rgba(245, 158, 11, 0.2)',
+          borderRadius: '6px',
+          padding: '6px 14px',
+          fontSize: '0.72rem',
+          fontWeight: 700,
+          fontFamily: 'var(--font-mono)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          pointerEvents: 'none'
+        }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b', boxShadow: '0 0 6px #f59e0b' }} />
+          <span>{toastMsg}</span>
+        </div>
+      )}
 
     </div>
   );

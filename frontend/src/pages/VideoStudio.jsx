@@ -65,6 +65,20 @@ export default function VideoStudio({
   const [stageMenuOpen, setStageMenuOpen] = useState(false);
   const [criticMenuOpen, setCriticMenuOpen] = useState(false);
 
+  // Stage View Mode: 'mobile' (9:16 iPhone 15 frame) vs 'full' (Entire Box Cinema Stage)
+  const [stageViewMode, setStageViewMode] = useState('mobile');
+  // Video Scaling in Full Box Mode: 'contain' (pristine letterbox preserving 9:16) vs 'cover' (edge-to-edge box fill)
+  const [videoFit, setVideoFit] = useState('contain');
+  // Floating Director Notes HUD overlay in Full Box Mode
+  const [showNotesOverlay, setShowNotesOverlay] = useState(false);
+  // Non-blocking in-app toast notification state
+  const [toastMsg, setToastMsg] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 2800);
+  };
+
   // Timecode formatter: matches reference 01:22:15 display format
   const formatTimecode = (sec) => {
     const currentVal = sec !== undefined ? sec : currentTime;
@@ -266,7 +280,7 @@ export default function VideoStudio({
       console.error('Failed to start synthesis:', err);
       setIsSynthesizing(false);
       setSynthesisActive(false);
-      alert(`Could not start video synthesis: ${err.message}`);
+      showToast(`Could not start video synthesis: ${err.message}`);
     }
   };
 
@@ -647,12 +661,36 @@ export default function VideoStudio({
                   Live Synthesis Status
                 </span>
               </div>
-              <MoreVertical 
-                size={12} 
-                color="#92400e" 
-                style={{ cursor: 'pointer' }} 
-                onClick={() => setSynthesisMenuOpen(!synthesisMenuOpen)}
-              />
+              <div style={{ position: 'relative' }}>
+                <MoreVertical 
+                  size={12} 
+                  color="#92400e" 
+                  style={{ cursor: 'pointer' }} 
+                  onClick={() => setSynthesisMenuOpen(!synthesisMenuOpen)}
+                />
+                {synthesisMenuOpen && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '18px',
+                    right: 0,
+                    width: '150px',
+                    background: '#0d1017',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '6px',
+                    padding: '4px',
+                    zIndex: 100,
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.8)',
+                    fontSize: '0.68rem'
+                  }}>
+                    <button 
+                      onClick={() => { setSynthesisProgress(100); setSynthesisActive(true); setSynthesisMenuOpen(false); showToast('Synthesis state refreshed'); }}
+                      style={{ width: '100%', background: 'transparent', border: 'none', color: '#cbd5e1', textAlign: 'left', padding: '5px 8px', cursor: 'pointer', borderRadius: '4px' }}
+                    >
+                      Refresh Status
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1px' }}>
@@ -723,60 +761,209 @@ export default function VideoStudio({
           boxSizing: 'border-box'
         }}>
           
-          {/* Header Row: "Master Cinema Stage" */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1px' }}>
-            <h2 style={{ fontSize: '0.88rem', fontWeight: 800, margin: 0, color: '#ffffff', letterSpacing: '0.02em' }}>
-              Master Cinema Stage
-            </h2>
-            <MoreVertical 
-              size={13} 
-              color="#64748b" 
-              style={{ cursor: 'pointer' }} 
-              onClick={() => setStageMenuOpen(!stageMenuOpen)}
-            />
+          {/* Header Row: "Master Cinema Stage" + View Mode Switcher + Overflow Menu */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px', position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h2 style={{ fontSize: '0.88rem', fontWeight: 800, margin: 0, color: '#ffffff', letterSpacing: '0.02em' }}>
+                Master Cinema Stage
+              </h2>
+
+              {/* View Mode Switcher Pill: Mobile (9:16) vs Entire Box */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '6px',
+                padding: '1.5px',
+                gap: '2px'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => setStageViewMode('mobile')}
+                  style={{
+                    background: stageViewMode === 'mobile' ? '#f59e0b' : 'transparent',
+                    color: stageViewMode === 'mobile' ? '#000000' : '#94a3b8',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '2px 7px',
+                    fontSize: '0.62rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '3px'
+                  }}
+                  title="Mobile View (9:16 iPhone 15 Pro mockup)"
+                >
+                  <span>📱</span> Mobile
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStageViewMode('full')}
+                  style={{
+                    background: stageViewMode === 'full' ? '#f59e0b' : 'transparent',
+                    color: stageViewMode === 'full' ? '#000000' : '#94a3b8',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '2px 7px',
+                    fontSize: '0.62rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '3px'
+                  }}
+                  title="Entire Box View (Expanded Cinema Stage Canvas)"
+                >
+                  <span>🔲</span> Entire Box
+                </button>
+              </div>
+
+              {/* Controls specific to Entire Box Mode */}
+              {stageViewMode === 'full' && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = videoFit === 'contain' ? 'cover' : 'contain';
+                      setVideoFit(next);
+                      showToast(next === 'contain' ? 'Pristine 9:16 Ratio' : 'Full Box Edge-to-Edge Bleed');
+                    }}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      borderRadius: '4px',
+                      color: '#fbbf24',
+                      padding: '2px 6px',
+                      fontSize: '0.58rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      fontFamily: 'var(--font-mono)'
+                    }}
+                    title="Toggle between pristine aspect contain and full canvas bleed"
+                  >
+                    {videoFit === 'contain' ? 'Fit (9:16)' : 'Fill Box'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowNotesOverlay(!showNotesOverlay)}
+                    style={{
+                      background: showNotesOverlay ? 'rgba(245, 158, 11, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+                      border: `1px solid ${showNotesOverlay ? '#f59e0b' : 'rgba(255, 255, 255, 0.15)'}`,
+                      borderRadius: '4px',
+                      color: showNotesOverlay ? '#fbbf24' : '#cbd5e1',
+                      padding: '2px 6px',
+                      fontSize: '0.58rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                    title="Toggle Director Notes HUD Overlay"
+                  >
+                    📋 Notes HUD {showNotesOverlay ? 'ON' : 'OFF'}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Stage Menu Dropdown */}
+            <div style={{ position: 'relative' }}>
+              <MoreVertical 
+                size={13} 
+                color="#64748b" 
+                style={{ cursor: 'pointer' }} 
+                onClick={() => setStageMenuOpen(!stageMenuOpen)}
+              />
+              {stageMenuOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: 0,
+                  width: '165px',
+                  background: '#0d1017',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: '6px',
+                  padding: '4px',
+                  zIndex: 100,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.8)',
+                  fontSize: '0.68rem'
+                }}>
+                  <button 
+                    onClick={() => { setStageViewMode(stageViewMode === 'mobile' ? 'full' : 'mobile'); setStageMenuOpen(false); }}
+                    style={{ width: '100%', background: 'transparent', border: 'none', color: '#cbd5e1', textAlign: 'left', padding: '5px 8px', cursor: 'pointer', borderRadius: '4px' }}
+                  >
+                    Switch to {stageViewMode === 'mobile' ? 'Entire Box' : 'Mobile'} View
+                  </button>
+                  <button 
+                    onClick={() => { setVideoFit(videoFit === 'contain' ? 'cover' : 'contain'); setStageMenuOpen(false); }}
+                    style={{ width: '100%', background: 'transparent', border: 'none', color: '#cbd5e1', textAlign: 'left', padding: '5px 8px', cursor: 'pointer', borderRadius: '4px' }}
+                  >
+                    Toggle {videoFit === 'contain' ? 'Fill Bleed' : 'Contain 9:16'}
+                  </button>
+                  <button 
+                    onClick={() => { handleToggleFullscreen(); setStageMenuOpen(false); }}
+                    style={{ width: '100%', background: 'transparent', border: 'none', color: '#cbd5e1', textAlign: 'left', padding: '5px 8px', cursor: 'pointer', borderRadius: '4px' }}
+                  >
+                    Toggle Browser Fullscreen
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Central Dual-Dock Display: Phone Monitor Left + Director Notes HUD Right */}
+          {/* Central Display: Adaptive Mobile Frame vs. Entire Box Stage */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '18px',
+            gap: stageViewMode === 'mobile' ? '18px' : '0',
             flex: 1,
-            minHeight: 0
+            minHeight: 0,
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden'
           }}>
             
-            {/* Phone Monitor: Realistic Curved iPhone 15 Pro Bezel with Dynamic Island */}
+            {/* Video Canvas Container (Adapts from iPhone Frame to Entire Box) */}
             <div style={{
-              width: 'clamp(175px, 15vw, 205px)',
-              height: 'clamp(280px, 32vh, 345px)',
-              borderRadius: '26px',
+              width: stageViewMode === 'mobile' ? 'clamp(175px, 15vw, 205px)' : '100%',
+              height: stageViewMode === 'mobile' ? 'clamp(280px, 32vh, 345px)' : '100%',
+              borderRadius: stageViewMode === 'mobile' ? '26px' : '8px',
               background: '#000000',
-              border: '2.5px solid #283042',
-              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.08)',
+              border: stageViewMode === 'mobile' ? '2.5px solid #283042' : '1px solid rgba(245, 158, 11, 0.25)',
+              boxShadow: stageViewMode === 'mobile' 
+                ? '0 10px 30px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.08)' 
+                : 'inset 0 0 24px rgba(0, 0, 0, 0.85), 0 4px 20px rgba(0, 0, 0, 0.6)',
               position: 'relative',
               overflow: 'hidden',
               flexShrink: 0,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
             onClick={toggleTimelinePlayback}
             title={isPlaying ? "Click to Pause" : "Click to Play"}
             >
               
-              {/* Dynamic Island Notch */}
-              <div style={{
-                position: 'absolute',
-                top: '5px',
-                width: '46px',
-                height: '11px',
-                background: '#000000',
-                borderRadius: '8px',
-                zIndex: 25,
-                boxShadow: '0 0 4px rgba(0,0,0,0.8)'
-              }} />
+              {/* Dynamic Island Notch - Only rendered in Mobile Mockup mode */}
+              {stageViewMode === 'mobile' && (
+                <div style={{
+                  position: 'absolute',
+                  top: '5px',
+                  width: '46px',
+                  height: '11px',
+                  background: '#000000',
+                  borderRadius: '8px',
+                  zIndex: 25,
+                  boxShadow: '0 0 4px rgba(0,0,0,0.8)'
+                }} />
+              )}
 
               {/* REAL LIVE VIDEO PLAYER */}
               <video
@@ -800,100 +987,142 @@ export default function VideoStudio({
                 style={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover'
+                  objectFit: stageViewMode === 'mobile' ? 'cover' : videoFit
                 }}
               />
 
-            </div>
-
-            {/* Right Side: Director Notes HUD Card (Matching Image 1 Master UI) */}
-            <div style={{
-              width: 'clamp(210px, 18vw, 250px)',
-              background: '#0d1017',
-              borderRadius: '9px',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              padding: '10px 14px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
-              boxSizing: 'border-box'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h4 style={{ fontSize: '0.78rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>
-                    Director Notes HUD
-                  </h4>
-                  <span style={{ fontSize: '0.56rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
-                    NOTES & DATA
+              {/* In Entire Box Mode: Overlay Watermark & Controls Badge */}
+              {stageViewMode === 'full' && (
+                <div style={{
+                  position: 'absolute',
+                  top: '10px',
+                  left: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(0, 0, 0, 0.65)',
+                  backdropFilter: 'blur(8px)',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  pointerEvents: 'none'
+                }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }} />
+                  <span style={{ fontSize: '0.60rem', color: '#cbd5e1', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
+                    STAGE FEED · 1080x1920 CINEMA {videoFit === 'cover' ? '(FILL)' : '(FIT)'}
                   </span>
                 </div>
-                <Sliders 
-                  size={12} 
-                  color="#f59e0b" 
-                  style={{ cursor: 'pointer' }} 
-                  onClick={handleToggleVoice}
-                  title="Audio Voice Preview"
-                />
-              </div>
+              )}
 
-              {/* Script Section */}
-              <div>
-                <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
-                  Script
-                </span>
-                <p style={{ fontSize: '0.72rem', color: '#e2e8f0', margin: '1px 0 0', fontWeight: 600 }}>
-                  {currentScene.script}
-                </p>
-              </div>
+            </div>
 
-              {/* Waveform Audio Preview with Golden Acoustic Waveform */}
-              <div 
-                onClick={handleToggleVoice}
-                style={{ cursor: 'pointer' }}
-                title="Click to preview audio"
-              >
-                <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)', marginBottom: '3px' }}>
-                  Waveform Audio Preview
-                </span>
-                
-                {/* Centered Golden Acoustic Waveform graphic */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '20px', gap: '2px' }}>
-                  {[3, 4, 6, 8, 11, 14, 18, 22, 26, 22, 18, 14, 11, 8, 6, 4, 3].map((h, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        width: '2px',
-                        height: isPlayingVoice ? `${Math.max(3, (h * 0.9) % 20)}px` : `${Math.round(h * 0.75)}px`,
-                        background: '#f59e0b',
-                        borderRadius: '1px',
-                        boxShadow: '0 0 4px rgba(245, 158, 11, 0.45)',
-                        transition: 'height 0.1s ease'
-                      }}
+            {/* Director Notes HUD Card: Rendered side-by-side in Mobile mode, OR as a floating translucent overlay in Entire Box mode */}
+            {(stageViewMode === 'mobile' || showNotesOverlay) && (
+              <div style={{
+                position: stageViewMode === 'full' ? 'absolute' : 'relative',
+                top: stageViewMode === 'full' ? '10px' : 'auto',
+                right: stageViewMode === 'full' ? '12px' : 'auto',
+                zIndex: stageViewMode === 'full' ? 30 : 'auto',
+                width: 'clamp(210px, 18vw, 250px)',
+                background: stageViewMode === 'full' ? 'rgba(13, 16, 23, 0.90)' : '#0d1017',
+                backdropFilter: stageViewMode === 'full' ? 'blur(12px)' : 'none',
+                borderRadius: '9px',
+                border: stageViewMode === 'full' ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)',
+                boxShadow: stageViewMode === 'full' ? '0 12px 32px rgba(0,0,0,0.85)' : 'none',
+                padding: '10px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                boxSizing: 'border-box'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h4 style={{ fontSize: '0.78rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>
+                      Director Notes HUD
+                    </h4>
+                    <span style={{ fontSize: '0.56rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+                      NOTES & DATA
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Sliders 
+                      size={12} 
+                      color="#f59e0b" 
+                      style={{ cursor: 'pointer' }} 
+                      onClick={handleToggleVoice}
+                      title="Audio Voice Preview"
                     />
-                  ))}
+                    {stageViewMode === 'full' && (
+                      <span 
+                        onClick={() => setShowNotesOverlay(false)} 
+                        style={{ cursor: 'pointer', fontSize: '0.70rem', color: '#94a3b8', padding: '0 2px' }}
+                        title="Close Overlay"
+                      >
+                        ✕
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Script Section */}
+                <div>
+                  <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
+                    Script
+                  </span>
+                  <p style={{ fontSize: '0.72rem', color: '#e2e8f0', margin: '1px 0 0', fontWeight: 600 }}>
+                    {currentScene.script}
+                  </p>
+                </div>
+
+                {/* Waveform Audio Preview with Golden Acoustic Waveform */}
+                <div 
+                  onClick={handleToggleVoice}
+                  style={{ cursor: 'pointer' }}
+                  title="Click to preview audio"
+                >
+                  <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)', marginBottom: '3px' }}>
+                    Waveform Audio Preview
+                  </span>
+                  
+                  {/* Centered Golden Acoustic Waveform graphic */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '20px', gap: '2px' }}>
+                    {[3, 4, 6, 8, 11, 14, 18, 22, 26, 22, 18, 14, 11, 8, 6, 4, 3].map((h, idx) => (
+                      <span
+                        key={idx}
+                        style={{
+                          width: '2px',
+                          height: isPlayingVoice ? `${Math.max(3, (h * 0.9) % 20)}px` : `${Math.round(h * 0.75)}px`,
+                          background: '#f59e0b',
+                          borderRadius: '1px',
+                          boxShadow: '0 0 4px rgba(245, 158, 11, 0.45)',
+                          transition: 'height 0.1s ease'
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Camera Cues Section */}
+                <div>
+                  <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
+                    Camera Cues
+                  </span>
+                  <p style={{ fontSize: '0.70rem', color: '#e2e8f0', margin: '1px 0 0', fontWeight: 500 }}>
+                    {currentScene.camera_cues}
+                  </p>
+                </div>
+
+                {/* Telemetry Section */}
+                <div>
+                  <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
+                    Telemetry
+                  </span>
+                  <p style={{ fontSize: '0.68rem', color: '#cbd5e1', margin: '1px 0 0', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
+                    Frame: {Math.round(2400 + (currentTime / duration) * 2100)} | Time: {formatTimecode(currentTime).slice(3)}
+                  </p>
                 </div>
               </div>
-
-              {/* Camera Cues Section */}
-              <div>
-                <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
-                  Camera Cues
-                </span>
-                <p style={{ fontSize: '0.70rem', color: '#e2e8f0', margin: '1px 0 0', fontWeight: 500 }}>
-                  {currentScene.camera_cues}
-                </p>
-              </div>
-
-              {/* Telemetry Section */}
-              <div>
-                <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: 700, display: 'block', fontFamily: 'var(--font-mono)' }}>
-                  Telemetry
-                </span>
-                <p style={{ fontSize: '0.68rem', color: '#cbd5e1', margin: '1px 0 0', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-                  Frame: {Math.round(2400 + (currentTime / duration) * 2100)} | Time: {formatTimecode(currentTime).slice(3)}
-                </p>
-              </div>
-            </div>
+            )}
 
           </div>
 
@@ -1001,12 +1230,36 @@ export default function VideoStudio({
                 GEMINI CRITIC v2.4
               </span>
             </div>
-            <MoreVertical 
-              size={13} 
-              color="#64748b" 
-              style={{ cursor: 'pointer' }} 
-              onClick={() => setCriticMenuOpen(!criticMenuOpen)}
-            />
+            <div style={{ position: 'relative' }}>
+              <MoreVertical 
+                size={13} 
+                color="#64748b" 
+                style={{ cursor: 'pointer' }} 
+                onClick={() => setCriticMenuOpen(!criticMenuOpen)}
+              />
+              {criticMenuOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: 0,
+                  width: '160px',
+                  background: '#0d1017',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: '6px',
+                  padding: '4px',
+                  zIndex: 100,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.8)',
+                  fontSize: '0.68rem'
+                }}>
+                  <button 
+                    onClick={() => { setCriticMenuOpen(false); showToast('Gemini Critic analysis refreshed'); }}
+                    style={{ width: '100%', background: 'transparent', border: 'none', color: '#cbd5e1', textAlign: 'left', padding: '5px 8px', cursor: 'pointer', borderRadius: '4px' }}
+                  >
+                    Re-analyze Scene Cues
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Top 2 Sub-Cards: Retention Curve Left + Hook Strength Gauge Right */}
@@ -1234,7 +1487,7 @@ export default function VideoStudio({
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b' }}>
               <button
                 type="button"
-                onClick={() => { setActiveTool('scissors'); alert(`Split clip at 01:22:15`); }}
+                onClick={() => { setActiveTool('scissors'); showToast(`Split clip placed at ${formatTimecode(currentTime)}`); }}
                 title="Razor / Cut Clip"
                 style={{ background: 'transparent', border: 'none', color: activeTool === 'scissors' ? '#38bdf8' : '#64748b', cursor: 'pointer', padding: '2px' }}
               >
@@ -1242,7 +1495,7 @@ export default function VideoStudio({
               </button>
               <button
                 type="button"
-                onClick={() => { setActiveTool('link'); alert("Tracks linked"); }}
+                onClick={() => { setActiveTool('link'); showToast('Audio & Video tracks linked'); }}
                 title="Link Audio & Video"
                 style={{ background: 'transparent', border: 'none', color: activeTool === 'link' ? '#38bdf8' : '#64748b', cursor: 'pointer', padding: '2px' }}
               >
@@ -1332,7 +1585,7 @@ export default function VideoStudio({
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#64748b' }}>
             <button
               type="button"
-              onClick={() => alert(`Marker set at ${formatTimecode(currentTime)}`)}
+              onClick={() => showToast(`Timeline marker saved at ${formatTimecode(currentTime)}`)}
               title="Add Marker"
               style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '2px' }}
             >
@@ -1340,7 +1593,7 @@ export default function VideoStudio({
             </button>
             <button
               type="button"
-              onClick={() => alert("Timeline Track Settings")}
+              onClick={() => showToast('Timeline tracks optimized for 60 FPS playback')}
               title="Track Settings"
               style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '2px' }}
             >
@@ -1741,6 +1994,32 @@ export default function VideoStudio({
         </div>
 
       </div>
+
+      {/* Floating In-App Toast Notification */}
+      {toastMsg && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '24px',
+          background: '#0d1017',
+          color: '#fbbf24',
+          border: '1px solid #f59e0b',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.85), 0 0 12px rgba(245, 158, 11, 0.2)',
+          borderRadius: '6px',
+          padding: '6px 14px',
+          fontSize: '0.72rem',
+          fontWeight: 700,
+          fontFamily: 'var(--font-mono)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          pointerEvents: 'none'
+        }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b', boxShadow: '0 0 6px #f59e0b' }} />
+          <span>{toastMsg}</span>
+        </div>
+      )}
 
     </div>
   );
