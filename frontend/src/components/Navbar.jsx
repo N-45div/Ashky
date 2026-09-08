@@ -1,5 +1,6 @@
 import React from 'react';
 import { Film, Search, BarChart3, Sparkles, Activity, ShieldCheck, Terminal, Layers } from 'lucide-react';
+import { AshkyTriangleLogo } from './AshkyLogo';
 
 export default function Navbar({ activeTab, setActiveTab, sidecarOpen, setSidecarOpen, systemHealthy = true }) {
   const navItems = [
@@ -34,19 +35,7 @@ export default function Navbar({ activeTab, setActiveTab, sidecarOpen, setSideca
           onClick={() => setActiveTab('landing')}
           style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
         >
-          <div style={{
-            width: '34px',
-            height: '34px',
-            borderRadius: '8px',
-            background: '#181c24',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#f0f3f6'
-          }}>
-            <Film size={18} />
-          </div>
+          <AshkyTriangleLogo size={24} />
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
             <span style={{
               fontWeight: 700,

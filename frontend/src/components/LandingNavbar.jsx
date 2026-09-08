@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { AshkyTriangleLogo } from './AshkyLogo';
 
 export default function LandingNavbar() {
   const navigate = useNavigate();
@@ -30,21 +31,7 @@ export default function LandingNavbar() {
           onClick={() => navigate('/')}
           style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', userSelect: 'none' }}
         >
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '8px',
-            background: '#ffffff',
-            color: '#090a0f',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 800,
-            fontSize: '0.95rem',
-            boxShadow: '0 2px 8px rgba(255, 255, 255, 0.15)'
-          }}>
-            @
-          </div>
+          <AshkyTriangleLogo size={28} />
           <span style={{
             fontWeight: 700,
             fontSize: '1.25rem',

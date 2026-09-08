@@ -5,6 +5,7 @@ import VideoStudio from './VideoStudio';
 import GeoOptimizer from './GeoOptimizer';
 import Observability from './Observability';
 import ErrorBoundary from '../components/ErrorBoundary';
+import { AshkyTriangleLogo } from '../components/AshkyLogo';
 import { 
   MessageSquare, Bell, LayoutGrid, Folder, Activity, 
   Settings, FolderArchive, FileText, Video, Sliders, 
@@ -143,19 +144,7 @@ export default function AppWorkspace({ initialPreset = null }) {
             }}
             title="Ashky Home"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path 
-                d="M12 2L2 22H22L12 2Z" 
-                fill="#f59e0b" 
-                stroke="#d97706" 
-                strokeWidth="1.5" 
-                strokeLinejoin="round" 
-              />
-              <path 
-                d="M12 8L6.5 19H17.5L12 8Z" 
-                fill="#07090e" 
-              />
-            </svg>
+            <AshkyTriangleLogo size={20} />
           </div>
           <span style={{
             fontSize: '0.86rem',

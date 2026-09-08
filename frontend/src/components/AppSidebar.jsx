@@ -5,6 +5,7 @@ import {
   Film, Search, BarChart3, Terminal, Home, 
   PanelLeftClose, PanelLeft, Plus, Cloud, Activity, CheckCircle2
 } from 'lucide-react';
+import { AshkyTriangleLogo } from './AshkyLogo';
 
 export default function AppSidebar({
   activeTab,
@@ -91,20 +92,7 @@ export default function AppSidebar({
                 cursor: 'pointer'
               }}
             >
-              <div style={{
-                width: '24px',
-                height: '24px',
-                borderRadius: '6px',
-                background: '#ffffff',
-                color: '#090a0f',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 800,
-                fontSize: '0.8rem'
-              }}>
-                @
-              </div>
+              <AshkyTriangleLogo size={20} />
               <span style={{
                 fontWeight: 700,
                 fontSize: '1.05rem',
