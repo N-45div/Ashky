@@ -168,11 +168,12 @@ def test_campaign_create_and_render_initiation():
     assert create_res.status_code == 200
     camp_id = create_res.json()["campaign_id"]
 
-    # Trigger render
+    # Trigger render (using turbo engine for test speed)
     render_res = client.post(f"/api/campaigns/{camp_id}/render", json={
         "voice": "en-US-GuyNeural",
         "aspect_ratio": "9:16",
         "include_subtitles": True,
+        "engine": "turbo",
     })
     assert render_res.status_code == 200
     render_data = render_res.json()

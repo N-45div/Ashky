@@ -930,9 +930,9 @@ export default function VideoStudio({
             
             {/* Video Canvas Container (Adapts from iPhone Frame to Entire Box) */}
             <div style={{
-              width: stageViewMode === 'mobile' ? 'clamp(175px, 15vw, 205px)' : '100%',
-              height: stageViewMode === 'mobile' ? 'clamp(280px, 32vh, 345px)' : '100%',
-              borderRadius: stageViewMode === 'mobile' ? '26px' : '8px',
+              width: stageViewMode === 'mobile' ? 'clamp(205px, 17vw, 235px)' : '100%',
+              height: stageViewMode === 'mobile' ? 'clamp(330px, 35vh, 395px)' : '100%',
+              borderRadius: stageViewMode === 'mobile' ? '28px' : '8px',
               background: '#000000',
               border: stageViewMode === 'mobile' ? '2.5px solid #283042' : '1px solid rgba(245, 158, 11, 0.25)',
               boxShadow: stageViewMode === 'mobile' 
@@ -955,9 +955,9 @@ export default function VideoStudio({
               {stageViewMode === 'mobile' && (
                 <div style={{
                   position: 'absolute',
-                  top: '5px',
-                  width: '46px',
-                  height: '11px',
+                  top: '6px',
+                  width: '50px',
+                  height: '12px',
                   background: '#000000',
                   borderRadius: '8px',
                   zIndex: 25,
