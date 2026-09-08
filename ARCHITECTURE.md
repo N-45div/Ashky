@@ -2,7 +2,7 @@
 
 > **Google Agentic Cinema: The Blockbuster Hackathon**  
 > **Partner Track**: Grafana Labs ($15,000 Track Prize Pool)  
-> **Core Technologies**: Google Gemini 3.7 / 3.5 Flash · Google Veo 3.1 Cinema · Grafana Cloud Hosted MCP · Prometheus · Loki · FastAPI · React 19
+> **Core Technologies**: Google Gemini 3.8 Flash · Google Veo 3.1 Cinema · Grafana Cloud Hosted MCP · Prometheus · Loki · FastAPI · React 19
 
 ---
 
@@ -57,7 +57,7 @@ flowchart TB
     end
 
     subgraph ServiceLayer [Internal AI & Video Services]
-        GeminiDirector[Gemini 3.7 Flash Director Engine]
+        GeminiDirector[Gemini 3.8 Flash Director Engine]
         VeoEngine[Google Veo 3.1 Video Engine]
         Compositor[FFmpeg Kinetic Video Compositor]
         TTSEngine[Microsoft Edge TTS Voice Synthesizer]
@@ -102,9 +102,9 @@ sequenceDiagram
     autonumber
     actor Founder as Creator / Solo Founder
     participant Orchestrator as Ashky Orchestrator
-    participant GeminiDirector as Gemini 3.7 Director Agent
+    participant GeminiDirector as Gemini 3.8 Flash Director Agent
     participant VideoEngine as Veo 3.1 / Turbo Compositor
-    participant CriticAgent as Gemini Vision Critic (TAO Loop)
+    participant CriticAgent as Gemini 3.8 Flash Vision Critic (Multimodal TAO Loop)
     participant MCPAgent as Grafana Cloud MCP Agent
 
     Founder->>Orchestrator: Submit Project Brief (Name, Pitch, Style, Audience)
@@ -144,7 +144,7 @@ stateDiagram-v2
     [*] --> Submitted: Creator initiates Synthesis
     
     state "Phase 1: Blueprint Generation" as P1 {
-        Submitted --> GeminiPrompt: Dispatch prompt to Gemini 3.7 Flash
+        Submitted --> GeminiPrompt: Dispatch prompt to Gemini 3.8 Flash
         GeminiPrompt --> ParseBlueprint: Extract 3 Scene Blueprints & Timings
     }
 
@@ -184,16 +184,16 @@ flowchart LR
     end
 
     subgraph Agentic [Ashky Think-Act-Observe Loop]
-        V2[30s Video] --> TAO[Gemini 3.7 Flash Agentic Engine]
-        TAO -->|Think| Plan[Hypothesize Retention Drop-off Points]
-        Plan -->|Act| Seek[Targeted Salient Keyframe Extraction]
-        Seek --> K1[0.8s Crash Zoom]
-        Seek --> K2[2.2s Text Pop-in]
-        Seek --> K3[8.5s Product UI]
-        Seek --> K4[24.0s CTA Anchor]
-        K1 & K2 & K3 & K4 -->|Observe| Eval[Compute Vision Critic Scores]
+        V2[30s Video] --> TAO[Gemini 3.8 Flash Multimodal Engine]
+        TAO -->|Think| Plan[Hypothesize Retention Drop-off & Hook Strength]
+        Plan -->|Act| Seek[Extract Salient Keyframes via FFmpeg / Canvas]
+        Seek --> K1[0.8s Pattern Interrupt Image]
+        Seek --> K2[2.2s Pacing Transition Image]
+        Seek --> K3[8.5s Mechanism UI Image]
+        Seek --> K4[24.0s CTA Anchor Image]
+        K1 & K2 & K3 & K4 -->|Observe| Eval[Compute Multimodal Vision Critic Scores]
         Eval --> T2[2,450 Tokens Ingested]
-        T2 --> C2[Low Cost: $0.018 / video]
+        T2 --> C2[Low Cost: $0.012 / video]
         C2 --> S2[88% Token Reduction · 66% Cost Savings]
     end
 ```

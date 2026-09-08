@@ -1,13 +1,12 @@
 import os
 from typing import Optional
 from dotenv import load_dotenv
-from pydantic_settings import BaseSettings
-from pydantic import ConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
 class Settings(BaseSettings):
-    model_config = ConfigDict(env_file=".env", extra="allow")
+    model_config = SettingsConfigDict(env_file=".env", extra="allow")
 
 
     APP_NAME: str = "Ashky"
@@ -18,9 +17,13 @@ class Settings(BaseSettings):
 
     # Google Gemini API (Agentic Video Understanding)
     GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY", "")
-    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-3.7-flash")
-    GEMINI_VISION_MODEL: str = os.getenv("GEMINI_VISION_MODEL", "gemini-3.7-flash")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+    GEMINI_VISION_MODEL: str = os.getenv("GEMINI_VISION_MODEL", "gemini-3.8-flash")
     GEMINI_IMAGE_MODEL: str = os.getenv("GEMINI_IMAGE_MODEL", "gemini-3.1-flash-image")
+
+    # Google Veo 3.1 AI Video Generation
+    VEO_MODEL: str = os.getenv("VEO_MODEL", "veo-3.1-generate-preview")
+    VEO_FAST_MODEL: str = os.getenv("VEO_FAST_MODEL", "veo-3.1-fast-generate-preview")
 
 
     # Grafana Cloud Settings

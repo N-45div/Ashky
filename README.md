@@ -2,14 +2,15 @@
 
 > **Google Agentic Cinema: The Blockbuster Hackathon**  
 > *Partner Track: Grafana Labs ($15,000 Track Prize Pool)*  
-> *Powered by Google Gemini 3.5 Flash Agentic Video Understanding & Grafana Cloud Model Context Protocol (MCP)*
+> *Powered by Google Gemini 3.8 Flash Agentic Video Understanding, Google Veo 3.1 & Grafana Cloud Model Context Protocol (MCP)*
 
 [![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688.svg)](https://fastapi.tiangolo.com/)
 [![React 19](https://img.shields.io/badge/React-19-61DAFB.svg)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-6.2%2B-646CFF.svg)](https://vitejs.dev/)
 [![Grafana Cloud MCP](https://img.shields.io/badge/Grafana%20Cloud-MCP%20Enabled-F46800.svg)](https://mcp.grafana.com)
-[![Gemini 3.5 Flash](https://img.shields.io/badge/Google%20Gemini-Agentic%20Video-4285F4.svg)](https://ai.google.dev)
+[![Gemini 3.8 Flash](https://img.shields.io/badge/Google%20Gemini-3.8%20Flash%20Agentic%20Video-4285F4.svg)](https://ai.google.dev)
+[![Google Veo 3.1](https://img.shields.io/badge/Google%20Veo-3.1%20Cinema%20Engine-FF6D00.svg)](https://deepmind.google/technologies/veo/)
 [![Tests Passing](https://img.shields.io/badge/Tests-21%2F21%20Passed-brightgreen.svg)](TESTING.md)
 [![Google Cloud Run](https://img.shields.io/badge/Google%20Cloud%20Run-Live%20Demo-4285F4?logo=googlecloud&logoColor=white)](https://ashky-949122795167.us-central1.run.app)
 
@@ -25,9 +26,10 @@
 **Ashky** is an AI-native autonomous cinema studio built specifically for the **Google Agentic Cinema Blockbuster Hackathon (Grafana Labs Track)**. It solves the two most crippling distribution bottlenecks for solo founders, indie hackers, and technical creators:
 
 1. **Autonomous Video Production**: Translating technical pitches into viral, hook-driven video scripts, scene-by-scene cinematography blueprints, and voiceovers with **FirstFrame UX** (Scene 1 rendered in **< 1.5s**).
-2. **Gemini 3.5 Flash Agentic Video Understanding**: Dynamically executing an agentic *Think → Act → Observe* loop that selectively inspects salient timeline keyframes rather than uniform frame dumping—slashing token consumption by **88%** and inference costs by **66%** while predicting 3-second hook drop-off rates.
-3. **Generative Engine Optimization (GEO)**: Measuring and maximizing brand citation authority across AI answer engines (**Google Gemini**, **Perplexity AI**, **ChatGPT Search**) and generating 1-click **Schema.org VideoObject JSON-LD** to ground AI search citations.
-4. **Grafana Cloud Observability & Official Hosted MCP Server**: Built-in Prometheus telemetry (`/metrics`), Loki error traces, and full **Model Context Protocol (MCP)** JSON-RPC 2.0 dispatch (`https://mcp.grafana.com/mcp`) for autonomous SRE self-healing and closed-loop retention re-writing.
+2. **Gemini 3.8 Flash Multimodal Agentic Video Understanding**: Dynamically executing an agentic *Think → Act → Observe* loop that extracts real visual keyframes (0.8s, 2.2s, 8.5s, 24.0s) directly from video pixels via FFmpeg, evaluating visual contrast, border text clipping, and 3-second hook drop-off—slashing token consumption by **88%** and inference costs by **66%**.
+3. **Google Veo 3.1 AI Generation Engine**: Deep integration with Google DeepMind's `veo-3.1-fast-generate-preview` and `veo-3.1-generate-preview` for cinematic photorealistic b-roll generation.
+4. **Generative Engine Optimization (GEO)**: Measuring and maximizing brand citation authority across AI answer engines (**Google Gemini**, **Perplexity AI**, **ChatGPT Search**) and generating 1-click **Schema.org VideoObject JSON-LD** to ground AI search citations.
+5. **Grafana Cloud Observability & Official Hosted MCP Server**: Built-in Prometheus telemetry (`/metrics`), Loki error traces, and full **Model Context Protocol (MCP)** JSON-RPC 2.0 dispatch (`https://mcp.grafana.com/mcp`) for autonomous SRE self-healing and closed-loop retention re-writing.
 
 For full architectural blueprints, see **[ARCHITECTURE.md](ARCHITECTURE.md)**.  
 For test verification logs and cURL recipes, see **[TESTING.md](TESTING.md)**.
@@ -53,15 +55,15 @@ graph TD
     end
 
     subgraph AgenticCluster["🤖 Multi-Agent Orchestration Cluster"]
-        Director["Gemini Flash Director Agent"]
-        Critic["Gemini 3.5 Flash Vision Critic (Think-Act-Observe)"]
+        Director["Gemini 3.8 Flash Director Agent"]
+        Critic["Gemini 3.8 Flash Vision Critic (Multimodal TAO Loop)"]
         GEOScout["GEO Search Intelligence Arm"]
         SREAgent["Grafana MCP Autonomous Copilot"]
     end
 
     subgraph GenerationEngines["🎞️ Dual Video Generation Engines"]
         Turbo["Turbo Engine (Deterministic PIL + FFmpeg)"]
-        Veo["Google Cloud Veo Engine (1080p Video Generation)"]
+        Veo["Google Veo 3.1 Engine (veo-3.1-fast-generate-preview)"]
         TTS["Edge & Web Audio TTS Synthesizer"]
     end
 
@@ -153,15 +155,21 @@ stateDiagram-v2
     AgenticQA --> ProductionReady: Ready for Export & GEO Distribution
 ```
 
-### 2. Gemini 3.5 Flash Agentic Video Understanding
-- **Think → Act → Observe Loop**: Rather than uniformly sampling 30–60 frames (expensive, redundant), Ashky’s Vision Critic autonomously searches for salient narrative events:
-  - `0.8s`: Crash-zoom & visual hook arrival
-  - `2.2s`: Value proposition kinetic typography pop-in
-  - `8.5s`: Product mechanism UI proof
-  - `24.0s`: Conversion CTA anchor
+### 2. Gemini 3.8 Flash Agentic Video Understanding
+- **True Multimodal Frame Inspection**: Rather than text-only summaries or uniform 1-FPS frame dumping (which consumes 20,000+ tokens), Ashky's Vision Critic extracts actual pixel keyframes via FFmpeg at salient narrative moments:
+  - `0.8s`: Pattern interrupt, chromatic contrast, and margin safe-zone text clipping check
+  - `2.2s`: Visual pacing change and value proposition typography verification
+  - `8.5s`: Product mechanism demonstration and UI legibility inspection
+  - `24.0s`: Conversion CTA anchor clarity and tap directive visibility
 - **88% Token Reduction**: Reduces inference cost from ~20,400 tokens to **2,450 tokens** per video analysis.
 - **66% Cost Reduction**: Slashes Gemini API expenditure from $0.035 to **$0.012** per evaluation.
-- **Predictive Drop-off Analytics**: Calculates predicted 3-second viewer drop-off percentage and flags retention bottlenecks before publishing.
+- **Predictive Drop-off Analytics**: Calculates predicted 3-second viewer drop-off percentage and returns concrete, actionable director recommendations.
+
+### 3. Google DeepMind Veo 3.1 Generation Engine
+- **Dual-Mode Rendering**:
+  - `veo-3.1-fast-generate-preview`: Rapid photorealistic cinematic B-roll generation in 9:16 vertical orientation.
+  - `veo-3.1-generate-preview`: Ultra-high definition full cinematic rendering.
+- **Turbo Compositor Fallback**: Sub-2s procedural canvas generation with burned-in kinetic subtitles and dynamic audio synchronization.
 
 ### 3. Generative Engine Optimization (GEO)
 - **AI Answer Engine Benchmarking**: Probes how **Google Gemini**, **Perplexity AI**, and **ChatGPT Search** cite tools in commercial queries.
@@ -387,12 +395,15 @@ Ashky implements the **Model Context Protocol (MCP)** specification (`2024-11-05
 
 | Variable Name | Required | Default | Description |
 | :--- | :---: | :---: | :--- |
-| `GEMINI_API_KEY` | Recommended | `""` | Google Gemini 3.5 Flash & 3.7 API access key |
+| `GEMINI_API_KEY` | Recommended | `""` | Google AI Studio API key (Required for Gemini 3.8 Flash & Veo 3.1) |
+| `GEMINI_MODEL` | Optional | `gemini-3.8-flash` | Gemini model for director blueprint synthesis & reasoning |
+| `GEMINI_VISION_MODEL` | Optional | `gemini-3.8-flash` | Gemini model for multimodal agentic video understanding |
+| `VEO_MODEL` | Optional | `veo-3.1-generate-preview` | Google Veo 3.1 standard generation model |
+| `VEO_FAST_MODEL` | Optional | `veo-3.1-fast-generate-preview` | Google Veo 3.1 fast preview generation model |
 | `GRAFANA_STACK_URL` | Optional | `""` | Base URL of Grafana Cloud stack (e.g. `https://my-stack.grafana.net`) |
-| `GRAFANA_TOKEN` | Optional | `""` | Grafana Cloud Service Account token (`glc_...`) |
-| `GRAFANA_METRICS_USER` | Optional | `""` | Prometheus remote-write instance user ID |
-| `GRAFANA_LOKI_USER` | Optional | `""` | Loki remote-write instance user ID |
-| `VEO_API_KEY` | Optional | `""` | Google Cloud Veo photorealistic video generation API key |
+| `GRAFANA_API_KEY` | Optional | `""` | Grafana Cloud Service Account token (`glc_...`) |
+| `GRAFANA_CLOUD_USER` | Optional | `""` | Prometheus remote-write instance user ID |
+| `GRAFANA_LOKI_URL` | Optional | `""` | Loki remote-write instance URL |
 | `HOST` | Optional | `0.0.0.0` | Backend bind host address |
 | `PORT` | Optional | `8000` | Backend bind HTTP port |
 | `ENVIRONMENT` | Optional | `development` | Deployment environment (`development` / `production`) |

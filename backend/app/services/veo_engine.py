@@ -19,8 +19,8 @@ from typing import Optional, Dict, List
 import urllib.request
 
 try:
-    from google import genai
-    from google.genai import types
+    from google import genai  # type: ignore
+    from google.genai import types  # type: ignore
     HAS_GENAI = True
 except ImportError:
     HAS_GENAI = False
@@ -42,7 +42,7 @@ class GoogleVeoEngine:
 
     def __init__(self):
         self.api_key = settings.GEMINI_API_KEY
-        self.model_name = "veo-3.1-fast-generate-preview"
+        self.model_name = getattr(settings, "VEO_FAST_MODEL", "veo-3.1-fast-generate-preview")
         self.client = None
         self._is_live = False
 
