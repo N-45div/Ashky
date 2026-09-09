@@ -183,22 +183,31 @@ class VideoCompositor:
         audio_path = audio_path.replace("\\", "/")
         output_path = output_path.replace("\\", "/")
 
-        # Escape special characters for ffmpeg drawtext filter
-        safe_title = title.replace("\\", "/").replace("'", "\\'").replace(":", "\\:")
-        safe_subtitle = voiceover_text.replace("\\", "/").replace("'", "\\'").replace(":", "\\:")
+        # Prepare title and subtitle text files to avoid FFmpeg escaping issues with apostrophes and %
+        output_dir = Path(output_path).parent
+        output_dir.mkdir(parents=True, exist_ok=True)
+        title_file_path = output_dir / f"title_{scene_number}.txt"
+        sub_file_path = output_dir / f"sub_{scene_number}.txt"
 
         # Truncate subtitle for display (max ~60 chars per line)
-        if len(safe_subtitle) > 120:
-            mid = len(safe_subtitle) // 2
-            split_pos = safe_subtitle.rfind(" ", 0, mid + 10)
+        formatted_subtitle = voiceover_text
+        if len(formatted_subtitle) > 120:
+            mid = len(formatted_subtitle) // 2
+            split_pos = formatted_subtitle.rfind(" ", 0, mid + 10)
             if split_pos == -1:
                 split_pos = mid
-            safe_subtitle = safe_subtitle[:split_pos] + "\n" + safe_subtitle[split_pos + 1:]
+            formatted_subtitle = formatted_subtitle[:split_pos] + "\n" + formatted_subtitle[split_pos + 1:]
+
+        title_file_path.write_text(title, encoding="utf-8")
+        sub_file_path.write_text(formatted_subtitle, encoding="utf-8")
+
+        title_file_esc = str(title_file_path).replace("\\", "/").replace(":", "\\:")
+        sub_file_esc = str(sub_file_path).replace("\\", "/").replace(":", "\\:")
 
         # Scene number badge
         scene_badge = f"SCENE {scene_number}"
 
-        # Build drawtext filter chain (fontfile= required on Windows)
+        # Build drawtext filter chain (fontfile= required on Windows, textfile= avoids escaping issues)
         font_esc = SYSTEM_FONT.replace(":", "\\:")
         drawtext_filters = (
             # Scene number badge (top-left)
@@ -207,15 +216,15 @@ class VideoCompositor:
             f"fontcolor=0xaaaaaa:fontsize=28:"
             f"x=60:y=80:"
             f"borderw=0,"
-            # Title (center-top area)
+            # Title (center-top area) with expansion=none to support % and textfile to support apostrophes
             f"drawtext=fontfile='{font_esc}':"
-            f"text='{safe_title}':"
+            f"textfile='{title_file_esc}':expansion=none:"
             f"fontcolor=white:fontsize={fc['fontsize_title']}:"
             f"x=(w-text_w)/2:y=h/4:"
             f"borderw={fc['borderw']}:bordercolor={fc['bordercolor']},"
             # Subtitle / voiceover text (bottom third, with fade-in)
             f"drawtext=fontfile='{font_esc}':"
-            f"text='{safe_subtitle}':"
+            f"textfile='{sub_file_esc}':expansion=none:"
             f"fontcolor=0xe0e0e0:fontsize={fc['fontsize_subtitle']}:"
             f"x=(w-text_w)/2:y=3*h/4:"
             f"borderw=2:bordercolor=black:"
@@ -273,6 +282,16 @@ class VideoCompositor:
         )
 
         _run_ffmpeg(args, f"scene {scene_number} clip generation")
+        
+        # Cleanup temporary text files
+        try:
+            if title_file_path.exists():
+                title_file_path.unlink()
+            if sub_file_path.exists():
+                sub_file_path.unlink()
+        except Exception:
+            pass
+
         logger.info(f"Scene {scene_number} clip: {output_path} ({duration}s)")
         return output_path
 

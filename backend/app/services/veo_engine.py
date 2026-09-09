@@ -42,7 +42,7 @@ class GoogleVeoEngine:
 
     def __init__(self):
         self.api_key = settings.GEMINI_API_KEY
-        self.model_name = getattr(settings, "VEO_FAST_MODEL", "veo-3.1-fast-generate-preview")
+        self.model_name = getattr(settings, "VEO_FAST_MODEL", "veo-3.1-generate-preview")
         self.client = None
         self._is_live = False
 
@@ -110,15 +110,37 @@ class GoogleVeoEngine:
             loop = asyncio.get_running_loop()
             
             def _launch_job():
-                return self.client.models.generate_videos(
-                    model=self.model_name,
-                    prompt=prompt,
-                    config=types.GenerateVideosConfig(
-                        aspect_ratio=clean_aspect,
-                        duration_seconds=clamped_duration,
-                        number_of_videos=1,
-                    )
-                )
+                models_to_try = [self.model_name]
+                for fallback_m in ["veo-3.1-generate-preview", "veo-3.1-lite-generate-preview"]:
+                    if fallback_m not in models_to_try:
+                        models_to_try.append(fallback_m)
+
+                last_err = None
+                for m in models_to_try:
+                    try:
+                        return self.client.models.generate_videos(
+                            model=m,
+                            prompt=prompt,
+                            config=types.GenerateVideosConfig(
+                                aspect_ratio=clean_aspect,
+                                duration_seconds=clamped_duration,
+                                number_of_videos=1,
+                            )
+                        )
+                    except Exception as err:
+                        last_err = err
+                        err_str = str(err)
+                        if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "quota" in err_str.lower():
+                            logger.warning(f"Veo model {m} quota exhausted (429). Trying fallback model if available...")
+                            log_collector.record_log(
+                                "WARN",
+                                "veo_engine",
+                                f"Veo model {m} quota exhausted (429). Attempting fallback tier..."
+                            )
+                            continue
+                        raise err
+                if last_err:
+                    raise last_err
 
             initial_op = await loop.run_in_executor(None, _launch_job)
             op_name = getattr(initial_op, 'name', None)

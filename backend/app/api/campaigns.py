@@ -397,6 +397,10 @@ async def agentic_inspect_direct(request: GeminiAgenticInspectionRequest):
 # Real Video & TTS Synthesis Pipeline
 # ==========================================
 
+# Concurrency gate: serialize heavy FFmpeg & Veo renders to protect 2GiB memory from OOM kill
+_RENDER_SEMAPHORE = asyncio.Semaphore(1)
+
+
 async def _execute_render(
     campaign_id: str,
     blueprint: CampaignBlueprint,
@@ -405,126 +409,151 @@ async def _execute_render(
     engine: str = "veo",
 ):
     """Background task: synthesizes voiceovers per scene, generates visuals via Veo 3.1/Gemini, and renders full video."""
-    try:
-        chosen_voice = voice or settings.EDGE_TTS_VOICE
-
+    if _RENDER_SEMAPHORE.locked():
         RENDER_STATUS_STORE[campaign_id] = RenderStatus(
             campaign_id=campaign_id,
-            status="synthesizing_audio",
-            progress_pct=20,
-            current_step="Synthesizing founder voiceovers with Edge TTS...",
+            status="queued",
+            progress_pct=5,
+            current_step="Waiting for render pipeline queue...",
         )
         log_collector.record_log(
             "INFO",
-            "tts_engine",
-            f"Generating scene voiceovers for campaign {campaign_id} (voice: {chosen_voice})"
+            "video_compositor",
+            f"Campaign {campaign_id} queued behind active render worker to prevent memory exhaustion"
         )
 
-        audio_paths = await tts_engine.generate_scene_voiceovers(
-            campaign_id=campaign_id,
-            scenes=blueprint.scenes,
-            voice=chosen_voice,
-        )
+    async with _RENDER_SEMAPHORE:
+        try:
+            chosen_voice = voice or settings.EDGE_TTS_VOICE
 
-        video_paths = None
-        if engine == "veo":
             RENDER_STATUS_STORE[campaign_id] = RenderStatus(
                 campaign_id=campaign_id,
-                status="rendering_scenes",
-                progress_pct=45,
-                current_step="Synthesizing cinematic scene shots with Google Veo 3.1...",
+                status="synthesizing_audio",
+                progress_pct=20,
+                current_step="Synthesizing founder voiceovers with Edge TTS...",
             )
             log_collector.record_log(
                 "INFO",
-                "veo_engine",
-                f"Generating {len(blueprint.scenes)} cinematic shots with Google Veo 3.1 for {campaign_id}"
+                "tts_engine",
+                f"Generating scene voiceovers for campaign {campaign_id} (voice: {chosen_voice})"
             )
-            try:
-                video_paths = await veo_engine.generate_campaign_videos(
+
+            audio_paths = await tts_engine.generate_scene_voiceovers(
+                campaign_id=campaign_id,
+                scenes=blueprint.scenes,
+                voice=chosen_voice,
+            )
+
+            video_paths = None
+            if engine == "veo":
+                RENDER_STATUS_STORE[campaign_id] = RenderStatus(
                     campaign_id=campaign_id,
-                    scenes=blueprint.scenes,
-                    aspect_ratio=aspect_ratio,
+                    status="rendering_scenes",
+                    progress_pct=45,
+                    current_step="Synthesizing cinematic scene shots with Google Veo 3.1...",
                 )
-                if video_paths:
-                    log_collector.record_log(
-                        "INFO",
-                        "veo_engine",
-                        f"Successfully generated {len(video_paths)} shots via Veo 3.1 for {campaign_id}"
+                log_collector.record_log(
+                    "INFO",
+                    "veo_engine",
+                    f"Generating {len(blueprint.scenes)} cinematic shots with Google Veo 3.1 for {campaign_id}"
+                )
+                try:
+                    video_paths = await veo_engine.generate_campaign_videos(
+                        campaign_id=campaign_id,
+                        scenes=blueprint.scenes,
+                        aspect_ratio=aspect_ratio,
                     )
-            except Exception as veo_err:
-                logger.warning(f"Veo generation exception: {veo_err}. Falling back to image engine.")
+                    if video_paths:
+                        log_collector.record_log(
+                            "INFO",
+                            "veo_engine",
+                            f"Successfully generated {len(video_paths)} shots via Veo 3.1 for {campaign_id}"
+                        )
+                    else:
+                        log_collector.record_log(
+                            "WARN",
+                            "veo_engine",
+                            f"Veo 3.1 returned 0 shots for {campaign_id} (quota/fallback); engaging cinematic keyframe compositor."
+                        )
+                except Exception as veo_err:
+                    logger.warning(f"Veo generation exception: {veo_err}. Falling back to image engine.")
+                    log_collector.record_log(
+                        "WARN",
+                        "veo_engine",
+                        f"Veo exception for {campaign_id}: {veo_err}. Transitioning to keyframe compositor."
+                    )
 
-        RENDER_STATUS_STORE[campaign_id] = RenderStatus(
-            campaign_id=campaign_id,
-            status="rendering_scenes",
-            progress_pct=65,
-            current_step="Compositing visual backgrounds & high-contrast gradients...",
-        )
-        log_collector.record_log(
-            "INFO",
-            "image_generator",
-            f"Generating visual backgrounds for {len(blueprint.scenes)} scenes for {campaign_id}"
-        )
+            RENDER_STATUS_STORE[campaign_id] = RenderStatus(
+                campaign_id=campaign_id,
+                status="rendering_scenes",
+                progress_pct=65,
+                current_step="Compositing visual backgrounds & high-contrast gradients...",
+            )
+            log_collector.record_log(
+                "INFO",
+                "image_generator",
+                f"Generating visual backgrounds for {len(blueprint.scenes)} scenes for {campaign_id}"
+            )
 
-        image_paths = await image_generator.generate_campaign_images(
-            campaign_id=campaign_id,
-            scenes=blueprint.scenes,
-            aspect_ratio=aspect_ratio,
-        )
+            image_paths = await image_generator.generate_campaign_images(
+                campaign_id=campaign_id,
+                scenes=blueprint.scenes,
+                aspect_ratio=aspect_ratio,
+            )
 
-        RENDER_STATUS_STORE[campaign_id] = RenderStatus(
-            campaign_id=campaign_id,
-            status="assembling_video",
-            progress_pct=85,
-            current_step="Compositing visuals, kinetic captions, and audio via FFmpeg...",
-        )
-        log_collector.record_log(
-            "INFO",
-            "video_compositor",
-            f"Compositing {len(blueprint.scenes)} scenes with {aspect_ratio} layout for {campaign_id}"
-        )
+            RENDER_STATUS_STORE[campaign_id] = RenderStatus(
+                campaign_id=campaign_id,
+                status="assembling_video",
+                progress_pct=85,
+                current_step="Compositing visuals, kinetic captions, and audio via FFmpeg...",
+            )
+            log_collector.record_log(
+                "INFO",
+                "video_compositor",
+                f"Compositing {len(blueprint.scenes)} scenes with {aspect_ratio} layout for {campaign_id}"
+            )
 
-        final_output = await video_compositor.render_campaign(
-            campaign_id=campaign_id,
-            scenes=blueprint.scenes,
-            audio_paths=audio_paths,
-            aspect_ratio=aspect_ratio,
-            image_paths=image_paths,
-            video_paths=video_paths,
-        )
+            final_output = await video_compositor.render_campaign(
+                campaign_id=campaign_id,
+                scenes=blueprint.scenes,
+                audio_paths=audio_paths,
+                aspect_ratio=aspect_ratio,
+                image_paths=image_paths,
+                video_paths=video_paths,
+            )
 
-        file_size = os.path.getsize(final_output) if os.path.exists(final_output) else 0
-        total_dur = sum(get_audio_duration(ap) + 0.5 for ap in audio_paths)
+            file_size = os.path.getsize(final_output) if os.path.exists(final_output) else 0
+            total_dur = sum(get_audio_duration(ap) + 0.5 for ap in audio_paths)
 
-        RENDER_STATUS_STORE[campaign_id] = RenderStatus(
-            campaign_id=campaign_id,
-            status="completed",
-            progress_pct=100,
-            current_step="Render complete! Video ready for playback & download.",
-            video_url=f"/media/videos/{campaign_id}.mp4",
-            download_url=f"/api/campaigns/{campaign_id}/download",
-            file_size_bytes=file_size,
-            duration_seconds=round(total_dur, 2),
-        )
-        log_collector.record_log(
-            "INFO",
-            "video_compositor",
-            f"Campaign {campaign_id} rendered: {file_size / 1024:.1f} KB, duration {round(total_dur, 2)}s"
-        )
-    except Exception as e:
-        logger.exception(f"Render failed for campaign {campaign_id}: {e}")
-        RENDER_STATUS_STORE[campaign_id] = RenderStatus(
-            campaign_id=campaign_id,
-            status="failed",
-            progress_pct=0,
-            current_step=f"Render failed: {str(e)}",
-            error=str(e),
-        )
-        log_collector.record_log(
-            "ERROR",
-            "video_compositor",
-            f"Render failed for {campaign_id}: {e}"
-        )
+            RENDER_STATUS_STORE[campaign_id] = RenderStatus(
+                campaign_id=campaign_id,
+                status="completed",
+                progress_pct=100,
+                current_step="Render complete! Video ready for playback & download.",
+                video_url=f"/media/videos/{campaign_id}.mp4",
+                download_url=f"/api/campaigns/{campaign_id}/download",
+                file_size_bytes=file_size,
+                duration_seconds=round(total_dur, 2),
+            )
+            log_collector.record_log(
+                "INFO",
+                "video_compositor",
+                f"Campaign {campaign_id} rendered: {file_size / 1024:.1f} KB, duration {round(total_dur, 2)}s"
+            )
+        except Exception as e:
+            logger.exception(f"Render failed for campaign {campaign_id}: {e}")
+            RENDER_STATUS_STORE[campaign_id] = RenderStatus(
+                campaign_id=campaign_id,
+                status="failed",
+                progress_pct=0,
+                current_step=f"Render failed: {str(e)}",
+                error=str(e),
+            )
+            log_collector.record_log(
+                "ERROR",
+                "video_compositor",
+                f"Render failed for {campaign_id}: {e}"
+            )
 
 
 @router.post("/quick-synthesize")

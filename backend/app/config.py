@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # Google Veo 3.1 AI Video Generation
     VEO_MODEL: str = os.getenv("VEO_MODEL", "veo-3.1-generate-preview")
-    VEO_FAST_MODEL: str = os.getenv("VEO_FAST_MODEL", "veo-3.1-fast-generate-preview")
+    VEO_FAST_MODEL: str = os.getenv("VEO_FAST_MODEL", "veo-3.1-generate-preview")
 
 
     # Grafana Cloud Settings

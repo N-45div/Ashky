@@ -334,7 +334,7 @@ async def handle_mcp_tool_call(tool_name: str, arguments: Dict[str, Any]) -> Dic
         }
 
     elif tool_name == "grafana_diagnose_pipeline":
-        current_hook = snapshot.get("avg_hook_strength_score", 88.5)
+        current_hook = min(100.0, float(snapshot.get("avg_hook_strength_score", 88.5)))
         diagnosis = {
             "health_status": "OPTIMAL",
             "endpoint": settings.GRAFANA_MCP_ENDPOINT,
@@ -378,7 +378,7 @@ async def handle_mcp_tool_call(tool_name: str, arguments: Dict[str, Any]) -> Dic
         optimized_title = f"The Sub-1s Shock Hook: {product_name}"
         optimized_text = f"NEVER BUILD BLIND: {product_name.upper()}"
         optimized_vo = f"Stop guessing what converts. Watch how {product_name} turns casual viewers into paying customers in under 3 seconds."
-        new_hook_score = max(current_score + 7, 94)
+        new_hook_score = int(min(98, max(int(current_score) + 7, 94)))
 
         if campaign_id in CAMPAIGN_STORE:
             blueprint = CAMPAIGN_STORE[campaign_id]
@@ -519,7 +519,7 @@ async def process_agent_inquiry(user_query: str) -> Dict[str, Any]:
             ])
             prompt = (
                 f"You are the autonomous Grafana Cloud Growth SRE & Pipeline Diagnostic Agent for Ashky Studio.\n"
-                f"Connected to official Grafana Cloud MCP: {settings.GRAFANA_MCP_ENDPOINT} targeting stack {settings.GRAFANA_STACK_URL}.\n"
+                f"Stack target: {settings.GRAFANA_STACK_URL} (metrics scraped via Prometheus /metrics, Loki log collector, local MCP server /mcp, hosted gateway standby: {settings.GRAFANA_MCP_ENDPOINT}).\n"
                 f"Active MCP tools: query_prometheus, query_loki, search_dashboards, list_alerts, grafana_diagnose_pipeline, grafana_optimize_retention_loop.\n"
                 f"A founder asks: '{user_query}'\n\n"
                 f"Live Prometheus Telemetry Snapshot:\n"

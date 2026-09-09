@@ -47,19 +47,27 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
     setTimeout(() => setToastMsg(null), 2800);
   };
 
-  const [logs, setLogs] = useState([
-    { id: 1, ts: '10:45:12', msg: "executing 'tool_call_1' (generate_3scene_script), latency =25ms, output: {scenes: 3}", type: 'tool', span: 'tool_call_1' },
-    { id: 2, ts: '10:45:13', msg: "executing 'tool_call_2' (veo_stream_firstframe), latency =25ms, output: {status: 'ok'}", type: 'tool', span: 'tool_call_2' },
-    { id: 3, ts: '10:45:14', msg: "running MCP query: latency > 50ms =25ms, output: {nodes: 4}", type: 'mcp' },
-    { id: 4, ts: '10:45:15', msg: "running MCP query: latency > 50ms =25ms, output: {p95: 18ms}", type: 'mcp' },
-    { id: 5, ts: '10:45:16', msg: "executing 'tool_call_1' (normalize_style_tokens), latency =26ms, output: {style: 'neon-noir'}", type: 'tool', span: 'tool_call_1' },
-    { id: 6, ts: '10:45:17', msg: "running MCP query: latency > 50ms =25ms, output: {connected: true}", type: 'mcp' },
-    { id: 7, ts: '10:45:18', msg: "running MCP query: latency > 50ms =25ms, output: {error_budget: '99.98%'}", type: 'mcp' },
-    { id: 8, ts: '10:45:19', msg: "running MCP query: latency > 50ms =25ms, output: {fps: 58.4}", type: 'mcp' },
-    { id: 9, ts: '10:45:20', msg: "running MCP query: latency > 50ms =25ms, output: {spans: 7}", type: 'mcp' },
-    { id: 10, ts: '10:45:36', msg: "running MCEP system messages core is: rally completed.", type: 'system' },
-    { id: 11, ts: '10:45:38', msg: "system messages: pipeline state optimal; Veo 3.1 streaming ready!", type: 'system' }
-  ]);
+  const [logs, setLogs] = useState(() => {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const t = (secOffset) => {
+      const d = new Date(now.getTime() - secOffset * 1000);
+      return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    };
+    return [
+      { id: 1, ts: t(28), msg: "executing 'tool_call_1' (generate_3scene_script), latency =25ms, output: {scenes: 3}", type: 'tool', span: 'tool_call_1' },
+      { id: 2, ts: t(26), msg: "executing 'tool_call_2' (veo_stream_firstframe), latency =25ms, output: {status: 'ok'}", type: 'tool', span: 'tool_call_2' },
+      { id: 3, ts: t(24), msg: "running MCP query: latency > 50ms =25ms, output: {nodes: 4}", type: 'mcp' },
+      { id: 4, ts: t(22), msg: "running MCP query: latency > 50ms =25ms, output: {p95: 18ms}", type: 'mcp' },
+      { id: 5, ts: t(20), msg: "executing 'tool_call_1' (normalize_style_tokens), latency =26ms, output: {style: 'neon-noir'}", type: 'tool', span: 'tool_call_1' },
+      { id: 6, ts: t(18), msg: "running MCP query: latency > 50ms =25ms, output: {connected: true}", type: 'mcp' },
+      { id: 7, ts: t(16), msg: "running MCP query: latency > 50ms =25ms, output: {error_budget: '99.98%'}", type: 'mcp' },
+      { id: 8, ts: t(14), msg: "running MCP query: latency > 50ms =25ms, output: {fps: 58.4}", type: 'mcp' },
+      { id: 9, ts: t(12), msg: "running MCP query: latency > 50ms =25ms, output: {spans: 7}", type: 'mcp' },
+      { id: 10, ts: t(8), msg: "running MCP system messages core is: telemetry sync completed.", type: 'system' },
+      { id: 11, ts: t(2), msg: "system messages: pipeline state optimal; Veo 3.1 streaming ready!", type: 'system' }
+    ];
+  });
 
   const terminalEndRef = useRef(null);
 
@@ -80,11 +88,11 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
       id: 'agent_steps',
       name: 'agent_steps',
       category: 'Gemini',
-      agent: 'Gemini 3.7 Flash Director',
+      agent: 'Gemini 3.8 Flash Director',
       latency: '420 ms',
       duration: '0.4s',
       status: 'HTTP 200 OK · Span #tr_8fa02',
-      args: { model: 'gemini-3.7-flash', task: '3-scene cinema blueprint', hook_target: 'crash_zoom_dolly' },
+      args: { model: 'gemini-3.8-flash', task: '3-scene cinema blueprint', hook_target: 'crash_zoom_dolly' },
       output: { total_scenes: 3, pattern_interrupt_hook: 'Crash-Zoom Low Angle', tokens: 1420 }
     },
     tool_call_1: {
@@ -128,7 +136,7 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
       latency: '2,120 ms',
       duration: '2.1s',
       status: 'HTTP 200 OK · Span #tr_8fa06',
-      args: { model: 'models/veo-3.1-fast-generate-preview', resolution: '1080x1920', motion_intensity: 8 },
+      args: { model: 'models/veo-3.1-generate-preview', resolution: '1080x1920', motion_intensity: 8 },
       output: { video_url: '/media/videos/camp_505abce3.mp4', frames: 120, fps: 24, status: 'success' }
     },
     output_synthesis: {
@@ -426,11 +434,11 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
             }}
           >
             <span style={{ fontSize: '0.46rem', color: '#64748b', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
-              GRAFANA MCP
+              LOCAL MCP (:8000/mcp)
             </span>
             <span style={{ fontSize: '0.70rem', color: '#34d399', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span style={{ width: '4.5px', height: '4.5px', borderRadius: '50%', background: '#34d399', boxShadow: '0 0 6px #34d399' }} />
-              CONNECTED
+              ACTIVE
             </span>
           </div>
 
@@ -1265,7 +1273,7 @@ export default function Observability({ onOpenSidecar, campaign, onNavigateToStu
                       padding: '1px 2px'
                     }}
                   >
-                    <span style={{ color: '#f59e0b', flexShrink: 0 }}>2024-10-27 {l.ts},</span>
+                    <span style={{ color: '#f59e0b', flexShrink: 0 }}>{new Date().toISOString().slice(0, 10)} {l.ts},</span>
                     <span style={{
                       color: l.type === 'tool' ? '#e2e8f0' : (l.type === 'mcp' ? '#38bdf8' : '#34d399')
                     }}>

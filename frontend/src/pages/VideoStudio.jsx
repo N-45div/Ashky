@@ -163,6 +163,47 @@ export default function VideoStudio({
     }
   };
 
+  const pollRenderStatus = (campId) => {
+    setIsSynthesizing(true);
+    setSynthesisActive(true);
+    const pollTimer = setInterval(async () => {
+      try {
+        const sResp = await fetch(`/api/campaigns/${campId}/render-status`);
+        if (sResp.ok) {
+          const sData = await sResp.json();
+          setSynthesisProgress(sData.progress_pct || 20);
+          setSynthesisStep(sData.current_step || 'Rendering video...');
+
+          if (sData.status === 'completed') {
+            clearInterval(pollTimer);
+            setIsSynthesizing(false);
+            setSynthesisActive(false);
+            setSynthesisProgress(100);
+            setSynthesisStep('Render complete! Video ready.');
+
+            // Swap in new video URL and restart playback smoothly
+            if (sData.video_url && videoPlayerRef.current) {
+              videoPlayerRef.current.src = sData.video_url;
+              videoPlayerRef.current.currentTime = 0;
+              setCurrentTime(0);
+              videoPlayerRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+            }
+
+            // Trigger fresh multimodal Gemini 3.8 Flash Vision Critic on newly rendered video
+            runAgenticVisionCritic(campId);
+          } else if (sData.status === 'failed') {
+            clearInterval(pollTimer);
+            setIsSynthesizing(false);
+            setSynthesisActive(false);
+            setSynthesisStep(`Render failed: ${sData.error || 'Check logs'}`);
+          }
+        }
+      } catch (pollErr) {
+        console.warn('Status poll warning:', pollErr);
+      }
+    }, 1500);
+  };
+
   // Timecode formatter: matches reference 01:22:15 display format
   const formatTimecode = (sec) => {
     const currentVal = sec !== undefined ? sec : currentTime;
@@ -329,42 +370,7 @@ export default function VideoStudio({
       }
 
       // Poll render status every 1.5s until completion
-      const pollTimer = setInterval(async () => {
-        try {
-          const sResp = await fetch(`/api/campaigns/${campId}/render-status`);
-          if (sResp.ok) {
-            const sData = await sResp.json();
-            setSynthesisProgress(sData.progress_pct || 20);
-            setSynthesisStep(sData.current_step || 'Rendering video...');
-
-            if (sData.status === 'completed') {
-              clearInterval(pollTimer);
-              setIsSynthesizing(false);
-              setSynthesisActive(false);
-              setSynthesisProgress(100);
-              setSynthesisStep('Render complete! Video ready.');
-
-              // Swap in new video URL and restart playback smoothly
-              if (sData.video_url && videoPlayerRef.current) {
-                videoPlayerRef.current.src = sData.video_url;
-                videoPlayerRef.current.currentTime = 0;
-                setCurrentTime(0);
-                videoPlayerRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
-              }
-
-              // Trigger fresh multimodal Gemini 3.8 Flash Vision Critic on newly rendered video
-              runAgenticVisionCritic(campId);
-            } else if (sData.status === 'failed') {
-              clearInterval(pollTimer);
-              setIsSynthesizing(false);
-              setSynthesisActive(false);
-              setSynthesisStep(`Render failed: ${sData.error || 'Check logs'}`);
-            }
-          }
-        } catch (pollErr) {
-          console.warn('Status poll warning:', pollErr);
-        }
-      }, 1500);
+      pollRenderStatus(campId);
 
     } catch (err) {
       console.error('Failed to start synthesis:', err);

@@ -66,13 +66,13 @@ async def test_video_compositor_scene_and_campaign_assembly():
     fake_scenes = [
         SceneBlueprint(
             scene_number=1,
-            title="Hook Scene",
+            title="What isn't 100% possible?",
             duration_seconds=3.0,
             timeframe="0-3s",
             camera_cues="Crash zoom to glowing terminal",
             kinetic_motion="Text pulses",
-            text_overlay="LaunchFlow Autonomous Agent",
-            voiceover_script="Introducing LaunchFlow, your autonomous onboarding agent.",
+            text_overlay="LaunchFlow Autonomous Agent: 100% Instant",
+            voiceover_script="What if dying wasn't game over—but 100% the key to winning?",
             visual_prompt="Dark sleek software UI",
             status="ready",
         )

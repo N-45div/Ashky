@@ -57,7 +57,7 @@ export default function AgentSidecar({
     {
       id: 1,
       sender: 'agent',
-      intro: `Ashky Pipeline Agent active for campaign "${campaignName}". Connected to official Grafana Cloud MCP.`,
+      intro: `Ashky SRE Observability Agent active for campaign "${campaignName}". Monitoring Prometheus metrics, Loki log collector, and local MCP server (/mcp).`,
       structured: {
         finding: "Pipeline is healthy across planning, progressive scene generation, and video synthesis stages.",
         userImpact: "Scene 1 delivered in 1.42s; no end-user latency degradation observed.",

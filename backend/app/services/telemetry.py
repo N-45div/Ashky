@@ -140,7 +140,7 @@ log_collector = LokiLogCollector()
 
 # Initialize with realistic telemetry logs
 log_collector.record_log("INFO", "telemetry", "Ashky Prometheus & Loki telemetry engine initialized")
-log_collector.record_log("INFO", "director_agent", "Gemini 3.7 Flash Director agent registered with cinema prompt bank")
+log_collector.record_log("INFO", "director_agent", "Gemini 3.8 Flash Director agent registered with cinema prompt bank")
 log_collector.record_log("INFO", "vision_critic", "Gemini Vision 3-second hook QA critic standing by")
 log_collector.record_log("INFO", "geo_arm", "Multi-LLM Citation prober ready for ChatGPT, Gemini, Perplexity")
 log_collector.record_log("INFO", "grafana_mcp", "Grafana Model Context Protocol provider active")
@@ -156,16 +156,17 @@ def record_campaign_metrics(category: str, aspect_ratio: str, tokens: int, cost:
     _metrics_state["total_spend_usd"] = round(_metrics_state["total_spend_usd"] + cost, 4)
 
     CAMPAIGNS_TOTAL.labels(category=category, aspect_ratio=aspect_ratio).inc()
-    GEMINI_TOKENS_TOTAL.labels(agent_name="director_agent", model="gemini-3.7-flash").inc(tokens)
+    GEMINI_TOKENS_TOTAL.labels(agent_name="director_agent", model="gemini-3.8-flash").inc(tokens)
     TOKEN_COST_USD_TOTAL.labels(agent_name="director_agent").inc(cost)
 
 def record_scene_render_time(scene_number: int, duration_sec: float):
     SCENE_RENDER_DURATION.labels(scene_number=str(scene_number)).observe(duration_sec)
 
-def record_hook_critic_score(campaign_id: str, score: int):
-    _metrics_state["latest_hook_score"] = float(score)
-    HOOK_STRENGTH_HISTOGRAM.observe(score)
-    CURRENT_HOOK_SCORE.labels(campaign_id=campaign_id).set(score)
+def record_hook_critic_score(campaign_id: str, score: float):
+    clamped_score = int(max(0, min(100, round(float(score)))))
+    _metrics_state["latest_hook_score"] = float(clamped_score)
+    HOOK_STRENGTH_HISTOGRAM.observe(clamped_score)
+    CURRENT_HOOK_SCORE.labels(campaign_id=campaign_id).set(clamped_score)
 
 def get_telemetry_snapshot() -> Dict[str, Any]:
     return {
@@ -185,7 +186,7 @@ def get_telemetry_snapshot() -> Dict[str, Any]:
         ],
         "mcp_server_endpoint": settings.GRAFANA_MCP_ENDPOINT,
         "grafana_stack_url": settings.GRAFANA_STACK_URL,
-        "mcp_connection_status": "CONNECTED (Streamable HTTP / OAuth 2.1 Ready)",
+        "mcp_connection_status": "LOCAL ACTIVE (:8000/mcp) | CLOUD HOSTED (STANDBY)",
         "system_status": "OPTIMAL",
         "recent_loki_logs": log_collector.get_recent_logs(20)
     }
