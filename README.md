@@ -19,10 +19,6 @@
 > 🩺 **System Health**: [https://ashky-949122795167.us-central1.run.app/health](https://ashky-949122795167.us-central1.run.app/health)  
 > 🤖 **MCP JSON-RPC 2.0**: `https://ashky-949122795167.us-central1.run.app/mcp`
 
-<p align="center">
-  <img src="docs/assets/ashky_veo_highlight_sm.gif" alt="Ashky Studio — Autonomous Video Ad Director Walkthrough" width="280" />
-</p>
-
 ---
 
 ## 🌟 Executive Summary
