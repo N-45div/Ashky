@@ -25,9 +25,9 @@
 
 **Ashky** is an AI-native autonomous cinema studio built specifically for the **Google Agentic Cinema Blockbuster Hackathon (Grafana Labs Track)**. It solves the two most crippling distribution bottlenecks for solo founders, indie hackers, and technical creators:
 
-1. **Autonomous Video Production**: Translating technical pitches into viral, hook-driven video scripts, scene-by-scene cinematography blueprints, and voiceovers with **FirstFrame UX** (Scene 1 rendered in **< 1.5s**).
-2. **Gemini 3.8 Flash Multimodal Agentic Video Understanding**: Dynamically executing an agentic *Think → Act → Observe* loop that extracts real visual keyframes (0.8s, 2.2s, 8.5s, 24.0s) directly from video pixels via FFmpeg, evaluating visual contrast, border text clipping, and 3-second hook drop-off—slashing token consumption by **90%** (~4,190-5,171 tokens vs. 20,400 baseline) and inference costs by **68.4%**.
-3. **Google Veo 3.1 AI Generation Engine**: Deep integration with Google DeepMind's `veo-3.1-fast-generate-preview` and `veo-3.1-generate-preview` for cinematic photorealistic b-roll generation.
+1. **Autonomous Video Production**: Translating technical pitches into viral, hook-driven video scripts, scene-by-scene cinematography blueprints, and voiceovers with **FirstFrame UX** (Scene 1 rendered in **~1.8s idle**).
+2. **Gemini 3.8 Flash Multimodal Agentic Video Understanding**: Dynamically executing an agentic *Think → Act → Observe* loop that extracts real visual keyframes (0.8s, 2.2s, 8.5s, 24.0s) directly from video pixels via FFmpeg, evaluating visual contrast, border text clipping, and 3-second hook drop-off—slashing token consumption by **~87–90%** (~4,200-5,900 tokens vs. 20,400 baseline) and inference costs by **68.4%**.
+3. **Google Veo 3.1 AI Generation Engine**: Deep integration with Google DeepMind's `veo-3.1-generate-preview` (with automated multi-tier fallback to `veo-3.1-lite-generate-preview`) for cinematic photorealistic b-roll generation.
 4. **Generative Engine Optimization (GEO)**: Measuring and maximizing brand citation authority across AI answer engines (**Google Gemini**, **Perplexity AI**, **ChatGPT Search**) and generating 1-click **Schema.org VideoObject JSON-LD** to ground AI search citations.
 5. **Grafana Cloud Observability & Official Hosted MCP Server**: Built-in Prometheus telemetry (`/metrics`), Loki error traces, and full **Model Context Protocol (MCP)** JSON-RPC 2.0 dispatch (`https://mcp.grafana.com/mcp`) for autonomous SRE self-healing and closed-loop retention re-writing.
 6. **Agentic Self-Improving Video Harness**: Closed-loop reinforcement from visual AI feedback (Reflexion loop). Multimodal keyframe defects (safe margin clipping, pacing stalls, contrast flaws) feed directly into Gemini 3.8 Flash to iteratively mutate Veo 3.1 prompts, camera kinetic cues, and safe-zone typography across versioned lineages (v1 ➔ v2 ➔ v3).
@@ -64,7 +64,7 @@ graph TD
 
     subgraph GenerationEngines["🎞️ Dual Video Generation Engines"]
         Turbo["Turbo Engine (Deterministic PIL + FFmpeg)"]
-        Veo["Google Veo 3.1 Engine (veo-3.1-fast-generate-preview)"]
+        Veo["Google Veo 3.1 Engine (veo-3.1-generate-preview)"]
         TTS["Edge & Web Audio TTS Synthesizer"]
     end
 
@@ -77,11 +77,11 @@ graph TD
 
     UI -->|Create Campaign| Router
     Router -->|Progressive Dispatch| SSEHub
-    SSEHub -->|Scene 1 in 1.4s| Phone
+    SSEHub -->|Scene 1 in ~1.8s (idle)| Phone
     Router --> Director
     Director --> GenerationEngines
     GenerationEngines --> Critic
-    Critic -->|90% Token Reduction| ObservabilityHUD
+    Critic -->|~87–90% Token Reduction| ObservabilityHUD
     Router --> GEOScout
     MCPDispatcher <--> MCPHosted
     Router --> Prom
@@ -112,7 +112,7 @@ sequenceDiagram
     
     par Progressive Scene 1 Stream (Sub-2s FirstFrame UX)
         Gateway->>Engine: Render Scene 1 (0-3s Hook Interrupt)
-        Engine-->>Studio: SSE event: scene_ready (1.42s latency)
+        Engine-->>Studio: SSE event: scene_ready (~1.8s idle latency)
         Studio-->>Founder: Real-time visual playback in mobile canvas
     and Background Scene 2 & 3
         Gateway->>Engine: Render Scene 2 (Mechanism) & Scene 3 (CTA)
@@ -121,7 +121,7 @@ sequenceDiagram
 
     Gateway->>Critic: POST /api/campaigns/{id}/agentic-inspect
     Critic->>Critic: Think → Act (Jump to 0.8s, 2.2s, 8.5s) → Observe
-    Critic-->>Gateway: Scorecard: Hook 60–62, Dropoff 42–46%, 90% Token Savings
+    Critic-->>Gateway: Scorecard: Hook 60–62, Dropoff 42–46%, ~87–90% Token Savings
     Gateway->>Grafana: Ingest Prometheus metrics (/metrics) & Loki logs
     
     opt Retention Drop Detected (<90)
@@ -138,7 +138,7 @@ sequenceDiagram
 ### 1. Progressive Video Engine (Sub-2s FirstFrame UX)
 - **The Problem**: Traditional video generation requires 45–120 seconds of blank-screen waiting, leading to 80% user drop-off.
 - **The Solution**: Ashky decouples the video timeline into 3 discrete narrative arcs:
-  - **Scene 1 (0–3s)**: Pattern interrupt hook. Generated and streamed via SSE in **1.42 seconds**.
+  - **Scene 1 (0–3s)**: Pattern interrupt hook. Generated and streamed via SSE in **~1.8s (idle)**.
   - **Scene 2 (3–15s)**: Core product mechanism & problem-solving walkthrough.
   - **Scene 3 (15–30s)**: Value-anchored call to action & founder proof.
 - Founders evaluate visual pacing, typography, and audio immediately while subsequent scenes render in the background.
@@ -147,7 +147,7 @@ sequenceDiagram
 stateDiagram-v2
     [*] --> Idle: Pitch Entered
     Idle --> GeneratingScene1: SSE Connection Opened
-    GeneratingScene1 --> Scene1Ready: FirstFrame Arrives (1.42s)
+    GeneratingScene1 --> Scene1Ready: FirstFrame Arrives (~1.8s idle)
     Scene1Ready --> GeneratingScene2: Streaming Scene 2
     GeneratingScene2 --> Scene2Ready: Scene 2 Rendered (4.1s)
     Scene2Ready --> GeneratingScene3: Streaming Scene 3
@@ -162,14 +162,15 @@ stateDiagram-v2
   - `2.2s`: Visual pacing change and value proposition typography verification
   - `8.5s`: Product mechanism demonstration and UI legibility inspection
   - `24.0s`: Conversion CTA anchor clarity and tap directive visibility
-- **90% Token Reduction**: Reduces inference cost from ~20,400 tokens to **~4,190 - 5,171 tokens** per video analysis.
+- **~87–90% Token Reduction**: Reduces inference cost from ~20,400 tokens (1-FPS static video ingestion baseline) to **~4,200 - 5,900 tokens** per video analysis.
 - **68% Cost Reduction**: Slashes Gemini API expenditure from $0.052 to **$0.016** (68.4% reduction) per evaluation.
 - **Predictive Drop-off Analytics**: Calculates predicted 3-second viewer drop-off percentage and returns concrete, actionable director recommendations.
 
 ### 3. Google DeepMind Veo 3.1 Generation Engine
-- **Dual-Mode Rendering**:
-  - `veo-3.1-fast-generate-preview`: Rapid photorealistic cinematic B-roll generation in 9:16 vertical orientation.
-  - `veo-3.1-generate-preview`: Ultra-high definition full cinematic rendering.
+- **Dual-Tier Cinematic Generation**:
+  - `veo-3.1-generate-preview`: Full photorealistic cinematic rendering in 9:16 vertical orientation (primary active model tier).
+  - `veo-3.1-lite-generate-preview`: High-efficiency low-latency cinematic fallback.
+  - *Operational Note*: Veo quotas are enforced per-model by Google AI Studio; because the preview fast variant (`veo-3.1-fast-generate-preview`) is quota-limited in developer preview, Ashky defaults `VEO_FAST_MODEL` to `veo-3.1-generate-preview` with automatic multi-tier fallback to `veo-3.1-lite-generate-preview`.
 - **Turbo Compositor Fallback**: Sub-2s procedural canvas generation with burned-in kinetic subtitles and dynamic audio synchronization.
 
 ### 3. Generative Engine Optimization (GEO)
@@ -244,7 +245,7 @@ Ashky/
 │           ├── Observability.jsx    # Real-time particle DAGs & PromQL telemetry charts
 │           └── GeoOptimizer.jsx     # Share of Voice benchmark & Schema.org exporter
 └── grafana/
-    └── ashky-production-dashboard.json # Grafana Cloud dashboard definition
+    └── ashky_dashboard.json            # Grafana Cloud dashboard definition
 ```
 
 ---
@@ -405,15 +406,15 @@ Ashky implements the **Model Context Protocol (MCP)** specification (`2024-11-05
 | `GEMINI_MODEL` | Optional | `gemini-3.8-flash` | Gemini model for director blueprint synthesis & reasoning |
 | `GEMINI_VISION_MODEL` | Optional | `gemini-3.8-flash` | Gemini model for multimodal agentic video understanding |
 | `VEO_MODEL` | Optional | `veo-3.1-generate-preview` | Google Veo 3.1 standard generation model |
-| `VEO_FAST_MODEL` | Optional | `veo-3.1-fast-generate-preview` | Google Veo 3.1 fast preview generation model |
+| `VEO_FAST_MODEL` | Optional | `veo-3.1-generate-preview` | Google Veo 3.1 fast preview generation model (defaults to `veo-3.1-generate-preview` to avoid preview 429 quota exhaustion) |
 | `GRAFANA_STACK_URL` | Optional | `""` | Base URL of Grafana Cloud stack (e.g. `https://my-stack.grafana.net`) |
 | `GRAFANA_API_KEY` | Optional | `""` | Grafana Cloud Service Account token (`glc_...`) |
 | `GRAFANA_CLOUD_USER` | Optional | `""` | Prometheus remote-write instance user ID |
 | `GRAFANA_LOKI_URL` | Optional | `""` | Loki remote-write instance URL |
 | `HOST` | Optional | `0.0.0.0` | Backend bind host address |
-| `PORT` | Optional | `8000` | Backend bind HTTP port |
+| `PORT` | Optional | `8000` | Backend HTTP bind port (Note: Container entrypoint in Dockerfile / Cloud Run handles `${PORT:-8080}` separately for dynamic port assignment) |
 | `ENVIRONMENT` | Optional | `development` | Deployment environment (`development` / `production`) |
-| `DEBUG` | Optional | `True` | Fast reloading and verbose tracebacks |
+| `DEBUG` | Optional | `True` | Fast reloading and verbose tracebacks (`True` / `False`) |
 
 ---
 

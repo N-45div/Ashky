@@ -9,11 +9,12 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="allow")
 
 
-    APP_NAME: str = "Ashky"
-    APP_VERSION: str = "1.0.0"
-    DEBUG: bool = True
-    PORT: int = 8000
-    HOST: str = "0.0.0.0"
+    APP_NAME: str = os.getenv("APP_NAME", "Ashky")
+    APP_VERSION: str = os.getenv("APP_VERSION", "1.0.0")
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+    DEBUG: bool = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
+    PORT: int = int(os.getenv("PORT", "8000"))
+    HOST: str = os.getenv("HOST", "0.0.0.0")
 
     # Google Gemini API (Agentic Video Understanding)
     GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY", "")
