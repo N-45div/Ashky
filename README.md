@@ -19,6 +19,10 @@
 > 🩺 **System Health**: [https://ashky-949122795167.us-central1.run.app/health](https://ashky-949122795167.us-central1.run.app/health)  
 > 🤖 **MCP JSON-RPC 2.0**: `https://ashky-949122795167.us-central1.run.app/mcp`
 
+<p align="center">
+  <img src="docs/assets/ashky_veo_highlight_sm.gif" alt="Ashky Studio — Autonomous Video Ad Director Walkthrough" width="100%" />
+</p>
+
 ---
 
 ## 🌟 Executive Summary
@@ -200,6 +204,7 @@ stateDiagram-v2
 
 ```
 Ashky/
+├── DEVPOST.md                       # Complete Devpost hackathon submission package, story, & demo script
 ├── ARCHITECTURE.md                  # Comprehensive 9-part system specification & 8 Mermaid diagrams
 ├── TESTING.md                       # Full 23-test verification matrix, curl recipes, QA guide
 ├── README.md                        # Master project documentation
