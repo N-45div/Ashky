@@ -223,7 +223,7 @@ class GeminiAgenticVideoEngine:
     - True multimodal vision inspection: extracts real salient video frames (0.8s, 2.2s, 8.5s, 24.0s)
     - Think -> Act -> Observe agentic loop for retention bottleneck detection
     - Dynamic 3-scene blueprint synthesis with customized hooks, kinetic typography, and visual prompts
-    - Achieves up to 88% token reduction vs static 1-FPS frame dumping by inspecting selective glances
+    - Achieves up to 90% token reduction vs static 1-FPS frame dumping by inspecting selective glances
     - Provides real-time Vision Critic retention scoring & 3s drop-off prediction
     - Fallback to intelligent deterministic generation if Gemini API is unreachable
     """
@@ -524,7 +524,7 @@ class GeminiAgenticVideoEngine:
         
         Extracts salient keyframe glances across the timeline (0.8s, 2.2s, 8.5s, 24.0s)
         and passes the actual image frames to Gemini's computer vision engine.
-        Achieves up to 88% token reduction vs static 1-FPS raw frame dumping.
+        Achieves up to 90% token reduction vs static 1-FPS raw frame dumping.
         """
         log_collector.record_log(
             "INFO",

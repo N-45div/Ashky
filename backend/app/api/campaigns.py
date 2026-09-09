@@ -362,7 +362,7 @@ async def agentic_inspect_campaign(campaign_id: str, focus_area: str = "all"):
     """
     Gemini Agentic Video Understanding Endpoint:
     Dynamically searches keyframes (0-3s pattern interrupt, UI mechanism, CTA anchor)
-    to evaluate retention drop-off while slashing token consumption by up to 88%.
+    to evaluate retention drop-off while slashing token consumption by up to 90%.
     """
     if campaign_id not in CAMPAIGN_STORE:
         raise HTTPException(status_code=404, detail="Campaign not found")

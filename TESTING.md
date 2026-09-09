@@ -191,7 +191,7 @@ curl -N -X GET http://localhost:8000/api/campaigns/stream/{campaign_id}
 curl -X POST http://localhost:8000/api/campaigns/{campaign_id}/agentic-inspect \
   -H "Content-Type: application/json"
 ```
-**Expected Response (`200 OK`)**: Contains `think_act_observe_loop`, `salient_timeline_events`, `token_efficiency` (88% savings), and `critic_scorecard`.
+**Expected Response (`200 OK`)**: Contains `think_act_observe_loop`, `salient_timeline_events`, `token_efficiency` (90% savings), and `critic_scorecard`.
 
 ### 7. Generative Engine Optimization (GEO) Prober
 
@@ -311,7 +311,7 @@ npm run build
 | **Full Box Expanded View** | Click the *"Full Box"* toggle icon in the preview header. | Smoothly expands video frame into wide studio container mode with real-time scene director annotations on the right side. |
 | **Video Runner Bar** | Click Play or drag the bottom scrub bar. | Amber/crimson playhead glides across 0s–30s timeline with active Scene indicator (Scene 1, 2, or 3) updating dynamically. |
 | **FirstFrame Generation** | Input pitch and click *"Generate Progressive Video"*. | Scene 1 canvas appears in `<2s` with animated headline pop-in and voiceover synthesis. |
-| **Agentic Timeline Inspector** | Open Agentic Inspector panel. | Displays salient keyframe milestones (0.8s, 2.2s, 8.5s, 24.0s) with 88% token reduction badge. |
+| **Agentic Timeline Inspector** | Open Agentic Inspector panel. | Displays salient keyframe milestones (0.8s, 2.2s, 8.5s, 24.0s) with 90% token reduction badge. |
 | **Live Observability DAGs** | Navigate to `/observability`. | Interactive animated node graphs with real-time moving particles, clickable nodes, and live PromQL telemetry. |
 | **Grafana MCP Copilot** | Send query: *"Diagnose hook drop-off in last campaign"*. | AI responds with synthesis from `grafana_diagnose_pipeline` tool call and actionable optimization suggestions. |
 

@@ -81,7 +81,7 @@ graph TD
     Router --> Director
     Director --> GenerationEngines
     GenerationEngines --> Critic
-    Critic -->|88% Token Reduction| ObservabilityHUD
+    Critic -->|90% Token Reduction| ObservabilityHUD
     Router --> GEOScout
     MCPDispatcher <--> MCPHosted
     Router --> Prom
@@ -121,7 +121,7 @@ sequenceDiagram
 
     Gateway->>Critic: POST /api/campaigns/{id}/agentic-inspect
     Critic->>Critic: Think → Act (Jump to 0.8s, 2.2s, 8.5s) → Observe
-    Critic-->>Gateway: Scorecard: Hook 94, Dropoff 14.2%, 88% Token Savings
+    Critic-->>Gateway: Scorecard: Hook 60–62, Dropoff 42–46%, 90% Token Savings
     Gateway->>Grafana: Ingest Prometheus metrics (/metrics) & Loki logs
     
     opt Retention Drop Detected (<90)

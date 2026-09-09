@@ -343,7 +343,7 @@ async def handle_mcp_tool_call(tool_name: str, arguments: Dict[str, Any]) -> Dic
                 f"Scene 1 Progressive Stream: Latency is {snapshot.get('avg_scene1_render_latency_ms', 1420.0)}ms (<2s FirstFrame UX benchmark met).",
                 f"Hook Retention Quality: Current hook score is {current_hook}/100; predicted 3-second drop-off is under 18%.",
                 "GEO Share of Voice: Perplexity AI cites product in 48% of queries; SearchGPT gap detected in comparison queries.",
-                f"Token Efficiency: Average campaign blueprint consumed {snapshot.get('total_gemini_tokens_consumed', 8420)} tokens ($0.038), running 88% cheaper than 1-FPS static video ingestion."
+                f"Token Efficiency: Average campaign blueprint consumed {snapshot.get('total_gemini_tokens_consumed', 8420)} tokens ($0.038), running 90% cheaper than 1-FPS static video ingestion."
             ],
             "recommendations": [
                 "Deploy the generated JSON-LD VideoObject schema to your landing page to boost Google Gemini grounding citations by an estimated +14%.",
@@ -606,7 +606,7 @@ async def process_agent_inquiry(user_query: str) -> Dict[str, Any]:
     elif any(k in query_lower for k in ["cost", "expensive", "token", "spend", "budget"]):
         answer = (
             f"Total Gemini token spend across all campaigns is **${token_spend}** ({snapshot.get('total_gemini_tokens_consumed', 8420)} tokens). "
-            f"Average cost per 3-scene blueprint is **$0.012**, running 88% cheaper than brute-force 1-FPS frame sampling."
+            f"Average cost per 3-scene blueprint is **$0.012**, running 90% cheaper than brute-force 1-FPS frame sampling."
         )
         structured = {
             "finding": f"Total Gemini pipeline token consumption is {snapshot.get('total_gemini_tokens_consumed', 8420)} tokens (${token_spend}).",

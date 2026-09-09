@@ -26,7 +26,7 @@
 Ashky solves this through five interconnected subsystems:
 1. **FirstFrame Progressive Streaming**: Sub-2s preview delivery of Scene 1 (Pattern Interrupt) via Server-Sent Events (SSE) while background workers render Scenes 2 and 3.
 2. **Dual-Engine Cinema Compositing**: High-fidelity video generation via **Google Veo 3.1 Cinema** and real-time kinetic assembly via **Turbo Compositor (FFmpeg + Edge TTS)**.
-3. **Gemini Agentic Video Understanding**: A *Think → Act → Observe* keyframe inspection agent that selectively targets salient temporal milestones (0.8s crash-zoom, 2.2s text pop-in, 8.5s UI reveal, 24.0s CTA anchor) rather than uniform 1-FPS frame dumping—reducing token consumption by **88%** and costs by **66%**.
+3. **Gemini Agentic Video Understanding**: A *Think → Act → Observe* keyframe inspection agent that selectively targets salient temporal milestones (0.8s crash-zoom, 2.2s text pop-in, 8.5s UI reveal, 24.0s CTA anchor) rather than uniform 1-FPS frame dumping—reducing token consumption by **90%** and costs by **68.4%**.
 4. **Generative Engine Optimization (GEO)**: Systematic probing of AI answer engines (Google Gemini, Perplexity, SearchGPT) to quantify Share of Voice (SOV) and emit 1-click **Schema.org `VideoObject`** JSON-LD to anchor organic machine citations.
 5. **Grafana Cloud Hosted MCP SRE Agent**: Native integration with the official **Grafana Cloud Model Context Protocol (`mcp.grafana.com/mcp`)**, exposing Prometheus metrics (`/metrics`), Loki log streams, and an autonomous SRE agent capable of PromQL diagnostics and closed-loop script optimization.
 
@@ -121,7 +121,7 @@ sequenceDiagram
 
     Orchestrator->>CriticAgent: Run Agentic Video Inspection (0-3s Hook)
     Note over CriticAgent: Think-Act-Observe Keyframe Extraction
-    CriticAgent-->>Orchestrator: Scorecard: Hook 94%, Brand 95%, 3s Drop-off 13.8%
+    CriticAgent-->>Orchestrator: Scorecard: Hook 60–62%, Brand 65–70%, 3s Drop-off 42–46%
 
     alt Hook Retention < 90%
         Orchestrator->>MCPAgent: Trigger Autonomous Closed-Loop Retention Loop
