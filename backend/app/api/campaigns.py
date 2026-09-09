@@ -30,19 +30,81 @@ from app.services.telemetry import (
 )
 from app.services.gemini_agent import gemini_agentic_engine
 from app.services.feedback_harness import feedback_harness
-from app.services.tts_engine import tts_engine, VIDEO_DIR
+from app.services.tts_engine import tts_engine, VIDEO_DIR, MEDIA_ROOT
 from app.services.video_compositor import video_compositor, get_audio_duration
 from app.services.image_generator import image_generator
 from app.services.veo_engine import veo_engine
 from app.config import settings
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/campaigns", tags=["campaigns"])
 
-# In-memory storage for active campaigns and rendering tasks
-CAMPAIGN_STORE: dict[str, CampaignBlueprint] = {}
-RENDER_STATUS_STORE: dict[str, RenderStatus] = {}
+CAMPAIGNS_DB_FILE = MEDIA_ROOT / "campaigns_db.json"
+RENDER_STATUS_DB_FILE = MEDIA_ROOT / "render_status_db.json"
+
+
+class PersistentStore(dict):
+    """
+    In-memory dictionary backed by disk JSON synchronization.
+    Guarantees campaign blueprints and render statuses survive container recycles.
+    """
+    def __init__(self, filepath: Path, model_cls):
+        super().__init__()
+        self.filepath = filepath
+        self.model_cls = model_cls
+        self._load()
+
+    def _persist(self):
+        try:
+            self.filepath.parent.mkdir(parents=True, exist_ok=True)
+            serialized = {}
+            for k, v in self.items():
+                if hasattr(v, "model_dump"):
+                    serialized[k] = v.model_dump()
+                elif isinstance(v, dict):
+                    serialized[k] = v
+            self.filepath.write_text(json.dumps(serialized, indent=2, default=str), encoding="utf-8")
+        except Exception as e:
+            logger.warning(f"Error persisting store to {self.filepath}: {e}")
+
+    def _load(self):
+        try:
+            if self.filepath.exists():
+                data = json.loads(self.filepath.read_text(encoding="utf-8"))
+                for k, v in data.items():
+                    if k not in self:
+                        if isinstance(v, dict):
+                            super().__setitem__(k, self.model_cls(**v))
+                        else:
+                            super().__setitem__(k, v)
+        except Exception as e:
+            logger.warning(f"Error loading store from {self.filepath}: {e}")
+
+    def __getitem__(self, key):
+        if not super().__contains__(key):
+            self._load()
+        return super().__getitem__(key)
+
+    def __contains__(self, key):
+        if not super().__contains__(key):
+            self._load()
+        return super().__contains__(key)
+
+    def get(self, key, default=None):
+        if not super().__contains__(key):
+            self._load()
+        return super().get(key, default)
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        self._persist()
+
+
+# Disk-persisted storage for active campaigns and rendering tasks
+CAMPAIGN_STORE: dict[str, CampaignBlueprint] = PersistentStore(CAMPAIGNS_DB_FILE, CampaignBlueprint)
+RENDER_STATUS_STORE: dict[str, RenderStatus] = PersistentStore(RENDER_STATUS_DB_FILE, RenderStatus)
 
 def _seed_neon_campaign(force: bool = False):
     """Pre-seed default campaign so real TTS & video rendering works out-of-the-box."""

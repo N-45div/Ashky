@@ -27,6 +27,12 @@ steps:
       - '2Gi'
       - '--cpu'
       - '2'
+      - '--no-cpu-throttling'
+      - '--cpu-boost'
+      - '--min-instances'
+      - '1'
+      - '--max-instances'
+      - '1'
 
 images:
   - 'gcr.io/$PROJECT_ID/ashky:latest'

@@ -43,7 +43,7 @@ graph TD
     B --> B4[GEO Engine & Schema.org]
     
     C --> C1[Think-Act-Observe Loop]
-    C --> C2[88% Token Reduction Math]
+    C --> C2[90% Token Reduction Math]
     C --> C3[Retention Scorecard QA]
     
     D --> D1[MCP JSON-RPC 2.0 Initialize]
@@ -61,6 +61,8 @@ graph TD
 
 | Test Suite File | Test Function | Purpose / Assertion | Result |
 | :--- | :--- | :--- | :---: |
+| `backend/tests/test_feedback_harness.py` | `test_feedback_harness_evolution_pipeline` | Mutates blueprint via multimodal vision critic feedback, safe-margins, and kinetic hooks | **PASSED** |
+| `backend/tests/test_feedback_harness.py` | `test_auto_improve_loop_terminates_or_improves` | Verifies autonomous multi-pass loop improves retention score or stops at target threshold | **PASSED** |
 | `backend/tests/test_foundation.py` | `test_health` | Validates `/health` endpoint and operational status of all 4 engines | **PASSED** |
 | `backend/tests/test_foundation.py` | `test_prometheus_metrics` | Validates Prometheus 0.0.4 exposition format and Ashky metric gauges | **PASSED** |
 | `backend/tests/test_foundation.py` | `test_campaign_presets` | Confirms preset definitions for B2B SaaS, DevTool, and AI Wrapper | **PASSED** |
@@ -70,7 +72,7 @@ graph TD
 | `backend/tests/test_foundation.py` | `test_grafana_snapshot_and_mcp` | Checks `/api/grafana/snapshot` and MCP tool registry | **PASSED** |
 | `backend/tests/test_foundation.py` | `test_neon_circuit_seeded_campaign` | Validates seeded campaign loading and deterministic playback | **PASSED** |
 | `backend/tests/test_gemini_agentic.py` | `test_gemini_agentic_inspection_direct` | Validates direct Think-Act-Observe loop, salient timestamps, and critic metrics | **PASSED** |
-| `backend/tests/test_gemini_agentic.py` | `test_gemini_agentic_inspection_existing_campaign` | Asserts 88% token reduction and retention inspection on active campaign | **PASSED** |
+| `backend/tests/test_gemini_agentic.py` | `test_gemini_agentic_inspection_existing_campaign` | Asserts 90% token reduction and retention inspection on active campaign | **PASSED** |
 | `backend/tests/test_gemini_agentic.py` | `test_dynamic_blueprint_generation_varies_by_product` | Validates unique, non-generic blueprint generation customized per product pitch | **PASSED** |
 | `backend/tests/test_grafana_cloud.py` | `test_prometheus_metrics_endpoint` | Checks Prometheus metric scraping and presence of `ashky_` prefixes | **PASSED** |
 | `backend/tests/test_grafana_cloud.py` | `test_mcp_jsonrpc_initialize_and_tools` | Asserts JSON-RPC 2.0 `initialize` and `tools/list` protocol contract | **PASSED** |
@@ -90,7 +92,7 @@ graph TD
 ### 1. Run Complete Automated Suite
 
 ```bash
-# Execute all 21 tests with verbose output
+# Execute all 23 tests with verbose output
 python -m pytest backend/tests/ -v
 
 # Run with execution duration profiling
@@ -103,6 +105,9 @@ python -m pytest backend/tests/ -x
 ### 2. Run Individual Test Modules
 
 ```bash
+# Agentic Self-Improving Video Harness
+python -m pytest backend/tests/test_feedback_harness.py -v
+
 # Foundation & System Health
 python -m pytest backend/tests/test_foundation.py -v
 

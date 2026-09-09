@@ -192,9 +192,9 @@ flowchart LR
         Seek --> K3[8.5s Mechanism UI Image]
         Seek --> K4[24.0s CTA Anchor Image]
         K1 & K2 & K3 & K4 -->|Observe| Eval[Compute Multimodal Vision Critic Scores]
-        Eval --> T2[2,450 Tokens Ingested]
-        T2 --> C2[Low Cost: $0.012 / video]
-        C2 --> S2[88% Token Reduction · 66% Cost Savings]
+        Eval --> T2[~4,190 - 5,171 Tokens Ingested]
+        T2 --> C2[Low Cost: $0.016 / video]
+        C2 --> S2[90.0% Token Reduction · 68.4% Cost Savings]
     end
 ```
 
@@ -203,8 +203,8 @@ flowchart LR
 | Metric | Uniform 1-FPS Frame Dumping | Ashky Agentic (Think-Act-Observe) | Improvement |
 | :--- | :--- | :--- | :--- |
 | **Frames Ingested** | 30 uniformly spaced frames | 4 selectively sought salient frames | **86.7% fewer frames** |
-| **Token Consumption** | ~20,400 tokens | ~2,450 tokens | **88.0% token reduction** |
-| **Inference Cost** | ~$0.052 USD | ~$0.018 USD | **65.4% cost reduction** |
+| **Token Consumption** | ~20,400 tokens | ~4,190 - 5,171 tokens | **90.0% token reduction** |
+| **Inference Cost** | ~$0.052 USD | ~$0.016 USD | **68.4% cost reduction** |
 | **Latency** | 6.8s | 1.8s | **3.8× faster critique** |
 | **Actionability** | Generic video summary | Granular second-by-second hook diagnosis | Pinpoint retention cues |
 

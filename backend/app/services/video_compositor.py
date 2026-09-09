@@ -93,7 +93,7 @@ def _find_ffprobe() -> str:
     return ffprobe_path
 
 
-def _run_ffmpeg(args: List[str], description: str = "ffmpeg") -> subprocess.CompletedProcess:
+def _run_ffmpeg(args: List[str], description: str = "ffmpeg", timeout: int = 300) -> subprocess.CompletedProcess:
     """Run an ffmpeg command and handle errors."""
     ffmpeg = _find_ffmpeg()
     cmd = [ffmpeg, "-y"] + args  # -y to overwrite output without asking
@@ -103,7 +103,7 @@ def _run_ffmpeg(args: List[str], description: str = "ffmpeg") -> subprocess.Comp
         cmd,
         capture_output=True,
         text=True,
-        timeout=120,
+        timeout=timeout,
     )
 
     if result.returncode != 0:
@@ -261,7 +261,8 @@ class VideoCompositor:
             + ["-vf", video_filters]
             + [
                 "-c:v", "libx264",
-                "-preset", "fast",
+                "-preset", "veryfast",
+                "-threads", "2",
                 "-crf", "23",
                 "-c:a", "aac",
                 "-b:a", "128k",
