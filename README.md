@@ -77,11 +77,11 @@ graph TD
 
     UI -->|Create Campaign| Router
     Router -->|Progressive Dispatch| SSEHub
-    SSEHub -->|Scene 1 in ~1.8s (idle)| Phone
+    SSEHub -->|Scene 1 in ~1.8s idle| Phone
     Router --> Director
     Director --> GenerationEngines
     GenerationEngines --> Critic
-    Critic -->|~87–90% Token Reduction| ObservabilityHUD
+    Critic -->|~87-90% Token Reduction| ObservabilityHUD
     Router --> GEOScout
     MCPDispatcher <--> MCPHosted
     Router --> Prom
